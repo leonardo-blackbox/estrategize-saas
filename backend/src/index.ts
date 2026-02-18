@@ -4,6 +4,7 @@ import cors from 'cors';
 import type { ErrorRequestHandler } from "express";
 import { supabaseAdmin } from './lib/supabaseAdmin.js';
 import authRouter from './routes/auth.js';
+import consultanciesRouter from './routes/consultancies.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
 const app = express();
@@ -56,6 +57,9 @@ app.get('/health/db', async (_req, res) => {
 
 // Auth routes
 app.use('/auth', authRouter);
+
+// API routes
+app.use('/api/consultancies', consultanciesRouter);
 
 // Protected: returns authenticated user id
 app.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
