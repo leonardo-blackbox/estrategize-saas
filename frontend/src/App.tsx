@@ -1,17 +1,38 @@
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useAuthStore } from './stores/authStore.ts';
+import { ProtectedRoute } from './components/ProtectedRoute.tsx';
+import { LoginPage } from './pages/LoginPage.tsx';
+import { SignupPage } from './pages/SignupPage.tsx';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage.tsx';
+import { DashboardPage } from './pages/DashboardPage.tsx';
+
 export default function App() {
+  const initialize = useAuthStore((s) => s.initialize);
+
+  useEffect(() => {
+    const unsubscribe = initialize();
+    return unsubscribe;
+  }, [initialize]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Iris Platform
-          </h1>
-          <p className="text-xl text-slate-300">
-            Business Strategy Consulting Platform
-          </p>
-          <p className="text-slate-400 mt-4">Frontend setup complete ✓</p>
-        </div>
-      </div>
-    </div>
-  )
+    <BrowserRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+        {/* Protected routes */}
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 }
