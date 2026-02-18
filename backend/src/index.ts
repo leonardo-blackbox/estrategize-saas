@@ -4,6 +4,7 @@ import cors from 'cors';
 import type { ErrorRequestHandler } from "express";
 import { supabaseAdmin } from './lib/supabaseAdmin.js';
 import authRouter from './routes/auth.js';
+import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -55,6 +56,11 @@ app.get('/health/db', async (_req, res) => {
 
 // Auth routes
 app.use('/auth', authRouter);
+
+// Protected: returns authenticated user id
+app.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
+  res.json({ user_id: req.userId });
+});
 
 // Basic route
 app.get('/', (req, res) => {

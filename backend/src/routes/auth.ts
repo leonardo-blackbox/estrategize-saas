@@ -1,7 +1,17 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 
 const router = Router();
+
+const emailPasswordSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+const signupSchema = emailPasswordSchema.extend({
+  full_name: z.string().optional(),
+});
 
 function ensureSupabase(): boolean {
   return supabaseAdmin !== null;
@@ -14,16 +24,12 @@ router.post('/signup', async (req, res) => {
     return;
   }
 
-  const { email, password, full_name } = req.body as {
-    email?: string;
-    password?: string;
-    full_name?: string;
-  };
-
-  if (!email || !password) {
-    res.status(400).json({ error: 'email and password are required' });
+  const parsed = signupSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
     return;
   }
+  const { email, password, full_name } = parsed.data;
 
   const { data, error } = await supabaseAdmin!.auth.admin.createUser({
     email,
@@ -64,15 +70,12 @@ router.post('/login', async (req, res) => {
     return;
   }
 
-  const { email, password } = req.body as {
-    email?: string;
-    password?: string;
-  };
-
-  if (!email || !password) {
-    res.status(400).json({ error: 'email and password are required' });
+  const parsed = emailPasswordSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
     return;
   }
+  const { email, password } = parsed.data;
 
   const { data, error } = await supabaseAdmin!.auth.signInWithPassword({
     email,
