@@ -20,16 +20,15 @@ function paramId(req: AuthenticatedRequest): string {
 }
 
 const createSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255),
-  description: z.string().max(2000).optional(),
-  sector: z.string().max(100).optional(),
+  title: z.string().min(1, 'Title is required').max(255),
+  client_name: z.string().max(255).optional(),
+  status: z.enum(['active', 'archived']).optional(),
 });
 
 const updateSchema = z.object({
-  name: z.string().min(1).max(255).optional(),
-  description: z.string().max(2000).optional(),
-  sector: z.string().max(100).optional(),
-  status: z.enum(['draft', 'active', 'completed', 'archived']).optional(),
+  title: z.string().min(1).max(255).optional(),
+  client_name: z.string().max(255).optional(),
+  status: z.enum(['active', 'archived']).optional(),
 });
 
 // GET /api/consultancies
@@ -108,7 +107,7 @@ router.delete('/:id', async (req: AuthenticatedRequest, res) => {
       res.status(404).json({ error: 'Consultancy not found' });
       return;
     }
-    res.status(204).send();
+    res.json({ ok: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     res.status(500).json({ error: message });

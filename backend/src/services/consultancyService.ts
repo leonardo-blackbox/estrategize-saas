@@ -3,26 +3,24 @@ import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 export interface Consultancy {
   id: string;
   user_id: string;
-  name: string;
-  description: string | null;
-  sector: string | null;
-  status: 'draft' | 'active' | 'completed' | 'archived';
+  title: string;
+  client_name: string | null;
+  status: 'active' | 'archived';
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface CreateConsultancyInput {
-  name: string;
-  description?: string;
-  sector?: string;
+  title: string;
+  client_name?: string;
+  status?: 'active' | 'archived';
 }
 
 export interface UpdateConsultancyInput {
-  name?: string;
-  description?: string;
-  sector?: string;
-  status?: 'draft' | 'active' | 'completed' | 'archived';
+  title?: string;
+  client_name?: string;
+  status?: 'active' | 'archived';
 }
 
 function ensureAdmin() {
@@ -64,7 +62,7 @@ export async function getConsultancy(
     .single();
 
   if (error) {
-    if (error.code === 'PGRST116') return null; // Not found
+    if (error.code === 'PGRST116') return null;
     throw new Error(`Failed to get consultancy: ${error.message}`);
   }
 
@@ -81,9 +79,9 @@ export async function createConsultancy(
     .from('consultancies')
     .insert({
       user_id: userId,
-      name: input.name,
-      description: input.description ?? null,
-      sector: input.sector ?? null,
+      title: input.title,
+      client_name: input.client_name ?? null,
+      status: input.status ?? 'active',
     })
     .select('*')
     .single();
@@ -102,7 +100,6 @@ export async function updateConsultancy(
 ): Promise<Consultancy | null> {
   const db = ensureAdmin();
 
-  // Verify ownership first
   const existing = await getConsultancy(userId, consultancyId);
   if (!existing) return null;
 
@@ -128,7 +125,6 @@ export async function softDeleteConsultancy(
 ): Promise<boolean> {
   const db = ensureAdmin();
 
-  // Verify ownership first
   const existing = await getConsultancy(userId, consultancyId);
   if (!existing) return false;
 
