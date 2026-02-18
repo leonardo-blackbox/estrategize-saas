@@ -1,0 +1,30 @@
+{
+  "name": "estrategize-saas",
+  "version": "1.0.0",
+  "description": "Business strategy consulting platform with AI-powered diagnostics, credit system, and subscription management.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c auto \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "type-check": "npm --prefix backend run type-check && npm --prefix frontend run type-check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leonardo-blackbox/estrategize-saas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/leonardo-blackbox/estrategize-saas/issues"
+  },
+  "homepage": "https://github.com/leonardo-blackbox/estrategize-saas#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
