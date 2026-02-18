@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import type { ErrorRequestHandler } from "express";
 import { supabaseAdmin } from './lib/supabaseAdmin.js';
+import authRouter from './routes/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -51,6 +52,9 @@ app.get('/health/db', async (_req, res) => {
     connected: data !== null,
   });
 });
+
+// Auth routes
+app.use('/auth', authRouter);
 
 // Basic route
 app.get('/', (req, res) => {
