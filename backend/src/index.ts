@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import type { ErrorRequestHandler } from "express";
+import { supabaseAdmin } from './lib/supabaseAdmin.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -17,6 +19,39 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Database health check
+app.get('/health/db', async (_req, res) => {
+  if (!supabaseAdmin) {
+    res.status(503).json({
+      status: 'error',
+      message: 'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set',
+    });
+    return;
+  }
+
+  const expectedTables = [
+    'profiles', 'plans', 'subscriptions', 'consultancies',
+    'consultancy_diagnostics', 'credit_transactions', 'audit_log',
+  ];
+
+  const { data, error } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .limit(0);
+
+  if (error) {
+    res.status(503).json({ status: 'error', message: error.message });
+    return;
+  }
+
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    tables: expectedTables,
+    connected: data !== null,
+  });
+});
+
 // Basic route
 app.get('/', (req, res) => {
   res.json({
@@ -27,10 +62,12 @@ app.get('/', (req, res) => {
 });
 
 // Error handling
-app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Error:', err);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+  console.error("Error:", err);
+  res.status(500).json({ error: "Internal Server Error" });
+};
+
+app.use(errorHandler);
 
 // 404 handler
 app.use((req, res) => {
