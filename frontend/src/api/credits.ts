@@ -20,6 +20,10 @@ export interface CreditTransaction {
   created_at: string;
 }
 
+// ============================================================================
+// Read operations
+// ============================================================================
+
 export function fetchBalance(): Promise<{ data: CreditBalance }> {
   return apiFetch('/api/credits/balance');
 }
@@ -29,4 +33,49 @@ export function fetchTransactions(
   offset = 0,
 ): Promise<{ data: CreditTransaction[] }> {
   return apiFetch(`/api/credits/transactions?limit=${limit}&offset=${offset}`);
+}
+
+// ============================================================================
+// Write operations
+// ============================================================================
+
+export function reserveCredits(params: {
+  amount: number;
+  idempotency_key?: string;
+  reference_id?: string;
+  description?: string;
+}): Promise<{ data: { reservation_id: string } }> {
+  return apiFetch('/api/credits/reserve', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+}
+
+export function consumeCredits(
+  reservationId: string,
+): Promise<{ ok: boolean }> {
+  return apiFetch('/api/credits/consume', {
+    method: 'POST',
+    body: JSON.stringify({ reservation_id: reservationId }),
+  });
+}
+
+export function releaseCredits(
+  reservationId: string,
+): Promise<{ ok: boolean }> {
+  return apiFetch('/api/credits/release', {
+    method: 'POST',
+    body: JSON.stringify({ reservation_id: reservationId }),
+  });
+}
+
+export function grantCredits(params: {
+  amount: number;
+  type?: 'purchase' | 'monthly_grant';
+  description?: string;
+}): Promise<{ data: { transaction_id: string } }> {
+  return apiFetch('/api/credits/grant', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
 }

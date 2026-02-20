@@ -6,6 +6,7 @@ import {
   reserveCredits,
   consumeCredits,
   releaseCredits,
+  grantCredits,
   listTransactions,
 } from '../services/creditService.js';
 
@@ -31,6 +32,12 @@ const consumeSchema = z.object({
 
 const releaseSchema = z.object({
   reservation_id: z.string().uuid('Invalid reservation ID'),
+});
+
+const grantSchema = z.object({
+  amount: z.number().int().positive('Amount must be a positive integer'),
+  type: z.enum(['purchase', 'monthly_grant']).default('purchase'),
+  description: z.string().max(500).optional(),
 });
 
 // ============================================================================
@@ -131,6 +138,35 @@ router.post('/release', async (req: AuthenticatedRequest, res) => {
     } else {
       res.status(500).json({ error: message });
     }
+  }
+});
+
+// ============================================================================
+// POST /api/credits/grant
+// Add credits to user (for purchases, monthly grants, testing)
+// ============================================================================
+
+router.post('/grant', async (req: AuthenticatedRequest, res) => {
+  const parsed = grantSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
+    return;
+  }
+
+  try {
+    const transactionId = await grantCredits(
+      req.userId!,
+      parsed.data.amount,
+      parsed.data.type,
+      parsed.data.description,
+    );
+
+    res.status(201).json({
+      data: { transaction_id: transactionId },
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    res.status(500).json({ error: message });
   }
 });
 

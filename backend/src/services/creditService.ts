@@ -165,6 +165,128 @@ export async function releaseCredits(
 }
 
 // ============================================================================
+// Grant (purchase / monthly_grant)
+// ============================================================================
+
+export async function grantCredits(
+  userId: string,
+  amount: number,
+  type: 'purchase' | 'monthly_grant' = 'purchase',
+  description = 'Manual credit grant',
+): Promise<string> {
+  const db = ensureAdmin();
+
+  const { data, error } = await db.rpc('grant_credits', {
+    p_user_id: userId,
+    p_amount: amount,
+    p_type: type,
+    p_description: description,
+  });
+
+  if (error) {
+    throw new Error(`Failed to grant credits: ${error.message}`);
+  }
+
+  return data as string;
+}
+
+// ============================================================================
+// Atomic Reserve + Consume (convenience for single-step operations)
+// ============================================================================
+
+/**
+ * Performs a full credit cycle: reserve -> action -> consume/release.
+ * If the action succeeds, credits are consumed.
+ * If the action fails, credits are released back.
+ *
+ * @returns The result of the action function
+ */
+export async function withCreditCharge<T>(
+  userId: string,
+  amount: number,
+  action: (reservationId: string) => Promise<T>,
+  options?: {
+    idempotencyKey?: string;
+    referenceId?: string;
+    description?: string;
+  },
+): Promise<T> {
+  // Step 1: Reserve credits
+  const reservationId = await reserveCredits(
+    userId,
+    amount,
+    options?.idempotencyKey,
+    options?.referenceId,
+    options?.description,
+  );
+
+  try {
+    // Step 2: Execute the action
+    const result = await action(reservationId);
+
+    // Step 3: Consume credits on success
+    await consumeCredits(userId, reservationId);
+
+    return result;
+  } catch (err) {
+    // Step 3 (failure): Release credits back
+    try {
+      await releaseCredits(userId, reservationId);
+    } catch (releaseErr) {
+      console.error(
+        `CRITICAL: Failed to release reservation ${reservationId} after action failure:`,
+        releaseErr,
+      );
+    }
+    throw err;
+  }
+}
+
+// ============================================================================
+// Expire stale reservations
+// ============================================================================
+
+/**
+ * Release all pending reservations older than the given minutes.
+ * Intended to be called by a cron/scheduled task.
+ */
+export async function expireStaleReservations(
+  olderThanMinutes = 30,
+): Promise<number> {
+  const db = ensureAdmin();
+
+  const cutoff = new Date(Date.now() - olderThanMinutes * 60 * 1000).toISOString();
+
+  // Find stale pending reservations
+  const { data: stale, error: fetchError } = await db
+    .from('credit_transactions')
+    .select('id, user_id')
+    .eq('type', 'reserve')
+    .eq('status', 'pending')
+    .lt('created_at', cutoff);
+
+  if (fetchError) {
+    throw new Error(`Failed to fetch stale reservations: ${fetchError.message}`);
+  }
+
+  if (!stale || stale.length === 0) {
+    return 0;
+  }
+
+  let released = 0;
+  for (const row of stale) {
+    try {
+      await releaseCredits(row.user_id, row.id);
+      released++;
+    } catch {
+      console.error(`Failed to expire reservation ${row.id}`);
+    }
+  }
+
+  return released;
+}
+
+// ============================================================================
 // Transaction History
 // ============================================================================
 

@@ -98,7 +98,9 @@ export function TransactionHistory() {
                     </span>
                   </td>
                   <td className="px-5 py-3 text-white font-mono">
-                    {tx.type === 'consume' ? `-${tx.amount}` : `+${tx.amount}`}
+                    {tx.type === 'consume' || tx.type === 'reserve'
+                      ? `-${tx.amount}`
+                      : `+${tx.amount}`}
                   </td>
                   <td className="px-5 py-3">
                     <span

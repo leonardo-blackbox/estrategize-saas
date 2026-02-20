@@ -14,6 +14,7 @@ import {
   updateDiagnosis,
   getDiagnosisHistory,
 } from '../services/diagnosisService.js';
+import { withCreditCharge } from '../services/creditService.js';
 
 const router = Router();
 
@@ -136,8 +137,11 @@ router.delete('/:id', async (req: AuthenticatedRequest, res) => {
 // DIAGNOSIS ENDPOINTS (Story 1.8)
 // ============================================================================
 
+// Cost in credits for generating a diagnosis
+const DIAGNOSIS_CREDIT_COST = 1;
+
 // POST /api/consultancies/:id/diagnose
-// Generate a new diagnosis for a consultancy
+// Generate a new diagnosis for a consultancy (costs credits)
 router.post('/:id/diagnose', async (req: AuthenticatedRequest, res) => {
   try {
     const userId = req.userId!;
@@ -159,19 +163,37 @@ router.post('/:id/diagnose', async (req: AuthenticatedRequest, res) => {
       return;
     }
 
-    // Generate diagnosis
-    const diagnosis = await createDiagnosis(
+    // Reserve credits -> generate diagnosis -> consume (or release on failure)
+    const diagnosis = await withCreditCharge(
       userId,
-      consultancyId,
-      consultancy.title,
-      consultancy.client_name,
+      DIAGNOSIS_CREDIT_COST,
+      async () => {
+        return createDiagnosis(
+          userId,
+          consultancyId,
+          consultancy.title,
+          consultancy.client_name,
+        );
+      },
+      {
+        idempotencyKey: `diagnosis:${consultancyId}:v1`,
+        referenceId: consultancyId,
+        description: `AI diagnosis for consultancy "${consultancy.title}"`,
+      },
     );
 
     res.status(201).json({ data: diagnosis });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
+    const error = err as Error & { statusCode?: number };
+    const message = error.message ?? 'Unknown error';
     console.error('Diagnosis generation error:', err);
-    res.status(500).json({ error: message });
+
+    // 402 = insufficient credits
+    if (error.statusCode === 402 || message.includes('Insufficient credits')) {
+      res.status(402).json({ error: 'Insufficient credits to generate diagnosis' });
+    } else {
+      res.status(500).json({ error: message });
+    }
   }
 });
 
