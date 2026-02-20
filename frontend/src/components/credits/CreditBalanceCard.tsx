@@ -29,16 +29,16 @@ export function CreditBalanceCard() {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-700 bg-slate-800 p-5">
-        <p className="text-sm text-slate-400">Loading credits...</p>
+      <div className="rounded-[var(--radius-card)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-6 shadow-[var(--shadow-soft)]">
+        <p className="text-[15px] text-[var(--text-secondary)] animate-pulse">Loading credits...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-5">
-        <p className="text-sm text-red-400">{error}</p>
+      <div className="rounded-[var(--radius-card)] border border-[var(--color-error)]/20 bg-[var(--color-error)]/5 p-6">
+        <p className="text-[15px] text-[var(--color-error)]">{error}</p>
       </div>
     );
   }
@@ -46,28 +46,28 @@ export function CreditBalanceCard() {
   if (!balance) return null;
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-800 p-5">
-      <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wider">
+    <div className="rounded-[var(--radius-card)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-6 shadow-[var(--shadow-soft)] transition-colors hover:bg-[var(--bg-hover)]">
+      <h3 className="text-[13px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">
         Credit Balance
       </h3>
 
-      <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-3xl font-bold text-white">{balance.available}</span>
-        <span className="text-sm text-slate-400">available</span>
+      <div className="mt-4 flex items-baseline gap-2">
+        <span className="text-[40px] font-bold tracking-tight text-[var(--text-primary)]">{balance.available}</span>
+        <span className="text-[15px] font-medium text-[var(--text-secondary)]">available</span>
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-3">
+      <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4 border-t border-[var(--border-hairline)] pt-5">
         <div>
-          <p className="text-xs text-slate-500">Reserved</p>
-          <p className="text-sm font-medium text-amber-400">{balance.reserved}</p>
+          <p className="text-[12px] font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Reserved</p>
+          <p className="mt-1 text-[17px] font-semibold text-[var(--color-warning)]">{balance.reserved}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-500">Used (month)</p>
-          <p className="text-sm font-medium text-slate-300">{balance.consumed_this_month}</p>
+          <p className="text-[12px] font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Used (month)</p>
+          <p className="mt-1 text-[17px] font-semibold text-[var(--text-primary)]">{balance.consumed_this_month}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-500">Total Used</p>
-          <p className="text-sm font-medium text-slate-300">{balance.total_consumed}</p>
+          <p className="text-[12px] font-medium text-[var(--text-tertiary)] uppercase tracking-wider">Total Used</p>
+          <p className="mt-1 text-[17px] font-semibold text-[var(--text-primary)]">{balance.total_consumed}</p>
         </div>
       </div>
     </div>

@@ -18,6 +18,7 @@ import { ConsultancyCard } from '../components/consultancies/ConsultancyCard.tsx
 import { ConsultancyForm } from '../components/consultancies/ConsultancyForm.tsx';
 import { DeleteConfirmDialog } from '../components/consultancies/DeleteConfirmDialog.tsx';
 import { DiagnosisModal } from '../components/diagnosis/DiagnosisModal.tsx';
+import { Button } from '../components/ui/Button.tsx';
 
 type Modal =
   | { type: 'create' }
@@ -89,11 +90,9 @@ export function ConsultanciesPage() {
   async function handleOpenDiagnosis(consultancyId: string) {
     setDiagnosisLoading(true);
     try {
-      // Try to fetch existing diagnosis
       const existing = await getDiagnosis(consultancyId);
       setDiagnosis(existing.data);
-    } catch (err) {
-      // No diagnosis exists yet, we'll generate one
+    } catch {
       setDiagnosis(null);
     } finally {
       setDiagnosisLoading(false);
@@ -136,30 +135,29 @@ export function ConsultanciesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Consultancies</h1>
-        <button
-          onClick={() => setModal({ type: 'create' })}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
-        >
-          + New Consultancy
-        </button>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-[32px] sm:text-[40px] font-semibold tracking-tight text-[var(--text-primary)]">
+          Consultancies
+        </h1>
+        <Button onClick={() => setModal({ type: 'create' })}>
+          + New
+        </Button>
       </div>
 
       {/* Loading */}
       {loading && (
-        <div className="mt-12 text-center">
-          <p className="text-slate-400">Loading consultancies...</p>
+        <div className="mt-12 flex justify-center py-12">
+          <p className="text-[15px] text-[var(--text-secondary)] animate-pulse">Loading consultancies...</p>
         </div>
       )}
 
       {/* Error */}
       {!loading && error && (
-        <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="mt-6 rounded-[var(--radius-card)] border border-[var(--color-error)]/20 bg-[var(--color-error)]/5 p-6">
+          <p className="text-[15px] font-medium text-[var(--color-error)]">{error}</p>
           <button
             onClick={() => void load()}
-            className="mt-2 text-sm font-medium text-red-300 underline hover:text-red-200"
+            className="mt-3 text-[14px] font-medium text-[var(--color-error)] hover:opacity-70 transition-opacity"
           >
             Try again
           </button>
@@ -168,23 +166,24 @@ export function ConsultanciesPage() {
 
       {/* Empty state */}
       {!loading && !error && consultancies.length === 0 && (
-        <div className="mt-12 rounded-xl border border-dashed border-slate-700 px-6 py-16 text-center">
-          <p className="text-lg font-medium text-slate-300">No consultancies yet</p>
-          <p className="mt-1 text-sm text-slate-500">
+        <div className="mt-8 rounded-[var(--radius-card)] border border-dashed border-[var(--border-strong)] bg-transparent px-6 py-20 text-center flex flex-col items-center justify-center">
+          <p className="text-[20px] font-semibold text-[var(--text-primary)] tracking-tight">No consultancies yet</p>
+          <p className="mt-2 text-[15px] text-[var(--text-secondary)] max-w-sm">
             Create your first consultancy to get started.
           </p>
-          <button
+          <Button
+            variant="secondary"
+            className="mt-6"
             onClick={() => setModal({ type: 'create' })}
-            className="mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
           >
-            + New Consultancy
-          </button>
+            Create Consultancy
+          </Button>
         </div>
       )}
 
       {/* List */}
       {!loading && !error && consultancies.length > 0 && (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {consultancies.map((c) => (
             <ConsultancyCard
               key={c.id}
@@ -239,28 +238,28 @@ export function ConsultanciesPage() {
             />
           ) : (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <div className="fixed inset-0 bg-black/60" onClick={() => setModal(null)} />
-              <div className="relative w-full max-w-2xl rounded-xl border border-slate-700 bg-slate-800 p-6">
-                <h2 className="text-lg font-semibold text-white mb-4">
+              <div
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+                style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
+                onClick={() => setModal(null)}
+              />
+              <div className="relative w-full max-w-2xl rounded-[var(--radius-modal)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-8 shadow-[var(--shadow-elev)]">
+                <h2 className="text-[24px] font-semibold tracking-tight text-[var(--text-primary)] mb-3">
                   Generate Diagnosis for {modal.consultancyTitle}
                 </h2>
-                <p className="text-slate-300 mb-6">
+                <p className="text-[17px] leading-relaxed text-[var(--text-secondary)] mb-8">
                   No diagnosis has been generated yet. Generate one using the Iris strategic method to get insights about this consultancy.
                 </p>
-                <div className="flex justify-end gap-3">
-                  <button
-                    onClick={() => setModal(null)}
-                    className="rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 transition-colors"
-                  >
+                <div className="flex justify-end gap-3 pt-6 border-t border-[var(--border-hairline)]">
+                  <Button variant="ghost" onClick={() => setModal(null)}>
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => void handleGenerateDiagnosis(modal.consultancyId)}
                     disabled={diagnosisLoading}
-                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors disabled:opacity-50"
                   >
                     {diagnosisLoading ? 'Generating...' : 'Generate Diagnosis'}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -271,10 +270,14 @@ export function ConsultanciesPage() {
       {/* Diagnosis loading state */}
       {modal?.type === 'diagnosis' && diagnosisLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/60" />
-          <div className="relative rounded-xl border border-slate-700 bg-slate-800 p-6">
-            <p className="text-slate-300">Generating strategic diagnosis...</p>
-            <p className="text-xs text-slate-500 mt-2">This may take a moment.</p>
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+            style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
+          />
+          <div className="relative rounded-[var(--radius-modal)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-8 shadow-[var(--shadow-elev)] flex flex-col items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--text-primary)] mb-4"></div>
+            <p className="text-[17px] font-medium text-[var(--text-primary)]">Generating strategic diagnosis...</p>
+            <p className="text-[14px] text-[var(--text-secondary)] mt-1">This may take a moment.</p>
           </div>
         </div>
       )}

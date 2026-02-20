@@ -1,4 +1,5 @@
 import type { Consultancy } from '../../api/consultancies.ts';
+import { Button } from '../ui/Button.tsx';
 
 interface DeleteConfirmDialogProps {
   consultancy: Consultancy;
@@ -15,29 +16,32 @@ export function DeleteConfirmDialog({
 }: DeleteConfirmDialogProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onCancel} />
-      <div className="relative w-full max-w-sm rounded-xl border border-slate-700 bg-slate-800 p-6">
-        <h2 className="text-lg font-semibold text-white">Delete Consultancy</h2>
-        <p className="mt-2 text-sm text-slate-400">
+      <div
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+        style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
+        onClick={onCancel}
+      />
+      <div className="relative w-full max-w-sm rounded-[var(--radius-modal)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-6 shadow-[var(--shadow-elev)]">
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Delete Consultancy</h2>
+        <p className="mt-2 text-sm text-[var(--text-secondary)]">
           Are you sure you want to delete{' '}
-          <span className="font-medium text-white">{consultancy.title}</span>?
+          <span className="font-medium text-[var(--text-primary)]">{consultancy.title}</span>?
           This action can be undone by an administrator.
         </p>
 
         <div className="mt-6 flex justify-end gap-3">
-          <button
-            onClick={onCancel}
-            className="rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 transition-colors"
-          >
+          <Button variant="ghost" size="sm" onClick={onCancel}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
             onClick={() => void onConfirm()}
             disabled={loading}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50 transition-colors"
+            className="bg-[var(--color-error)] hover:opacity-90"
           >
             {loading ? 'Deleting...' : 'Delete'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Diagnosis, DiagnosisContent } from '../../api/diagnoses.ts';
 import { DiagnosisDisplay } from './DiagnosisDisplay.tsx';
 import { DiagnosisEditor } from './DiagnosisEditor.tsx';
+import { Button } from '../ui/Button.tsx';
 
 type View = 'display' | 'edit' | 'history';
 
@@ -38,14 +39,18 @@ export function DiagnosisModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-3xl max-h-[90vh] rounded-xl border border-slate-700 bg-slate-800 overflow-hidden flex flex-col">
+      <div
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+        style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-3xl max-h-[90vh] rounded-[var(--radius-modal)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] overflow-hidden flex flex-col shadow-[var(--shadow-elev)]">
         {/* Header */}
-        <div className="border-b border-slate-700 p-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Strategic Diagnosis</h2>
+        <div className="border-b border-[var(--border-hairline)] p-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">Strategic Diagnosis</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-300 transition-colors"
+            className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
           >
             ✕
           </button>
@@ -75,40 +80,40 @@ export function DiagnosisModal({
 
           {view === 'history' && (
             <div className="space-y-4">
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setView('display')}
-                className="text-indigo-400 hover:text-indigo-300 text-sm font-medium"
               >
                 ← Back to current
-              </button>
+              </Button>
 
               {historyLoading ? (
-                <p className="text-slate-400">Loading history...</p>
+                <p className="text-[var(--text-secondary)] animate-pulse">Loading history...</p>
               ) : history && history.length > 0 ? (
                 <div className="space-y-3">
                   {history.map((v) => (
                     <div
                       key={v.id}
-                      className="p-4 rounded-lg border border-slate-700 bg-slate-700/40 hover:bg-slate-700/60 transition-colors cursor-pointer"
+                      className="p-4 rounded-[var(--radius-md)] border border-[var(--border-hairline)] bg-[var(--bg-surface-2)] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
                       onClick={() => {
-                        // Show this version in display
                         setView('display');
                       }}
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-white">v{v.version}</p>
-                          <p className="text-xs text-slate-400 mt-1">
+                          <p className="font-medium text-[var(--text-primary)]">v{v.version}</p>
+                          <p className="text-xs text-[var(--text-tertiary)] mt-1">
                             {new Date(v.created_at).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
                               hour: '2-digit',
                               minute: '2-digit',
                             })}
-                            {v.is_edited && ' • Edited'}
+                            {v.is_edited && ' * Edited'}
                           </p>
                         </div>
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-[var(--text-muted)]">
                           {v.tokens_used ? `${v.tokens_used} tokens` : 'Manual'}
                         </span>
                       </div>
@@ -116,7 +121,7 @@ export function DiagnosisModal({
                   ))}
                 </div>
               ) : (
-                <p className="text-slate-400">No version history</p>
+                <p className="text-[var(--text-secondary)]">No version history</p>
               )}
             </div>
           )}

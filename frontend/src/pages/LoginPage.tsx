@@ -1,7 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuthStore } from '../stores/authStore.ts';
 import { AuthErrorMessage } from '../components/AuthErrorMessage.tsx';
+import { Button } from '../components/ui/Button.tsx';
+import { Input } from '../components/ui/Input.tsx';
+import { staggerContainer, staggerItem } from '../lib/motion.ts';
 
 export function LoginPage() {
   const { user, loading, signIn } = useAuthStore();
@@ -25,77 +29,88 @@ export function LoginPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <p className="text-slate-400">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
+        <p className="text-[15px] text-[var(--text-secondary)] animate-pulse">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 px-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-white">Iris Platform</h1>
-          <p className="text-slate-400 mt-2">Sign in to your account</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)] px-4">
+      <motion.div
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+        className="w-full max-w-md space-y-8"
+      >
+        <motion.div variants={staggerItem} className="text-center">
+          <h1 className="text-[28px] font-semibold tracking-tight text-[var(--text-primary)]">
+            Iris Platform
+          </h1>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-2">
+            Sign in to your account
+          </p>
+        </motion.div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <AuthErrorMessage />
+        <motion.div
+          variants={staggerItem}
+          className="rounded-[var(--radius-card)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-6 shadow-[var(--shadow-soft)]"
+        >
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <AuthErrorMessage />
 
-          <div>
-            <label htmlFor="email" className="block text-sm text-slate-300 mb-1">
-              Email
-            </label>
-            <input
+            <Input
+              label="Email"
               id="email"
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="you@example.com"
             />
-          </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm text-slate-300 mb-1">
-              Password
-            </label>
-            <input
+            <Input
+              label="Password"
               id="password"
               type="password"
               required
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="••••••••"
             />
-          </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {submitting ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+            <Button
+              type="submit"
+              disabled={submitting}
+              fullWidth
+              size="lg"
+            >
+              {submitting ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </form>
+        </motion.div>
 
-        <div className="text-center text-sm text-slate-400 space-y-2">
+        <motion.div variants={staggerItem} className="text-center text-[13px] text-[var(--text-tertiary)] space-y-2">
           <p>
-            <Link to="/forgot-password" className="text-blue-400 hover:text-blue-300">
+            <Link
+              to="/forgot-password"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            >
               Forgot your password?
             </Link>
           </p>
           <p>
             Don&apos;t have an account?{' '}
-            <Link to="/signup" className="text-blue-400 hover:text-blue-300">
+            <Link
+              to="/signup"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
+            >
               Sign up
             </Link>
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

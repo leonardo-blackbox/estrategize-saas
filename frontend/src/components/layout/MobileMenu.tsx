@@ -24,20 +24,24 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
   return (
     <div className="fixed inset-0 z-50 lg:hidden">
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      <div
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+        style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
+        onClick={onClose}
+      />
 
       {/* Drawer */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-slate-900 border-r border-slate-700 flex flex-col">
-        <div className="flex h-16 items-center justify-between border-b border-slate-700 px-4">
+      <div className="fixed inset-y-0 left-0 w-64 bg-[var(--bg-base)] border-r border-[var(--border-hairline)] flex flex-col">
+        <div className="flex h-16 items-center justify-between border-b border-[var(--border-hairline)] px-4">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center">
-              <span className="text-sm font-bold text-white">I</span>
+            <div className="h-8 w-8 rounded-[var(--radius-sm)] bg-[var(--text-primary)] flex items-center justify-center">
+              <span className="text-sm font-bold text-[var(--bg-base)]">I</span>
             </div>
-            <span className="text-lg font-bold text-white">Iris Platform</span>
+            <span className="text-lg font-bold text-[var(--text-primary)]">Iris Platform</span>
           </div>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-slate-400 hover:text-white transition-colors"
+            className="rounded-[var(--radius-sm)] p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
             aria-label="Close menu"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

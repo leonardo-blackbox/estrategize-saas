@@ -1,10 +1,308 @@
 @import "tailwindcss";
 
-/* Hide scrollbar for horizontal scroll containers */
+/* ========================================
+   ESTRATEGIZE — Premium Design Tokens
+   Black & White, Apple Glass, Dual Theme
+   ======================================== */
+
+/* ── Dark Theme (default) ── */
+:root,
+[data-theme="dark"] {
+  /* Base surfaces */
+  --bg-base: #000000;
+  --bg-surface-1: #0a0a0a;
+  --bg-surface-2: #141414;
+  --bg-elevated: #1c1c1e;
+  --bg-hover: #2c2c2e;
+  --bg-active: #3a3a3c;
+
+  /* Text */
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-tertiary: #6e6e73;
+  --text-muted: #48484a;
+
+  /* Borders — hairline Apple style */
+  --border-hairline: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  /* Glass */
+  --glass-bg: rgba(28, 28, 30, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.04);
+
+  /* Shadows */
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-elev: 0 4px 24px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3);
+
+  /* Selection */
+  --selection-bg: rgba(255, 255, 255, 0.15);
+  --selection-text: #ffffff;
+
+  /* Scrollbar */
+  --scrollbar-thumb: rgba(255, 255, 255, 0.08);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.14);
+
+  /* Focus ring */
+  --focus-ring: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Light Theme ── */
+[data-theme="light"] {
+  /* Base surfaces */
+  --bg-base: #ffffff;
+  --bg-surface-1: #f5f5f7;
+  --bg-surface-2: #ebebed;
+  --bg-elevated: #ffffff;
+  --bg-hover: #e8e8ed;
+  --bg-active: #d1d1d6;
+
+  /* Text */
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #86868b;
+  --text-muted: #aeaeb2;
+
+  /* Borders — hairline Apple style */
+  --border-hairline: rgba(0, 0, 0, 0.06);
+  --border-default: rgba(0, 0, 0, 0.10);
+  --border-strong: rgba(0, 0, 0, 0.18);
+
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-highlight: rgba(255, 255, 255, 0.6);
+
+  /* Shadows */
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-elev: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+
+  /* Selection */
+  --selection-bg: rgba(0, 0, 0, 0.10);
+  --selection-text: #1d1d1f;
+
+  /* Scrollbar */
+  --scrollbar-thumb: rgba(0, 0, 0, 0.10);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.18);
+
+  /* Focus ring */
+  --focus-ring: rgba(0, 0, 0, 0.4);
+}
+
+/* ── Theme-agnostic tokens ── */
+:root {
+  /* Semantic status (muted, works on both themes) */
+  --color-success: #34c759;
+  --color-warning: #ff9f0a;
+  --color-error: #ff3b30;
+
+  /* Radius — Apple Squircle scale */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-card: 20px;
+  --radius-modal: 24px;
+  --radius-pill: 9999px;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Typography — SF Pro stack */
+  --font-sans: "SF Pro Display", "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", monospace;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* Safe areas */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* Bottom tabs */
+  --bottom-tabs-height: 72px;
+
+  /* Interactive background (mouse tracking) */
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+
+  /* ── LEGACY COMPAT — maps old var names to new tokens ── */
+  --color-bg-primary: var(--bg-base);
+  --color-bg-secondary: var(--bg-surface-1);
+  --color-bg-tertiary: var(--bg-surface-2);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-hover: var(--bg-hover);
+  --color-bg-active: var(--bg-active);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-muted: var(--text-muted);
+  --color-border-subtle: var(--border-hairline);
+  --color-border-default: var(--border-default);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--text-primary);
+  --color-accent-hover: var(--text-secondary);
+  --color-accent-subtle: rgba(128, 128, 128, 0.10);
+  --color-accent-muted: rgba(128, 128, 128, 0.06);
+  --shadow-sm: var(--shadow-soft);
+  --shadow-md: var(--shadow-elev);
+  --shadow-lg: var(--shadow-elev);
+  --shadow-glow: none;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+}
+
+/* ========================================
+   Admin theme overrides (P&B + controlled glass)
+   ======================================== */
+
+[data-admin="true"] {
+  --bg-base: #050505;
+  --bg-surface-1: #0a0a0a;
+  --bg-surface-2: #111111;
+  --bg-elevated: #161616;
+  --text-primary: #e5e5e7;
+  --border-hairline: rgba(255, 255, 255, 0.05);
+}
+
+/* ========================================
+   Global Resets & Defaults
+   ======================================== */
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100dvh;
+  transition: background-color var(--duration-normal) var(--ease-out-expo),
+              color var(--duration-normal) var(--ease-out-expo);
+}
+
+/* iOS safe area support */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-top: var(--safe-area-top);
+  }
+}
+
+/* ========================================
+   Scrollbar Styles
+   ======================================== */
+
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* ========================================
+   Reduced Motion
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ========================================
+   Selection
+   ======================================== */
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+/* ========================================
+   Focus visible (keyboard navigation)
+   ======================================== */
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Apple Glass utility classes
+   ======================================== */
+
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 0.5px 0 0 var(--glass-highlight);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+}
+
+/* Fallback when backdrop-filter is not supported */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass {
+    background: var(--bg-surface-2);
+    border: 1px solid var(--border-default);
+    box-shadow: var(--shadow-soft);
+  }
+}
+
+.glass-subtle {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 0.5px 0 0 var(--glass-highlight);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-subtle {
+    background: var(--bg-surface-1);
+    border: 1px solid var(--border-hairline);
+  }
 }

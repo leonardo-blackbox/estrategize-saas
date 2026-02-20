@@ -9,18 +9,18 @@ const typeLabel: Record<string, string> = {
   release: 'Release',
 };
 
-const typeColor: Record<string, string> = {
-  purchase: 'text-green-400',
-  monthly_grant: 'text-green-400',
-  reserve: 'text-amber-400',
-  consume: 'text-red-400',
-  release: 'text-blue-400',
+const typeStyle: Record<string, string> = {
+  purchase: 'text-[var(--color-success)]',
+  monthly_grant: 'text-[var(--color-success)]',
+  reserve: 'text-[var(--color-warning)]',
+  consume: 'text-[var(--color-error)]',
+  release: 'text-[var(--text-secondary)]',
 };
 
 const statusBadge: Record<string, string> = {
-  pending: 'bg-amber-500/20 text-amber-400',
-  confirmed: 'bg-green-500/20 text-green-400',
-  released: 'bg-blue-500/20 text-blue-400',
+  pending: 'bg-[var(--bg-hover)] text-[var(--color-warning)]',
+  confirmed: 'bg-[var(--bg-hover)] text-[var(--color-success)]',
+  released: 'bg-[var(--bg-hover)] text-[var(--text-secondary)]',
 };
 
 export function TransactionHistory() {
@@ -51,65 +51,65 @@ export function TransactionHistory() {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-700 bg-slate-800 p-5">
-        <p className="text-sm text-slate-400">Loading transactions...</p>
+      <div className="rounded-[var(--radius-card)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-5">
+        <p className="text-sm text-[var(--text-secondary)] animate-pulse">Loading transactions...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-5">
-        <p className="text-sm text-red-400">{error}</p>
+      <div className="rounded-[var(--radius-card)] border border-[var(--color-error)]/20 bg-[var(--color-error)]/5 p-5">
+        <p className="text-sm text-[var(--color-error)]">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-800 overflow-hidden">
-      <div className="p-5 border-b border-slate-700">
-        <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wider">
+    <div className="rounded-[var(--radius-card)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] overflow-hidden">
+      <div className="p-5 border-b border-[var(--border-hairline)]">
+        <h3 className="text-sm font-medium text-[var(--text-tertiary)] uppercase tracking-wider">
           Transaction History
         </h3>
       </div>
 
       {transactions.length === 0 ? (
         <div className="p-5 text-center">
-          <p className="text-sm text-slate-500">No transactions yet</p>
+          <p className="text-sm text-[var(--text-muted)]">No transactions yet</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-700/30">
+            <thead className="bg-[var(--bg-surface-2)]">
               <tr>
-                <th className="px-5 py-3 text-xs font-medium text-slate-400 uppercase">Type</th>
-                <th className="px-5 py-3 text-xs font-medium text-slate-400 uppercase">Amount</th>
-                <th className="px-5 py-3 text-xs font-medium text-slate-400 uppercase">Status</th>
-                <th className="px-5 py-3 text-xs font-medium text-slate-400 uppercase">Date</th>
-                <th className="px-5 py-3 text-xs font-medium text-slate-400 uppercase">Description</th>
+                <th className="px-5 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase">Type</th>
+                <th className="px-5 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase">Amount</th>
+                <th className="px-5 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase">Status</th>
+                <th className="px-5 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase">Date</th>
+                <th className="px-5 py-3 text-xs font-medium text-[var(--text-tertiary)] uppercase">Description</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700">
+            <tbody className="divide-y divide-[var(--border-hairline)]">
               {transactions.map((tx) => (
-                <tr key={tx.id} className="hover:bg-slate-700/20 transition-colors">
+                <tr key={tx.id} className="hover:bg-[var(--bg-hover)] transition-colors">
                   <td className="px-5 py-3">
-                    <span className={`font-medium ${typeColor[tx.type] ?? 'text-slate-300'}`}>
+                    <span className={`font-medium ${typeStyle[tx.type] ?? 'text-[var(--text-secondary)]'}`}>
                       {typeLabel[tx.type] ?? tx.type}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-white font-mono">
+                  <td className="px-5 py-3 text-[var(--text-primary)] font-mono">
                     {tx.type === 'consume' || tx.type === 'reserve'
                       ? `-${tx.amount}`
                       : `+${tx.amount}`}
                   </td>
                   <td className="px-5 py-3">
                     <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge[tx.status] ?? ''}`}
+                      className={`inline-flex rounded-[var(--radius-pill)] px-2 py-0.5 text-xs font-medium ${statusBadge[tx.status] ?? ''}`}
                     >
                       {tx.status}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-slate-400">
+                  <td className="px-5 py-3 text-[var(--text-tertiary)]">
                     {new Date(tx.created_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -117,7 +117,7 @@ export function TransactionHistory() {
                       minute: '2-digit',
                     })}
                   </td>
-                  <td className="px-5 py-3 text-slate-400 truncate max-w-[200px]">
+                  <td className="px-5 py-3 text-[var(--text-tertiary)] truncate max-w-[200px]">
                     {tx.description ?? '—'}
                   </td>
                 </tr>

@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { cn } from '../../lib/cn.ts';
 
 interface NavItemProps {
   to: string;
@@ -13,11 +14,12 @@ export function NavItem({ to, label, icon, onClick }: NavItemProps) {
       to={to}
       onClick={onClick}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+        cn(
+          'flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium transition-colors',
           isActive
-            ? 'bg-slate-700 text-white'
-            : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-        }`
+            ? 'bg-[var(--bg-surface-2)] text-[var(--text-primary)]'
+            : 'text-[var(--text-tertiary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]',
+        )
       }
     >
       {icon}

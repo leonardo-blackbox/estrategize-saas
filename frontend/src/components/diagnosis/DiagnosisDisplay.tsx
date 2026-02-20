@@ -1,4 +1,5 @@
 import type { Diagnosis } from '../../api/diagnoses.ts';
+import { Button } from '../ui/Button.tsx';
 
 interface DiagnosisDisplayProps {
   diagnosis: Diagnosis;
@@ -16,13 +17,13 @@ export function DiagnosisDisplay({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-slate-700 pb-4">
+      <div className="border-b border-[var(--border-hairline)] pb-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-[var(--text-secondary)]">
               Diagnosis v{diagnosis.version}
               {isEdited && diagnosis.edited_at && (
-                <span className="ml-2 text-amber-500">
+                <span className="ml-2 text-[var(--color-warning)]">
                   (Edited{' '}
                   {new Date(diagnosis.edited_at).toLocaleDateString('en-US', {
                     month: 'short',
@@ -32,7 +33,7 @@ export function DiagnosisDisplay({
                 </span>
               )}
             </p>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-1">
               Generated{' '}
               {new Date(diagnosis.created_at).toLocaleDateString('en-US', {
                 month: 'short',
@@ -40,25 +41,19 @@ export function DiagnosisDisplay({
                 hour: '2-digit',
                 minute: '2-digit',
               })}
-              {diagnosis.tokens_used && ` • ${diagnosis.tokens_used} tokens`}
+              {diagnosis.tokens_used && ` * ${diagnosis.tokens_used} tokens`}
             </p>
           </div>
           <div className="flex gap-2">
             {onViewHistory && (
-              <button
-                onClick={onViewHistory}
-                className="rounded-md px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-700 transition-colors"
-              >
+              <Button variant="ghost" size="sm" onClick={onViewHistory}>
                 History
-              </button>
+              </Button>
             )}
             {onEdit && (
-              <button
-                onClick={onEdit}
-                className="rounded-md px-3 py-1.5 text-sm text-indigo-400 hover:bg-indigo-500/10 transition-colors"
-              >
+              <Button variant="secondary" size="sm" onClick={onEdit}>
                 Edit
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -66,22 +61,22 @@ export function DiagnosisDisplay({
 
       {/* Executive Summary */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-2">Executive Summary</h3>
-        <p className="text-slate-300 leading-relaxed">{diagnosis.content.executiveSummary}</p>
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Executive Summary</h3>
+        <p className="text-[var(--text-secondary)] leading-relaxed">{diagnosis.content.executiveSummary}</p>
       </div>
 
       {/* Sections */}
       <div className="space-y-6">
         {diagnosis.content.sections.map((section, idx) => (
           <div key={idx}>
-            <h4 className="text-base font-semibold text-white mb-3">{section.name}</h4>
+            <h4 className="text-base font-semibold text-[var(--text-primary)] mb-3">{section.name}</h4>
             <ul className="space-y-2">
               {section.insights.map((insight, insightIdx) => (
                 <li
                   key={insightIdx}
-                  className="flex gap-3 text-slate-300 leading-relaxed"
+                  className="flex gap-3 text-[var(--text-secondary)] leading-relaxed"
                 >
-                  <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-indigo-500" />
+                  <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[var(--text-primary)]" />
                   <span>{insight}</span>
                 </li>
               ))}

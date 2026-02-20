@@ -1,7 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuthStore } from '../stores/authStore.ts';
 import { AuthErrorMessage } from '../components/AuthErrorMessage.tsx';
+import { Button } from '../components/ui/Button.tsx';
+import { Input } from '../components/ui/Input.tsx';
+import { staggerContainer, staggerItem } from '../lib/motion.ts';
 
 export function SignupPage() {
   const { user, loading, signUp } = useAuthStore();
@@ -28,100 +32,116 @@ export function SignupPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <p className="text-slate-400">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)]">
+        <p className="text-[15px] text-[var(--text-secondary)] animate-pulse">Loading...</p>
       </div>
     );
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 px-4">
-        <div className="w-full max-w-md text-center space-y-4">
-          <h2 className="text-2xl font-bold text-white">Check your email</h2>
-          <p className="text-slate-400">
-            We sent a confirmation link to <strong className="text-white">{email}</strong>.
-          </p>
-          <Link to="/login" className="text-blue-400 hover:text-blue-300 text-sm">
-            Back to login
-          </Link>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)] px-4">
+        <motion.div
+          variants={staggerContainer}
+          initial="initial"
+          animate="animate"
+          className="w-full max-w-md text-center space-y-4"
+        >
+          <motion.h2 variants={staggerItem} className="text-[24px] font-semibold tracking-tight text-[var(--text-primary)]">
+            Check your email
+          </motion.h2>
+          <motion.p variants={staggerItem} className="text-[15px] text-[var(--text-secondary)]">
+            We sent a confirmation link to{' '}
+            <strong className="text-[var(--text-primary)] font-semibold">{email}</strong>.
+          </motion.p>
+          <motion.div variants={staggerItem}>
+            <Link
+              to="/login"
+              className="text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
+            >
+              Back to login
+            </Link>
+          </motion.div>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 px-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-white">Create Account</h1>
-          <p className="text-slate-400 mt-2">Start using Iris Platform</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-base)] px-4">
+      <motion.div
+        variants={staggerContainer}
+        initial="initial"
+        animate="animate"
+        className="w-full max-w-md space-y-8"
+      >
+        <motion.div variants={staggerItem} className="text-center">
+          <h1 className="text-[28px] font-semibold tracking-tight text-[var(--text-primary)]">
+            Create Account
+          </h1>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-2">
+            Start using Iris Platform
+          </p>
+        </motion.div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <AuthErrorMessage />
+        <motion.div
+          variants={staggerItem}
+          className="rounded-[var(--radius-card)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-6 shadow-[var(--shadow-soft)]"
+        >
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <AuthErrorMessage />
 
-          <div>
-            <label htmlFor="fullName" className="block text-sm text-slate-300 mb-1">
-              Full Name
-            </label>
-            <input
+            <Input
+              label="Full Name"
               id="fullName"
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Your name"
             />
-          </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm text-slate-300 mb-1">
-              Email
-            </label>
-            <input
+            <Input
+              label="Email"
               id="email"
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="you@example.com"
             />
-          </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm text-slate-300 mb-1">
-              Password
-            </label>
-            <input
+            <Input
+              label="Password"
               id="password"
               type="password"
               required
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Minimum 6 characters"
             />
-          </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {submitting ? 'Creating account...' : 'Sign Up'}
-          </button>
-        </form>
+            <Button
+              type="submit"
+              disabled={submitting}
+              fullWidth
+              size="lg"
+            >
+              {submitting ? 'Creating account...' : 'Sign Up'}
+            </Button>
+          </form>
+        </motion.div>
 
-        <p className="text-center text-sm text-slate-400">
+        <motion.p variants={staggerItem} className="text-center text-[13px] text-[var(--text-tertiary)]">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-400 hover:text-blue-300">
+          <Link
+            to="/login"
+            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
+          >
             Sign in
           </Link>
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { Consultancy, CreateConsultancyPayload, UpdateConsultancyPayload } from '../../api/consultancies.ts';
+import { Button } from '../ui/Button.tsx';
+import { Input } from '../ui/Input.tsx';
 
 interface ConsultancyFormProps {
   initial?: Consultancy | null;
@@ -37,62 +39,48 @@ export function ConsultancyForm({ initial, onSubmit, onCancel, loading }: Consul
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onCancel} />
-      <div className="relative w-full max-w-md rounded-xl border border-slate-700 bg-slate-800 p-6">
-        <h2 className="text-lg font-semibold text-white">
+      <div
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+        style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
+        onClick={onCancel}
+      />
+      <div className="relative w-full max-w-md rounded-[var(--radius-modal)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-6 shadow-[var(--shadow-elev)]">
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
           {isEdit ? 'Edit Consultancy' : 'New Consultancy'}
         </h2>
 
         <form onSubmit={(e) => void handleSubmit(e)} className="mt-4 space-y-4">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-slate-300">
-              Title *
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-white placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              placeholder="e.g. Digital Transformation Strategy"
-              maxLength={255}
-            />
-          </div>
+          <Input
+            label="Title *"
+            id="title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Digital Transformation Strategy"
+            maxLength={255}
+          />
 
-          <div>
-            <label htmlFor="client_name" className="block text-sm font-medium text-slate-300">
-              Client Name
-            </label>
-            <input
-              id="client_name"
-              type="text"
-              value={clientName}
-              onChange={(e) => setClientName(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-white placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              placeholder="e.g. TechCorp Inc."
-              maxLength={255}
-            />
-          </div>
+          <Input
+            label="Client Name"
+            id="client_name"
+            type="text"
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
+            placeholder="e.g. TechCorp Inc."
+            maxLength={255}
+          />
 
           {error && (
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-sm text-[var(--color-error)]">{error}</p>
           )}
 
           <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 transition-colors"
-            >
+            <Button variant="ghost" size="sm" type="button" onClick={onCancel}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 transition-colors"
-            >
+            </Button>
+            <Button variant="primary" size="sm" type="submit" disabled={loading}>
               {loading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { CreditBalanceCard } from '../components/credits/CreditBalanceCard.tsx';
 import { TransactionHistory } from '../components/credits/TransactionHistory.tsx';
 import { grantCredits } from '../api/credits.ts';
+import { Button } from '../components/ui/Button.tsx';
 
 export function CreditsPage() {
   const [granting, setGranting] = useState(false);
@@ -25,19 +26,20 @@ export function CreditsPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Credits</h1>
-        <button
+        <h1 className="text-[24px] font-semibold tracking-tight text-[var(--text-primary)]">Credits</h1>
+        <Button
+          variant="primary"
+          size="sm"
           onClick={handleGrant}
           disabled={granting}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
         >
           {granting ? 'Granting...' : 'Grant 10 Credits (Test)'}
-        </button>
+        </Button>
       </div>
 
       {grantError && (
-        <div className="mt-3 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2">
-          <p className="text-sm text-red-400">{grantError}</p>
+        <div className="mt-3 rounded-[var(--radius-md)] border border-[var(--color-error)]/20 bg-[var(--color-error)]/5 px-4 py-2">
+          <p className="text-sm text-[var(--color-error)]">{grantError}</p>
         </div>
       )}
 

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import type { DiagnosisContent } from '../../api/diagnoses.ts';
+import { Button } from '../ui/Button.tsx';
+import { Textarea } from '../ui/Input.tsx';
 
 interface DiagnosisEditorProps {
   initialContent: DiagnosisContent;
@@ -39,47 +41,37 @@ export function DiagnosisEditor({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black/60" onClick={onCancel} />
-      <div className="relative w-full max-w-2xl rounded-xl border border-slate-700 bg-slate-800 p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Edit Diagnosis</h2>
+      <div
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+        style={{ WebkitBackdropFilter: 'blur(8px)', backdropFilter: 'blur(8px)' }}
+        onClick={onCancel}
+      />
+      <div className="relative w-full max-w-2xl rounded-[var(--radius-modal)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-6 shadow-[var(--shadow-elev)]">
+        <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Edit Diagnosis</h2>
 
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
-          <div>
-            <label htmlFor="summary" className="block text-sm font-medium text-slate-300 mb-2">
-              Executive Summary
-            </label>
-            <textarea
-              id="summary"
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-              className="block w-full rounded-lg border border-slate-600 bg-slate-700 px-3 py-2 text-white placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
-              rows={4}
-              placeholder="Update the executive summary..."
-            />
-          </div>
+          <Textarea
+            label="Executive Summary"
+            id="summary"
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            rows={4}
+            placeholder="Update the executive summary..."
+          />
 
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-[var(--text-tertiary)]">
             Note: Sections and insights are read-only. Generate a new diagnosis to replace the entire content.
           </p>
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
 
           <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onCancel}
-              disabled={loading}
-              className="rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 transition-colors disabled:opacity-50"
-            >
+            <Button variant="ghost" size="sm" type="button" onClick={onCancel} disabled={loading}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors disabled:opacity-50"
-            >
+            </Button>
+            <Button variant="primary" size="sm" type="submit" disabled={loading}>
               {loading ? 'Saving...' : 'Save Changes'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
