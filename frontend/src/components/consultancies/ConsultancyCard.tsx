@@ -4,6 +4,7 @@ interface ConsultancyCardProps {
   consultancy: Consultancy;
   onEdit: (c: Consultancy) => void;
   onDelete: (c: Consultancy) => void;
+  onDiagnosis?: (c: Consultancy) => void;
 }
 
 const statusStyles: Record<string, string> = {
@@ -11,7 +12,7 @@ const statusStyles: Record<string, string> = {
   archived: 'bg-slate-500/20 text-slate-400',
 };
 
-export function ConsultancyCard({ consultancy, onEdit, onDelete }: ConsultancyCardProps) {
+export function ConsultancyCard({ consultancy, onEdit, onDelete, onDiagnosis }: ConsultancyCardProps) {
   const created = new Date(consultancy.created_at).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -39,6 +40,14 @@ export function ConsultancyCard({ consultancy, onEdit, onDelete }: ConsultancyCa
       <div className="mt-4 flex items-center justify-between">
         <span className="text-xs text-slate-500">Created {created}</span>
         <div className="flex gap-2">
+          {onDiagnosis && (
+            <button
+              onClick={() => onDiagnosis(consultancy)}
+              className="rounded-md px-3 py-1.5 text-sm text-amber-400 hover:bg-amber-500/10 transition-colors"
+            >
+              Diagnose
+            </button>
+          )}
           <button
             onClick={() => onEdit(consultancy)}
             className="rounded-md px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-700 transition-colors"

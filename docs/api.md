@@ -71,6 +71,101 @@ curl -X DELETE http://localhost:3001/api/consultancies/<uuid> \
 
 ---
 
+## Diagnoses (`/api/consultancies/:id/diagnose`)
+
+**Story 1.8** — Strategic diagnosis generation via OpenAI using the Iris method framework.
+
+### POST /api/consultancies/:id/diagnose
+
+Generate a strategic diagnosis for a consultancy using the Iris method.
+
+```bash
+curl -X POST http://localhost:3001/api/consultancies/<uuid>/diagnose \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+**Response:** `201 { data: Diagnosis }`
+
+**Error:**
+- `404` Consultancy not found
+- `409` Diagnosis already exists (use PUT to update)
+- `500` OpenAI API error or database error
+
+### GET /api/consultancies/:id/diagnose
+
+Fetch the latest diagnosis for a consultancy.
+
+```bash
+curl http://localhost:3001/api/consultancies/<uuid>/diagnose \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Response:** `200 { data: Diagnosis }` or `404 { error: "No diagnosis found" }`
+
+### PUT /api/consultancies/:id/diagnose
+
+Update diagnosis content (executive summary). Creates a new version.
+
+```bash
+curl -X PUT http://localhost:3001/api/consultancies/<uuid>/diagnose \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": {
+      "executiveSummary": "Updated summary...",
+      "sections": [
+        {"name": "Internal Assessment", "insights": [...]},
+        {"name": "Market Reality", "insights": [...]}
+      ]
+    }
+  }'
+```
+
+**Body:**
+```json
+{
+  "content": {
+    "executiveSummary": "string",
+    "sections": [
+      {"name": "string", "insights": ["string"]}
+    ]
+  }
+}
+```
+
+**Response:** `200 { data: Diagnosis }` (new version)
+
+### GET /api/consultancies/:id/diagnose/history
+
+Get all diagnosis versions (history) for a consultancy.
+
+```bash
+curl http://localhost:3001/api/consultancies/<uuid>/diagnose/history \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Response:** `200 { data: Diagnosis[] }`
+
+---
+
+## Diagnosis Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | uuid | Primary key |
+| user_id | uuid | Owner (auth.users FK) |
+| consultancy_id | uuid | Parent consultancy (FK) |
+| content | jsonb | Diagnosis content (`{ executiveSummary, sections }`) |
+| is_edited | boolean | Whether the diagnosis was manually edited |
+| edited_at | timestamptz | Last manual edit timestamp |
+| version | integer | Diagnosis version (increments on edit) |
+| tokens_used | integer | OpenAI tokens consumed |
+| created_at | timestamptz | Initial generation timestamp |
+| updated_at | timestamptz | Last update timestamp |
+
+---
+
 ## Error Format
 
 All errors return: `{ error: string }`

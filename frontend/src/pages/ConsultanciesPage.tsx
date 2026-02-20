@@ -6,14 +6,24 @@ import {
   deleteConsultancy,
 } from '../api/consultancies.ts';
 import type { Consultancy, CreateConsultancyPayload, UpdateConsultancyPayload } from '../api/consultancies.ts';
+import {
+  generateDiagnosis,
+  getDiagnosis,
+  updateDiagnosis,
+  getDiagnosisHistory,
+  type Diagnosis,
+  type DiagnosisContent,
+} from '../api/diagnoses.ts';
 import { ConsultancyCard } from '../components/consultancies/ConsultancyCard.tsx';
 import { ConsultancyForm } from '../components/consultancies/ConsultancyForm.tsx';
 import { DeleteConfirmDialog } from '../components/consultancies/DeleteConfirmDialog.tsx';
+import { DiagnosisModal } from '../components/diagnosis/DiagnosisModal.tsx';
 
 type Modal =
   | { type: 'create' }
   | { type: 'edit'; consultancy: Consultancy }
   | { type: 'delete'; consultancy: Consultancy }
+  | { type: 'diagnosis'; consultancyId: string; consultancyTitle: string }
   | null;
 
 export function ConsultanciesPage() {
@@ -22,6 +32,8 @@ export function ConsultanciesPage() {
   const [error, setError] = useState('');
   const [modal, setModal] = useState<Modal>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
+  const [diagnosisLoading, setDiagnosisLoading] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -71,6 +83,54 @@ export function ConsultanciesPage() {
       await load();
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleOpenDiagnosis(consultancyId: string) {
+    setDiagnosisLoading(true);
+    try {
+      // Try to fetch existing diagnosis
+      const existing = await getDiagnosis(consultancyId);
+      setDiagnosis(existing.data);
+    } catch (err) {
+      // No diagnosis exists yet, we'll generate one
+      setDiagnosis(null);
+    } finally {
+      setDiagnosisLoading(false);
+    }
+
+    const consultancy = consultancies.find(c => c.id === consultancyId);
+    setModal({
+      type: 'diagnosis',
+      consultancyId,
+      consultancyTitle: consultancy?.title || 'Consultancy',
+    });
+  }
+
+  async function handleGenerateDiagnosis(consultancyId: string) {
+    setDiagnosisLoading(true);
+    try {
+      const result = await generateDiagnosis(consultancyId);
+      setDiagnosis(result.data);
+    } catch (err) {
+      console.error('Failed to generate diagnosis:', err);
+      alert(err instanceof Error ? err.message : 'Failed to generate diagnosis');
+    } finally {
+      setDiagnosisLoading(false);
+    }
+  }
+
+  async function handleSaveDiagnosis(content: DiagnosisContent) {
+    if (!modal || modal.type !== 'diagnosis') return;
+    setDiagnosisLoading(true);
+    try {
+      const result = await updateDiagnosis(modal.consultancyId, content);
+      setDiagnosis(result.data);
+    } catch (err) {
+      console.error('Failed to save diagnosis:', err);
+      throw err;
+    } finally {
+      setDiagnosisLoading(false);
     }
   }
 
@@ -131,6 +191,7 @@ export function ConsultanciesPage() {
               consultancy={c}
               onEdit={(item) => setModal({ type: 'edit', consultancy: item })}
               onDelete={(item) => setModal({ type: 'delete', consultancy: item })}
+              onDiagnosis={(item) => void handleOpenDiagnosis(item.id)}
             />
           ))}
         </div>
@@ -163,6 +224,59 @@ export function ConsultanciesPage() {
           onCancel={() => setModal(null)}
           loading={submitting}
         />
+      )}
+
+      {/* Diagnosis modal */}
+      {modal?.type === 'diagnosis' && !diagnosisLoading && (
+        <>
+          {diagnosis ? (
+            <DiagnosisModal
+              diagnosis={diagnosis}
+              onClose={() => setModal(null)}
+              onSave={handleSaveDiagnosis}
+              onLoadHistory={() => getDiagnosisHistory(modal.consultancyId).then(r => r.data)}
+              saving={diagnosisLoading}
+            />
+          ) : (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="fixed inset-0 bg-black/60" onClick={() => setModal(null)} />
+              <div className="relative w-full max-w-2xl rounded-xl border border-slate-700 bg-slate-800 p-6">
+                <h2 className="text-lg font-semibold text-white mb-4">
+                  Generate Diagnosis for {modal.consultancyTitle}
+                </h2>
+                <p className="text-slate-300 mb-6">
+                  No diagnosis has been generated yet. Generate one using the Iris strategic method to get insights about this consultancy.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setModal(null)}
+                    className="rounded-lg px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => void handleGenerateDiagnosis(modal.consultancyId)}
+                    disabled={diagnosisLoading}
+                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors disabled:opacity-50"
+                  >
+                    {diagnosisLoading ? 'Generating...' : 'Generate Diagnosis'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Diagnosis loading state */}
+      {modal?.type === 'diagnosis' && diagnosisLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/60" />
+          <div className="relative rounded-xl border border-slate-700 bg-slate-800 p-6">
+            <p className="text-slate-300">Generating strategic diagnosis...</p>
+            <p className="text-xs text-slate-500 mt-2">This may take a moment.</p>
+          </div>
+        </div>
       )}
     </div>
   );
