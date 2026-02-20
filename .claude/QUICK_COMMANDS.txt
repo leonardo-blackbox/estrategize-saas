@@ -1,0 +1,99 @@
+════════════════════════════════════════════════════════════════════════════════
+                         AIOS QUICK COMMANDS REFERENCE
+════════════════════════════════════════════════════════════════════════════════
+
+🤖 AGENT INVOCATION
+──────────────────────────────────────────────────────────────────────────────
+@dev              → Development (code implementation, debugging)
+@qa               → Quality assurance (testing, code review)
+@architect        → Architecture design
+@po               → Product owner (stories, epics)
+@pm               → Product management
+@sm               → Scrum master (sprint planning)
+@analyst          → Research & analysis
+@data-engineer    → Database design & optimization
+@ux-design        → UX/UI design
+@devops           → DevOps (git push, CI/CD) - EXCLUSIVE
+
+💻 DEV AGENT COMMANDS (use with @dev, prefix: *)
+──────────────────────────────────────────────────────────────────────────────
+STORY DEVELOPMENT:
+  *develop {story-id}           → Implement story (interactive)
+  *develop-yolo {story-id}      → Autonomous mode
+  *develop-preflight {story-id} → Planning only
+  *help                         → Show all commands
+
+BUILD & RECOVERY:
+  *build-autonomous {id}        → Autonomous build with retries
+  *build-resume {id}            → Resume from checkpoint
+  *build-status [--all]         → Show build status
+  *track-attempt                → Track implementation attempt
+  *rollback [--hard]            → Rollback to last good state
+
+TESTING & QUALITY:
+  *run-tests                    → Run linting + tests
+  *apply-qa-fixes               → Apply QA feedback
+  *fix-qa-issues                → Fix QA issues (8-phase)
+  *backlog-debt {title}         → Register technical debt
+
+WORKTREE (isolated branches):
+  *worktree-create {id}         → Create isolated worktree
+  *worktree-list                → List active worktrees
+  *worktree-merge {id}          → Merge back to base
+  *worktree-cleanup             → Remove stale worktrees
+
+WORKFLOW & SERVICE:
+  *create-service               → Scaffold service from template
+  *waves [--visual]             → Analyze parallel execution
+
+CONTEXT & INFO:
+  *load-full {file}             → Load complete file
+  *clear-cache                  → Clear context cache
+  *session-info                 → Show session details
+  *explain                      → Explain what I did
+  *guide                        → Comprehensive guide
+  *exit                         → Exit dev mode
+
+GOTCHAS MEMORY (lessons learned):
+  *gotcha {title} - {desc}      → Add gotcha
+  *gotchas [--category X]       → List gotchas
+  *gotcha-context               → Get relevant gotchas
+
+🔥 MOST COMMON WORKFLOWS
+──────────────────────────────────────────────────────────────────────────────
+Implement a story:
+  @dev
+  *develop story-1.8
+
+Run tests:
+  @dev
+  *run-tests
+
+Create a new story:
+  @po
+  *create-story
+
+Push to remote (ONLY @devops):
+  @devops
+  *push
+
+Review architecture:
+  @architect
+  *design {feature-name}
+
+⚠️  CRITICAL RULES
+──────────────────────────────────────────────────────────────────────────────
+✅ @dev:       Can commit locally, run tests, implement code
+❌ @dev:       CANNOT push to remote (use @devops)
+
+✅ @devops:    Can push, create PRs, merge, deploy
+❌ @devops:    CANNOT write code (use @dev)
+
+✅ @po:        Can create stories, manage backlog
+❌ @po:        CANNOT implement code (use @dev)
+
+📚 FULL REFERENCE
+──────────────────────────────────────────────────────────────────────────────
+See: .claude/AIOS_COMMANDS.md (comprehensive guide)
+
+════════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,17 @@
+Migration Tracking Log
+======================
+
+001_init_schema.sql
+  Status: Applied
+  Date: 2026-02-11 (initial setup)
+  Description: Initial schema with consultancies, credits, etc.
+  RLS: Enabled
+
+002_align_consultancies_prd.sql
+  Status: Applied ✅
+  Date: 2026-02-18 (applied manually to Supabase project zihtyuwqfrkzzcmhstbd)
+  Description: PRD alignment - rename columns (name→title, description→client_name), drop sector, update status constraint (active|archived), recreate RLS policies
+  Verified: Pending user SQL verification
+
+Note: Migration 002 was applied manually via Supabase SQL Editor (CLI lacked project link permissions).
+Verification: User should run queries from MIGRATION_002_VERIFICATION.md to confirm remote schema matches migration.

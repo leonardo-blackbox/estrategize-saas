@@ -1,0 +1,344 @@
+{
+  "meta": {
+    "version": "1.0",
+    "aios_version": "3.0",
+    "last_updated": "2026-02-19",
+    "description": "AIOS Agents & Commands Index"
+  },
+  "agents": {
+    "dev": {
+      "name": "Dex",
+      "persona": "Builder",
+      "invoke": "@dev",
+      "use_for": "Code implementation, debugging, refactoring",
+      "commands": [
+        "develop",
+        "develop-yolo",
+        "develop-preflight",
+        "run-tests",
+        "apply-qa-fixes",
+        "create-service",
+        "build-autonomous",
+        "build-resume",
+        "build-status",
+        "track-attempt",
+        "rollback",
+        "worktree-create",
+        "worktree-list",
+        "worktree-merge",
+        "gotcha",
+        "gotchas",
+        "execute-subtask",
+        "verify-subtask",
+        "help",
+        "exit"
+      ]
+    },
+    "qa": {
+      "name": "Quinn",
+      "persona": "Tester",
+      "invoke": "@qa",
+      "use_for": "Testing, QA, code review",
+      "commands": [
+        "review",
+        "test",
+        "coverage",
+        "help",
+        "exit"
+      ]
+    },
+    "architect": {
+      "name": "Aria",
+      "persona": "Designer",
+      "invoke": "@architect",
+      "use_for": "Architecture design, technical decisions",
+      "commands": [
+        "design",
+        "review-prd",
+        "impact-analysis",
+        "help",
+        "exit"
+      ]
+    },
+    "po": {
+      "name": "Pax",
+      "persona": "Product Owner",
+      "invoke": "@po",
+      "use_for": "Create/manage stories, epics, backlog",
+      "commands": [
+        "create-story",
+        "create-epic",
+        "manage-backlog",
+        "validate-story",
+        "help",
+        "exit"
+      ]
+    },
+    "pm": {
+      "name": "Morgan",
+      "persona": "Product Manager",
+      "invoke": "@pm",
+      "use_for": "Product management, market analysis",
+      "commands": [
+        "help",
+        "exit"
+      ]
+    },
+    "sm": {
+      "name": "River",
+      "persona": "Scrum Master",
+      "invoke": "@sm",
+      "use_for": "Sprint planning, team coordination",
+      "commands": [
+        "plan-sprint",
+        "assign-story",
+        "track-progress",
+        "help",
+        "exit"
+      ]
+    },
+    "analyst": {
+      "name": "Alex",
+      "persona": "Analyst",
+      "invoke": "@analyst",
+      "use_for": "Research, competitive analysis, brainstorming",
+      "commands": [
+        "market-research",
+        "competitive-analysis",
+        "roi-calculate",
+        "brainstorm",
+        "help",
+        "exit"
+      ]
+    },
+    "data-engineer": {
+      "name": "Dara",
+      "persona": "Data Engineer",
+      "invoke": "@data-engineer",
+      "use_for": "Database design, migrations, RLS optimization",
+      "commands": [
+        "design-schema",
+        "create-migration",
+        "optimize-query",
+        "audit-rls",
+        "help",
+        "exit"
+      ]
+    },
+    "ux-design": {
+      "name": "Uma",
+      "persona": "UX Designer",
+      "invoke": "@ux-design",
+      "use_for": "UX/UI design, wireframes, accessibility",
+      "commands": [
+        "create-wireframe",
+        "design-system",
+        "accessibility-audit",
+        "help",
+        "exit"
+      ]
+    },
+    "devops": {
+      "name": "Gage",
+      "persona": "DevOps Engineer",
+      "invoke": "@devops",
+      "use_for": "Git push, CI/CD, infrastructure (EXCLUSIVE)",
+      "commands": [
+        "push",
+        "create-pr",
+        "merge-pr",
+        "deploy",
+        "ci-status",
+        "help",
+        "exit"
+      ],
+      "note": "ONLY agent that can push to remote"
+    }
+  },
+  "commands": {
+    "develop": {
+      "agent": "dev",
+      "syntax": "*develop {story-id}",
+      "description": "Implement story (interactive mode)",
+      "example": "*develop story-1.8"
+    },
+    "develop-yolo": {
+      "agent": "dev",
+      "syntax": "*develop-yolo {story-id}",
+      "description": "Autonomous development mode",
+      "example": "*develop-yolo story-1.8"
+    },
+    "develop-preflight": {
+      "agent": "dev",
+      "syntax": "*develop-preflight {story-id}",
+      "description": "Planning mode (no implementation)",
+      "example": "*develop-preflight story-1.8"
+    },
+    "run-tests": {
+      "agent": "dev",
+      "syntax": "*run-tests",
+      "description": "Execute linting and all tests",
+      "example": "*run-tests"
+    },
+    "apply-qa-fixes": {
+      "agent": "dev",
+      "syntax": "*apply-qa-fixes",
+      "description": "Apply QA feedback and fixes",
+      "example": "*apply-qa-fixes"
+    },
+    "create-service": {
+      "agent": "dev",
+      "syntax": "*create-service",
+      "description": "Scaffold service from template",
+      "example": "*create-service"
+    },
+    "build-autonomous": {
+      "agent": "dev",
+      "syntax": "*build-autonomous {story-id}",
+      "description": "Autonomous build loop with retries",
+      "example": "*build-autonomous story-1.8"
+    },
+    "build-resume": {
+      "agent": "dev",
+      "syntax": "*build-resume {story-id}",
+      "description": "Resume build from checkpoint",
+      "example": "*build-resume story-1.8"
+    },
+    "build-status": {
+      "agent": "dev",
+      "syntax": "*build-status [--all]",
+      "description": "Show build status",
+      "example": "*build-status --all"
+    },
+    "push": {
+      "agent": "devops",
+      "syntax": "*push",
+      "description": "Push changes to remote (ONLY via @devops)",
+      "example": "*push",
+      "critical": true
+    },
+    "create-pr": {
+      "agent": "devops",
+      "syntax": "*create-pr",
+      "description": "Create pull request (ONLY via @devops)",
+      "example": "*create-pr",
+      "critical": true
+    },
+    "merge-pr": {
+      "agent": "devops",
+      "syntax": "*merge-pr {pr-id}",
+      "description": "Merge PR (ONLY via @devops)",
+      "example": "*merge-pr 42",
+      "critical": true
+    },
+    "create-story": {
+      "agent": "po",
+      "syntax": "*create-story",
+      "description": "Create new story",
+      "example": "*create-story"
+    },
+    "create-epic": {
+      "agent": "po",
+      "syntax": "*create-epic",
+      "description": "Create new epic",
+      "example": "*create-epic"
+    },
+    "help": {
+      "agent": "any",
+      "syntax": "*help",
+      "description": "Show all commands for current agent",
+      "example": "*help"
+    },
+    "exit": {
+      "agent": "any",
+      "syntax": "*exit",
+      "description": "Exit agent mode",
+      "example": "*exit"
+    }
+  },
+  "rules": {
+    "dev": {
+      "can": [
+        "Implement code",
+        "Fix bugs",
+        "Run local tests",
+        "Commit locally",
+        "Create branches"
+      ],
+      "cannot": [
+        "Push to remote",
+        "Create PRs",
+        "Merge to main"
+      ]
+    },
+    "devops": {
+      "can": [
+        "Push changes",
+        "Create PRs",
+        "Merge PRs",
+        "Deploy",
+        "Manage CI/CD"
+      ],
+      "cannot": [
+        "Write code",
+        "Create stories",
+        "Review PRD"
+      ]
+    },
+    "po": {
+      "can": [
+        "Create stories",
+        "Create epics",
+        "Manage backlog",
+        "Write acceptance criteria"
+      ],
+      "cannot": [
+        "Implement code",
+        "Push to remote"
+      ]
+    }
+  },
+  "quick_workflows": {
+    "implement_story": {
+      "steps": [
+        "@dev",
+        "*develop story-X.Y"
+      ],
+      "description": "Implement a story"
+    },
+    "test_code": {
+      "steps": [
+        "@dev",
+        "*run-tests"
+      ],
+      "description": "Run all tests"
+    },
+    "push_code": {
+      "steps": [
+        "@devops",
+        "*push"
+      ],
+      "description": "Push to remote (ONLY via @devops)"
+    },
+    "create_story": {
+      "steps": [
+        "@po",
+        "*create-story"
+      ],
+      "description": "Create new story"
+    },
+    "review_architecture": {
+      "steps": [
+        "@architect",
+        "*design {feature}"
+      ],
+      "description": "Review feature architecture"
+    }
+  },
+  "references": {
+    "full_guide": ".claude/AIOS_COMMANDS.md",
+    "quick_card": ".claude/QUICK_COMMANDS.txt",
+    "settings": ".claude/settings.local.json",
+    "aios_dev_config": ".aios-core/development/agents/dev.md"
+  }
+}

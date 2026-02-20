@@ -71,6 +71,31 @@ estrategize-saas/
     └── workflows/     # CI/CD pipelines
 ```
 
+## 🤖 AIOS Commands & Agents
+
+Use Claude Code with AIOS agents for development:
+
+```bash
+@dev              # Implement code (use *develop {story-id})
+@qa               # QA & testing
+@po               # Product owner (create stories)
+@sm               # Scrum master (sprint planning)
+@architect        # Architecture design
+@devops           # DevOps (git push, CI/CD - EXCLUSIVE)
+```
+
+**Quick Start:**
+```
+@dev
+*develop story-1.8
+```
+
+📖 **Full Reference:** [.claude/AIOS_COMMANDS.md](./.claude/AIOS_COMMANDS.md)
+
+⚡ **Quick Card:** [.claude/QUICK_COMMANDS.txt](./.claude/QUICK_COMMANDS.txt)
+
+---
+
 ## 🛠️ Available Commands
 
 ### Frontend
@@ -110,6 +135,8 @@ npm run type-check    # TypeScript type checking
 
 - **[PRD (Product Requirements)](./docs/prd/epic-1.md)** - Complete feature specifications and story breakdown
 - **[CLAUDE.md](./CLAUDE.md)** - Architecture and development guidance
+- **[AIOS Commands Reference](./.claude/AIOS_COMMANDS.md)** - Agents and commands guide
+- **[AIOS Quick Commands](./.claude/QUICK_COMMANDS.txt)** - Quick reference card
 - **[Frontend README](./frontend/README.md)** - Frontend-specific setup
 - **[Backend README](./backend/)** - Backend-specific setup (coming soon)
 
