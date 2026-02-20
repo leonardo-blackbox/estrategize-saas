@@ -166,6 +166,134 @@ curl http://localhost:3001/api/consultancies/<uuid>/diagnose/history \
 
 ---
 
+## Credits (`/api/credits`)
+
+**Story 1.9** — Atomic reserve/consume/release credit system with idempotency.
+
+### GET /api/credits/balance
+
+Get current credit balance and usage stats.
+
+```bash
+curl http://localhost:3001/api/credits/balance \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "available": 100,
+    "reserved": 5,
+    "total_consumed": 20,
+    "consumed_this_month": 8,
+    "transaction_count": 15
+  }
+}
+```
+
+### POST /api/credits/reserve
+
+Reserve credits before an operation (e.g. AI diagnosis). Atomic with balance check.
+
+```bash
+curl -X POST http://localhost:3001/api/credits/reserve \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 5, "idempotency_key": "diag-abc123", "description": "AI diagnosis"}'
+```
+
+**Body:** `{ amount: number, idempotency_key?: string, reference_id?: string, description?: string }`
+
+**Response:** `201 { data: { reservation_id: "uuid" } }`
+
+**Errors:**
+- `400` Invalid input (Zod)
+- `402` Insufficient credits
+
+### POST /api/credits/consume
+
+Confirm a reservation (reserve -> consume). Atomic, prevents double-consume.
+
+```bash
+curl -X POST http://localhost:3001/api/credits/consume \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"reservation_id": "uuid"}'
+```
+
+**Body:** `{ reservation_id: string (uuid) }`
+
+**Response:** `200 { ok: true }`
+
+**Errors:**
+- `404` Reservation not found
+- `409` Reservation already processed (double-consume prevented)
+
+### POST /api/credits/release
+
+Cancel a reservation (returns credits to available balance). Atomic, prevents double-release.
+
+```bash
+curl -X POST http://localhost:3001/api/credits/release \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"reservation_id": "uuid"}'
+```
+
+**Body:** `{ reservation_id: string (uuid) }`
+
+**Response:** `200 { ok: true }`
+
+**Errors:**
+- `404` Reservation not found
+- `409` Reservation already processed
+
+### GET /api/credits/transactions
+
+List recent credit transactions (paginated).
+
+```bash
+curl "http://localhost:3001/api/credits/transactions?limit=20&offset=0" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Query params:** `limit` (default 50, max 100), `offset` (default 0)
+
+**Response:** `200 { data: CreditTransaction[] }`
+
+---
+
+## Credit Transaction Schema
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | uuid | Primary key |
+| user_id | uuid | Owner (auth.users FK) |
+| amount | integer | Credit amount (always positive) |
+| type | text | `purchase`, `monthly_grant`, `reserve`, `consume`, `release` |
+| status | text | `pending`, `confirmed`, `released` |
+| idempotency_key | text | Unique key for dedup (nullable) |
+| reference_id | text | Related entity ID (nullable) |
+| description | text | Human-readable description (nullable) |
+| created_at | timestamptz | Transaction timestamp |
+
+### Credit Flow
+
+```
+User has 100 credits available
+
+1. POST /reserve {amount: 5}  → available: 95, reserved: 5
+2a. POST /consume {id}        → available: 95, consumed: 5   (success path)
+2b. POST /release {id}        → available: 100, reserved: 0  (error path)
+```
+
+### Idempotency
+
+Sending the same `idempotency_key` twice returns the existing reservation ID without creating a duplicate. This prevents double-charges under network retries.
+
+---
+
 ## Error Format
 
 All errors return: `{ error: string }`
@@ -174,7 +302,9 @@ All errors return: `{ error: string }`
 |------|---------|
 | 400 | Validation error (Zod) |
 | 401 | Missing or invalid auth token |
+| 402 | Insufficient credits |
 | 404 | Resource not found or not owned |
+| 409 | Conflict (already processed) |
 | 500 | Internal server error |
 
 ---

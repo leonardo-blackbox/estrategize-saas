@@ -5,6 +5,7 @@ import type { ErrorRequestHandler } from "express";
 import { supabaseAdmin } from './lib/supabaseAdmin.js';
 import authRouter from './routes/auth.js';
 import consultanciesRouter from './routes/consultancies.js';
+import creditsRouter from './routes/credits.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
 const app = express();
@@ -60,6 +61,7 @@ app.use('/auth', authRouter);
 
 // API routes
 app.use('/api/consultancies', consultanciesRouter);
+app.use('/api/credits', creditsRouter);
 
 // Protected: returns authenticated user id
 app.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {

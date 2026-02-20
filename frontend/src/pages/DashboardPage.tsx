@@ -10,8 +10,8 @@ import {
   mockRecentActivities,
   mockRecommendedCourses,
   mockLockedResources,
-  mockCreditStatus,
 } from '../mocks/dashboardMock.ts';
+import { CreditBalanceCard } from '../components/credits/CreditBalanceCard.tsx';
 
 const statusLabel: Record<string, string> = {
   in_progress: 'In Progress',
@@ -39,9 +39,6 @@ const levelLabel: Record<string, string> = {
 
 export function DashboardPage() {
   const user = useAuthStore((s) => s.user);
-  const creditPercent = Math.round(
-    (mockCreditStatus.used / mockCreditStatus.total) * 100,
-  );
 
   return (
     <div className="space-y-8">
@@ -206,39 +203,9 @@ export function DashboardPage() {
 
         {/* Right column */}
         <div className="space-y-8 lg:col-span-4">
-          {/* 8. Status de Créditos */}
+          {/* 8. Status de Créditos (live data) */}
           <Section title="Credit Status">
-            <Card>
-              <div className="mb-4 flex items-baseline justify-between">
-                <span className="text-3xl font-bold text-white">
-                  {mockCreditStatus.available}
-                </span>
-                <span className="text-sm text-slate-400">
-                  of {mockCreditStatus.total} credits
-                </span>
-              </div>
-              <div className="mb-2 h-2 rounded-full bg-slate-700">
-                <div
-                  className="h-2 rounded-full bg-indigo-500"
-                  style={{ width: `${creditPercent}%` }}
-                />
-              </div>
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>{mockCreditStatus.used} used</span>
-                <span>{mockCreditStatus.available} remaining</span>
-              </div>
-              <div className="mt-4 rounded-lg bg-slate-700/50 p-3">
-                <p className="text-sm text-slate-300">
-                  <span className="font-medium text-white">
-                    {mockCreditStatus.planName}
-                  </span>{' '}
-                  plan
-                </p>
-                <p className="mt-0.5 text-xs text-slate-400">
-                  Renews {mockCreditStatus.renewalDate}
-                </p>
-              </div>
-            </Card>
+            <CreditBalanceCard />
           </Section>
 
           {/* 7. Recursos Bloqueados */}

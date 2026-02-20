@@ -10,6 +10,7 @@ import { DashboardPage } from './pages/DashboardPage.tsx';
 import { ConsultanciesPage } from './pages/ConsultanciesPage.tsx';
 import { PlansPage } from './pages/PlansPage.tsx';
 import { SettingsPage } from './pages/SettingsPage.tsx';
+import { CreditsPage } from './pages/CreditsPage.tsx';
 
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
@@ -37,6 +38,7 @@ export default function App() {
         >
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/consultancies" element={<ConsultanciesPage />} />
+          <Route path="/credits" element={<CreditsPage />} />
           <Route path="/plans" element={<PlansPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
