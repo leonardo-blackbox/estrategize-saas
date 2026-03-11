@@ -1,0 +1,622 @@
+epic:
+  id: "2"
+  name: "Member System + Admin Console (Iris SaaS)"
+  version: "1.0.0"
+  created: "2026-03-01"
+  author: "@pm (Morgan)"
+  prd: "docs/prd/epic-2.md"
+  extends: "docs/prd/epic-1.md"
+  execution_mode: interactive
+  total_stories: 20
+  total_waves: 6
+
+  gates:
+    - id: gate-1
+      name: "Design/UX Aprovado"
+      owner: "@ux-design-expert"
+      reviewer: "@pm"
+      criteria: "Layout Netflix funcional, navegação aprovada desktop + mobile"
+      blocks_wave: 4
+    - id: gate-2
+      name: "Data/RLS Validado"
+      owner: "@data-engineer"
+      reviewer: "@qa"
+      criteria: "Schema completo, RLS testada (isolamento de dados confirmado)"
+      blocks_wave: 2
+    - id: gate-3
+      name: "Webhooks Validados"
+      owner: "@qa"
+      reviewer: "@dev"
+      criteria: "Idempotência + assinatura HMAC verificadas com testes automatizados"
+      blocks_wave: 6
+    - id: gate-4
+      name: "QA Final"
+      owner: "@qa"
+      criteria: "Todos os fluxos críticos passando (signup, acesso, drip, admin CRUD)"
+      blocks_wave: null  # terminal gate
+
+  waves:
+
+    # ═══════════════════════════════════════════════════════
+    # WAVE 1 — Foundation (Paralelo, sem dependências)
+    # ═══════════════════════════════════════════════════════
+    - wave: 1
+      name: "Foundation"
+      execution: parallel
+      description: >
+        Infraestrutura base: schema do banco, RLS, admin guard e entitlements engine.
+        Tudo roda em paralelo — são domínios independentes.
+      stories:
+
+        - story_id: "2.1"
+          title: "Schema, Migrations & RLS — Member Area"
+          file: "docs/stories/2.1.story.md"
+          agents:
+            primary: "@data-engineer"
+            supporting: "@architect"
+          scope: backend/database
+          estimated_complexity: high
+          description: >
+            Criar todas as tabelas do member area + admin no PostgreSQL (Supabase).
+            Habilitar RLS com políticas corretas: usuários acessam só seus dados,
+            admins bypassam via service_role ou role check. Incluir migrations e seeds de teste.
+          deliverables:
+            - "Migrations SQL para todas as 12 tabelas novas"
+            - "RLS policies por tabela (select, insert, update, delete)"
+            - "Seed de dados de teste (1 admin, 2 users, 2 cursos, 5 aulas)"
+            - "docs/database-schema-v2.md atualizado"
+          tables:
+            - courses
+            - modules
+            - lessons
+            - lesson_attachments
+            - collections
+            - course_collections
+            - plan_entitlements
+            - user_entitlements
+            - enrollments
+            - lesson_progress
+            - webhook_events
+            - audit_logs
+          acceptance_criteria:
+            - "Todas as tabelas criadas e migradas sem erro"
+            - "RLS: user_A não consegue SELECT em dados de user_B"
+            - "RLS: admin consegue SELECT em qualquer linha"
+            - "Seed de teste executável com npm run db:seed"
+
+        - story_id: "2.2"
+          title: "Admin Infrastructure — Rotas, Guard, Role"
+          file: "docs/stories/2.2.story.md"
+          agents:
+            primary: "@dev"
+            supporting: "@architect"
+          scope: frontend/backend
+          estimated_complexity: medium
+          description: >
+            Criar a infraestrutura completa do admin: layout separado no React,
+            rotas protegidas /admin/*, middleware de verificação de role admin no backend,
+            bootstrap do primeiro admin via env ADMIN_EMAIL.
+          deliverables:
+            - "Layout AdminLayout.tsx separado do DashboardLayout"
+            - "AdminRoute guard (403 para não-admins)"
+            - "Middleware isAdmin no backend (verifica role em profiles)"
+            - "Bootstrap: se ADMIN_EMAIL no .env, upsert role=admin no primeiro login"
+            - "Página /admin (index) com status do sistema"
+          acceptance_criteria:
+            - "Acessar /admin sem role admin retorna 403 / redirect"
+            - "Admin logado acessa /admin com sucesso"
+            - "Sidebar admin separada da sidebar de usuário"
+            - "ADMIN_EMAIL no .env configura role automaticamente no primeiro login"
+
+        - story_id: "2.3"
+          title: "Entitlements Engine — Core Logic"
+          file: "docs/stories/2.3.story.md"
+          agents:
+            primary: "@dev"
+            supporting: "@architect"
+          scope: backend
+          estimated_complexity: high
+          description: >
+            Implementar o core do sistema de entitlements que resolve se um usuário
+            tem acesso a um curso/módulo/aula. Cascata: plan_entitlements → user_entitlements
+            (override allow/deny) → drip gating → expiration check.
+          deliverables:
+            - "src/services/entitlementsService.ts com função resolveAccess(userId, resourceId)"
+            - "Tipos: CourseAccess, ModuleAccess, LessonAccess"
+            - "Cache de entitlements por usuário (TTL 5min)"
+            - "Testes unitários: 10+ casos cobrindo cascata de acesso"
+          acceptance_criteria:
+            - "resolveAccess retorna { allowed: boolean, reason: string, expiresAt?: Date }"
+            - "Plan entitlement libera acesso corretamente"
+            - "User override deny bloqueia mesmo com plan entitlement"
+            - "Drip: aula bloqueada até dias desde enrollment"
+            - "Expiração: acesso negado após expires_at"
+            - ">80% cobertura nos testes unitários do engine"
+
+    # ═══════════════════════════════════════════════════════
+    # WAVE 2 — Core Backend (Paralelo, depende de Wave 1)
+    # ═══════════════════════════════════════════════════════
+    - wave: 2
+      name: "Core Backend"
+      execution: parallel
+      depends_on: [wave-1]
+      gate_required: gate-2
+      description: >
+        Webhook handler, onboarding e drip engine. Todos dependem do schema (2.1)
+        e do entitlements engine (2.3).
+      stories:
+
+        - story_id: "2.4"
+          title: "Webhook Handler — Gateway-Agnostic + Idempotency"
+          file: "docs/stories/2.4.story.md"
+          agents:
+            primary: "@dev"
+          scope: backend
+          estimated_complexity: high
+          depends_on: ["2.1", "2.3"]
+          description: >
+            Implementar handler de webhooks genérico que suporta múltiplos gateways
+            (Stripe, Hotmart, Kiwify). Verificação HMAC obrigatória.
+            Idempotência via event_id. Dispatcher de eventos para handlers específicos.
+          deliverables:
+            - "POST /api/webhooks/:provider (stripe | hotmart | kiwify)"
+            - "HMAC verification por provider (secret no .env)"
+            - "Salvar evento em webhook_events antes de processar"
+            - "Idempotência: se event_id já existe com status=processed, return 200 sem reprocessar"
+            - "Event dispatcher: purchase_approved → onboardingService"
+            - "Testes: evento duplicado não gera 2 matrículas"
+          acceptance_criteria:
+            - "Webhook sem assinatura válida retorna 401"
+            - "Evento duplicado retorna 200 mas não reprocessa"
+            - "Evento salvo em webhook_events com payload, status e timestamps"
+            - "Suporte a pelo menos: purchase_approved, canceled, payment_failed"
+
+        - story_id: "2.5"
+          title: "Onboarding Flow — Compra → User → Entitlements + E-mail"
+          file: "docs/stories/2.5.story.md"
+          agents:
+            primary: "@dev"
+          scope: backend
+          estimated_complexity: medium
+          depends_on: ["2.1", "2.3", "2.4"]
+          description: >
+            Fluxo completo de onboarding disparado por webhook de compra aprovada.
+            Cria usuário se não existir, aplica entitlements do plano, envia e-mail.
+          deliverables:
+            - "onboardingService.ts: processPurchase(event)"
+            - "Se email novo: createUser (Supabase Auth invite/magic link) + enviar e-mail de boas-vindas"
+            - "Se email existente: upsert enrollment + atualizar entitlements"
+            - "Template de e-mail: boas-vindas com link de acesso"
+            - "Audit log: purchase_onboarding_completed"
+          acceptance_criteria:
+            - "Novo usuário: conta criada + e-mail de acesso enviado + entitlements aplicados"
+            - "Usuário existente: entitlements atualizados + sem duplicar conta"
+            - "Evento de onboarding registrado no audit_log"
+            - "Falha no e-mail não bloqueia criação de acesso (retry async)"
+
+        - story_id: "2.6"
+          title: "Drip Engine — Liberação por Dias + Override"
+          file: "docs/stories/2.6.story.md"
+          agents:
+            primary: "@dev"
+          scope: backend
+          estimated_complexity: medium
+          depends_on: ["2.1", "2.3"]
+          description: >
+            Sistema de drip: liberar aulas/módulos X dias após data de matrícula.
+            Admin pode fazer override com "grant full access" quebrando o drip.
+          deliverables:
+            - "Campo drip_days em lessons/modules"
+            - "dripService.ts: isUnlocked(enrollmentDate, dripDays) → boolean"
+            - "Integração com entitlementsService"
+            - "Admin action: grantFullAccess(userId, courseId) → seta override em user_entitlements"
+            - "Testes: drip correto por dias + override funcionando"
+          acceptance_criteria:
+            - "Aula com drip_days=7 fica bloqueada nos primeiros 6 dias após matrícula"
+            - "No dia 7+: aula desbloqueada automaticamente"
+            - "grantFullAccess: desbloqueio imediato ignorando drip_days"
+            - "Override salvo em user_entitlements com motivo admin_override"
+
+    # ═══════════════════════════════════════════════════════
+    # WAVE 3 — Admin Console Backend (Paralelo, depende de Wave 1)
+    # ═══════════════════════════════════════════════════════
+    - wave: 3
+      name: "Admin Console Backend"
+      execution: parallel
+      depends_on: [wave-1]
+      description: >
+        APIs do admin console. Rodam em paralelo pois são domínios distintos.
+        Dependem apenas do schema (Wave 1).
+      stories:
+
+        - story_id: "2.7"
+          title: "Admin API — Course/Module/Lesson CRUD"
+          file: "docs/stories/2.7.story.md"
+          agents:
+            primary: "@dev"
+          scope: backend
+          depends_on: ["2.1", "2.2"]
+          estimated_complexity: medium
+          description: >
+            APIs REST completas para gestão de conteúdo pelo admin.
+            CRUD de cursos, módulos, aulas, anexos, coleções e tags.
+          deliverables:
+            - "GET/POST /api/admin/courses"
+            - "GET/PUT/DELETE /api/admin/courses/:id"
+            - "GET/POST /api/admin/courses/:id/modules"
+            - "GET/PUT/DELETE /api/admin/modules/:id"
+            - "GET/POST /api/admin/modules/:id/lessons"
+            - "GET/PUT/DELETE /api/admin/lessons/:id"
+            - "POST /api/admin/lessons/:id/attachments"
+            - "GET/POST /api/admin/collections"
+            - "POST /api/admin/courses/:id/publish | /archive"
+            - "Validação Zod em todos os endpoints"
+          acceptance_criteria:
+            - "Todos os endpoints retornam 403 para não-admin"
+            - "CRUD completo funciona via Postman/testes"
+            - "Publicar/arquivar atualiza status do curso"
+            - "Upload de imagem de capa integrado com Supabase Storage"
+
+        - story_id: "2.8"
+          title: "Admin API — User Management + Access Control"
+          file: "docs/stories/2.8.story.md"
+          agents:
+            primary: "@dev"
+          scope: backend
+          depends_on: ["2.1", "2.2", "2.3"]
+          estimated_complexity: medium
+          description: >
+            APIs para gestão de usuários e controle de acessos pelo admin.
+            Ver perfil, entitlements, conceder/revogar, reset.
+          deliverables:
+            - "GET /api/admin/users (paginado, com filtros)"
+            - "GET /api/admin/users/:id (perfil + plano + entitlements efetivos)"
+            - "POST /api/admin/users/:id/entitlements (conceder acesso)"
+            - "DELETE /api/admin/users/:id/entitlements/:entitlementId (revogar)"
+            - "POST /api/admin/users/:id/grant-full-access/:courseId"
+            - "POST /api/admin/users/:id/reprocess-entitlements"
+            - "POST /api/admin/users/:id/resend-welcome-email"
+          acceptance_criteria:
+            - "Lista de usuários com paginação (limit/offset)"
+            - "Conceder acesso cria user_entitlement e audit_log"
+            - "Revogar acesso remove entitlement e bloqueia imediatamente"
+            - "Reprocessar atualiza entitlements baseado no plano atual"
+
+        - story_id: "2.9"
+          title: "Admin API — Webhook Events & Audit Logs"
+          file: "docs/stories/2.9.story.md"
+          agents:
+            primary: "@dev"
+          scope: backend
+          depends_on: ["2.1", "2.2"]
+          estimated_complexity: low
+          description: >
+            APIs de leitura para webhook_events e audit_logs com filtros e paginação.
+          deliverables:
+            - "GET /api/admin/webhooks (paginado, filtros: provider, status, date)"
+            - "GET /api/admin/webhooks/:id (payload completo)"
+            - "GET /api/admin/audit-logs (paginado, filtros: action, user, date)"
+            - "GET /api/admin/audit-logs/:id"
+          acceptance_criteria:
+            - "Filtros funcionais por status, provider e período"
+            - "Payload de webhook visível sem dados sensíveis expostos"
+            - "Paginação com cursor ou offset"
+
+    # ═══════════════════════════════════════════════════════
+    # WAVE 4 — Member Area Frontend (Paralelo, depende de Wave 2+3)
+    # ═══════════════════════════════════════════════════════
+    - wave: 4
+      name: "Member Area Frontend"
+      execution: parallel
+      depends_on: [wave-2, wave-3]
+      gate_required: gate-1
+      description: >
+        Frontend da área de membros Netflix-like. Gate 1 (UX) deve passar antes desta wave.
+        Stories podem rodar em paralelo após aprovação do layout base (2.10).
+      stories:
+
+        - story_id: "2.10"
+          title: "Member Area Layout & Navigation"
+          file: "docs/stories/2.10.story.md"
+          agents:
+            primary: "@ux-design-expert"
+            secondary: "@dev"
+          scope: frontend
+          estimated_complexity: medium
+          description: >
+            Layout base da área de membros: header, sidebar/nav, rota /formacao/*.
+            Design premium responsivo (desktop + mobile). Este é o gate de UX.
+          deliverables:
+            - "MemberLayout.tsx: header com busca, avatar, progress geral"
+            - "Rota /formacao protegida (requer auth)"
+            - "Sidebar/nav mobile com hamburger"
+            - "Tema consistente com o SaaS (P&B Apple Glass design system)"
+            - "Skeleton loaders para carregamento"
+          gate: gate-1
+          acceptance_criteria:
+            - "Layout aprovado visualmente pelo PM"
+            - "Responsivo: mobile (375px) e desktop (1440px)"
+            - "Navegação /formacao → /formacao/curso/:id → /formacao/aula/:id funcional"
+            - "Skeleton loaders em todas as seções de dados"
+
+        - story_id: "2.11"
+          title: "Catálogo Netflix-like — Hero + Carrosséis + Cards"
+          file: "docs/stories/2.11.story.md"
+          agents:
+            primary: "@ux-design-expert"
+            secondary: "@dev"
+          scope: frontend
+          depends_on: ["2.10"]
+          estimated_complexity: high
+          description: >
+            Página principal do catálogo com hero/banner, carrosséis por coleção e
+            cards de curso com estados visuais (locked/unlocked/in_progress).
+          deliverables:
+            - "HeroBanner.tsx: curso destaque com CTA"
+            - "CourseCarousel.tsx: horizontal scroll + keyboard nav"
+            - "Carrosséis: Continue assistindo, Liberados, Bloqueados, Recomendações"
+            - "CourseCard.tsx: thumbnail, título, progresso, estado (lock/unlock), CTA"
+            - "Busca básica (client-side + debounce)"
+          acceptance_criteria:
+            - "Hero com animação/transição suave"
+            - "Carrosséis com scroll horizontal suave + seta de navegação"
+            - "Card locked: blur leve + ícone de lock + CTA upgrade"
+            - "Card in_progress: barra de progresso visual"
+            - "Busca filtra cursos em tempo real (debounce 300ms)"
+
+        - story_id: "2.12"
+          title: "Página do Curso — Módulos, Aulas, Progresso, Drip"
+          file: "docs/stories/2.12.story.md"
+          agents:
+            primary: "@dev"
+          scope: frontend
+          depends_on: ["2.10", "2.3"]
+          estimated_complexity: medium
+          description: >
+            Página de detalhe do curso com lista de módulos/aulas, estado de acesso
+            por drip/entitlement, progresso visual por módulo e curso.
+          deliverables:
+            - "CoursePage.tsx: header, progresso geral, lista de módulos colapsáveis"
+            - "LessonRow.tsx: status (locked/available/completed), duração, materiais"
+            - "ProgressBar por módulo e curso (calculado via lesson_progress)"
+            - "Drip badge: 'Libera em X dias' para aulas com drip pendente"
+          acceptance_criteria:
+            - "Módulos expansíveis com lista de aulas"
+            - "Aula locked mostra motivo: drip ou entitlement"
+            - "Progresso calculado corretamente (completed lessons / total lessons)"
+            - "CTA 'Continuar' vai para última aula não concluída"
+
+        - story_id: "2.13"
+          title: "Página da Aula — Player, Progresso, Materiais"
+          file: "docs/stories/2.13.story.md"
+          agents:
+            primary: "@dev"
+          scope: frontend
+          depends_on: ["2.10"]
+          estimated_complexity: medium
+          description: >
+            Página de reprodução de aula com player embed, salvar progresso/timestamp,
+            marcar como concluída e lista de materiais.
+          deliverables:
+            - "LessonPage.tsx: player, controles, próxima aula, materiais"
+            - "VideoPlayer.tsx: embed YouTube/Vimeo com retomada de timestamp"
+            - "Salvar progresso: PATCH /api/lesson-progress a cada 30s"
+            - "Botão 'Marcar como concluída' + feedback visual"
+            - "Sidebar: lista de aulas do módulo com estado"
+            - "Attachments.tsx: lista de materiais para download"
+          acceptance_criteria:
+            - "Vídeo retoma do timestamp salvo ao reabrir"
+            - "Progresso salvo a cada 30s sem bloquear UX"
+            - "Marcar concluída atualiza progresso no curso imediatamente"
+            - "Navegação sequencial (anterior/próxima) funciona"
+            - "Materiais disponíveis para download"
+
+        - story_id: "2.14"
+          title: "Paywall Elegante + Continue Assistindo"
+          file: "docs/stories/2.14.story.md"
+          agents:
+            primary: "@ux-design-expert"
+            secondary: "@dev"
+          scope: frontend
+          depends_on: ["2.10", "2.11"]
+          estimated_complexity: medium
+          description: >
+            UX do paywall: cursos bloqueados não quebram a navegação.
+            "Continue assistindo" como carrossel da home com progresso real.
+          deliverables:
+            - "PaywallOverlay.tsx: blur + lock + CTA para upgrade (sem modal invasivo)"
+            - "LockedCourseCard.tsx: preview do conteúdo + badge de plano necessário"
+            - "ContinueWatchingCarousel.tsx: busca última aula por usuário"
+            - "Hook useContinueWatching: query lesson_progress por usuário"
+          acceptance_criteria:
+            - "Curso bloqueado: thumbnail visível com overlay de 30% blur + lock"
+            - "CTA de upgrade direciona para /planos sem sair da área de membros"
+            - "Continue assistindo: mostra até 10 aulas em progresso"
+            - "Progresso correto no card do continue assistindo"
+
+    # ═══════════════════════════════════════════════════════
+    # WAVE 5 — Admin Console Frontend (Paralelo, depende de Wave 3)
+    # ═══════════════════════════════════════════════════════
+    - wave: 5
+      name: "Admin Console Frontend"
+      execution: parallel
+      depends_on: [wave-3]
+      description: >
+        Frontend do admin console. Depende das APIs (Wave 3) e da infra (2.2).
+        Design funcional e limpo — não precisa de UX premium, mas deve ser usável.
+      stories:
+
+        - story_id: "2.15"
+          title: "Admin UI — Content Management (Cursos/Módulos/Aulas)"
+          file: "docs/stories/2.15.story.md"
+          agents:
+            primary: "@dev"
+          scope: frontend
+          depends_on: ["2.2", "2.7"]
+          estimated_complexity: high
+          description: >
+            Interface de gestão de conteúdo: CRUD visual de cursos, módulos e aulas
+            com formulários, upload de capas e organização de carrosséis.
+          deliverables:
+            - "/admin/conteudo: lista de cursos com status e ações"
+            - "CourseForm.tsx: criar/editar curso (título, descrição, capa, tags)"
+            - "ModuleForm.tsx: criar/editar módulo com ordenação drag-and-drop"
+            - "LessonForm.tsx: criar/editar aula (embed URL, drip_days, materiais)"
+            - "CollectionManager.tsx: criar coleções e associar cursos"
+            - "Botões Publicar / Arquivar com confirmação"
+          acceptance_criteria:
+            - "Admin cria curso completo com módulos e aulas via UI"
+            - "Upload de capa funcional (Supabase Storage)"
+            - "Reordenar aulas por drag-and-drop salva order corretamente"
+            - "Publicar curso muda status e aparece no catálogo"
+
+        - story_id: "2.16"
+          title: "Admin UI — Users, Access & Entitlements"
+          file: "docs/stories/2.16.story.md"
+          agents:
+            primary: "@dev"
+          scope: frontend
+          depends_on: ["2.2", "2.8"]
+          estimated_complexity: medium
+          description: >
+            Interface de gestão de usuários: listagem, perfil com entitlements,
+            concessão/revogação de acesso e ações de admin.
+          deliverables:
+            - "/admin/usuarios: tabela paginada com busca por email/nome"
+            - "UserDetail.tsx: plano, entitlements efetivos, histórico de acesso"
+            - "EntitlementManager.tsx: conceder/revogar acesso com seletor de curso"
+            - "GrantFullAccess.tsx: botão com confirmação de override de drip"
+            - "Botão 'Reenviar e-mail de boas-vindas'"
+          acceptance_criteria:
+            - "Admin encontra usuário por email e vê perfil completo"
+            - "Conceder acesso: seletor de curso + submit → entitlement criado"
+            - "Revogar: confirmação + revogação imediata"
+            - "Grant full access: aviso de consequência + confirmação"
+
+        - story_id: "2.17"
+          title: "Admin UI — Webhooks, Audit Logs & Dashboard"
+          file: "docs/stories/2.17.story.md"
+          agents:
+            primary: "@dev"
+          scope: frontend
+          depends_on: ["2.2", "2.9"]
+          estimated_complexity: medium
+          description: >
+            Telas de monitoramento: webhook events com payload, audit logs
+            e dashboard de status do sistema.
+          deliverables:
+            - "/admin: dashboard com métricas (total users, cursos ativos, webhooks recentes)"
+            - "/admin/webhooks: tabela com provider, evento, status, timestamp + detalhe do payload"
+            - "/admin/auditoria: tabela com ação, usuário, target, timestamp"
+            - "Filtros por data, status e tipo de evento"
+          acceptance_criteria:
+            - "Dashboard mostra números reais via API"
+            - "Webhook detail mostra payload JSON formatado"
+            - "Filtros funcionais (date range + status)"
+            - "Audit log mostra ações admin com usuário responsável"
+
+    # ═══════════════════════════════════════════════════════
+    # WAVE 6 — QA, Segurança & Go-Live (Sequencial)
+    # ═══════════════════════════════════════════════════════
+    - wave: 6
+      name: "QA, Segurança & Go-Live"
+      execution: sequential
+      depends_on: [wave-4, wave-5]
+      gate_required: gate-3
+      description: >
+        Fase final de validação, segurança e deploy. Gate 3 (webhooks) deve passar primeiro.
+        Stories executadas em sequência: security → e2e → go-live.
+      stories:
+
+        - story_id: "2.18"
+          title: "Security Audit — RLS, Rate Limit, Webhook Signatures"
+          file: "docs/stories/2.18.story.md"
+          agents:
+            primary: "@qa"
+            supporting: "@dev"
+          scope: backend/security
+          estimated_complexity: high
+          description: >
+            Auditoria completa de segurança: verificar RLS em todas as tabelas novas,
+            adicionar rate limiting nos endpoints sensíveis, validar assinaturas de webhook.
+          deliverables:
+            - "RLS audit: testar todas as 12 tabelas com 3 perfis (anon, user, admin)"
+            - "Rate limiting: /api/webhook (100/min), /admin/* (60/min), /api/auth/* (10/min)"
+            - "Webhook: teste de rejeição sem assinatura + com assinatura inválida"
+            - "Relatório de segurança: docs/security-audit-epic2.md"
+          acceptance_criteria:
+            - "Nenhuma tabela expõe dados cross-user via RLS"
+            - "Rate limit retorna 429 quando ultrapassado"
+            - "Webhook sem HMAC retorna 401"
+            - "Relatório de segurança aprovado pelo @qa"
+
+        - story_id: "2.19"
+          title: "E2E Tests — Fluxos Críticos"
+          file: "docs/stories/2.19.story.md"
+          agents:
+            primary: "@qa"
+          scope: testing
+          depends_on: ["2.18"]
+          estimated_complexity: high
+          description: >
+            Testes E2E cobrindo os 4 fluxos críticos: onboarding via webhook,
+            acesso por entitlement, drip/override e admin CRUD.
+          deliverables:
+            - "Teste: webhook purchase_approved → user criado → entitlement aplicado"
+            - "Teste: evento duplicado → 200 sem reprocessar (idempotência)"
+            - "Teste: acesso a aula com entitlement válido"
+            - "Teste: acesso negado sem entitlement (RLS + engine)"
+            - "Teste: drip liberado após X dias"
+            - "Teste: grant_full_access quebra drip"
+            - "Teste: admin cria curso + publica + aparece no catálogo"
+            - "Gate 4: todos os testes passando"
+          gate: gate-4
+          acceptance_criteria:
+            - "Todos os 7 testes E2E passando"
+            - "Cobertura dos serviços críticos > 80%"
+            - "Zero flaky tests"
+
+        - story_id: "2.20"
+          title: "Go-Live Checklist + Deploy"
+          file: "docs/stories/2.20.story.md"
+          agents:
+            primary: "@devops"
+            supporting: "@qa"
+          scope: deployment
+          depends_on: ["2.19"]
+          estimated_complexity: medium
+          description: >
+            Checklist de go-live e deploy da epic 2 completa em produção.
+          deliverables:
+            - "Go-live checklist executado (docs/go-live-epic2.md)"
+            - "Variáveis de ambiente em produção configuradas"
+            - "Migrations executadas em produção"
+            - "Smoke tests em produção"
+            - "Deploy FE (Vercel) + BE (Railway)"
+          acceptance_criteria:
+            - "Todas as variáveis de ambiente novas configuradas em prod"
+            - "Migrations rodadas sem erro em prod"
+            - "Smoke test: cadastro via webhook, acesso a aula, admin funcionando"
+            - "Monitoramento ativo (logs, erros)"
+
+  summary:
+    total_stories: 20
+    by_wave:
+      wave_1: 3
+      wave_2: 3
+      wave_3: 3
+      wave_4: 5
+      wave_5: 3
+      wave_6: 3
+    by_agent:
+      dev: 12
+      ux_design_expert: 4
+      data_engineer: 1
+      architect: 2
+      qa: 3
+      devops: 1
+    estimated_complexity:
+      high: 8
+      medium: 9
+      low: 1
+    gates: 4
