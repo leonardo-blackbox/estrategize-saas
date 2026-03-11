@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -159,6 +160,33 @@ router.post('/logout', async (req, res) => {
   }
 
   res.json({ message: 'Logged out successfully' });
+});
+
+// GET /auth/profile — returns user profile with role (for frontend admin guard)
+router.get('/profile', requireAuth, async (req: AuthenticatedRequest, res) => {
+  if (!supabaseAdmin) {
+    res.status(503).json({ error: 'DB unavailable' });
+    return;
+  }
+
+  const { data: profile, error } = await supabaseAdmin
+    .from('profiles')
+    .select('id, full_name, role, created_at')
+    .eq('id', req.userId!)
+    .single();
+
+  if (error || !profile) {
+    res.status(404).json({ error: 'Profile not found' });
+    return;
+  }
+
+  // Get email from auth user
+  const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(req.userId!);
+
+  res.json({
+    ...profile,
+    email: authUser?.user?.email ?? null,
+  });
 });
 
 export default router;
