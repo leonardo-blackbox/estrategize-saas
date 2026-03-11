@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore.ts';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
+import { AdminRoute } from './components/AdminRoute.tsx';
 
 // Theme store import — side-effect: applies data-theme on <html> at module load
 import './stores/themeStore.ts';
@@ -31,6 +32,8 @@ import { ConsultoriasPage } from './pages/member/ConsultoriasPage.tsx';
 import { ConsultoriaDetailPage } from './pages/member/ConsultoriaDetailPage.tsx';
 import { ContaPage } from './pages/member/ContaPage.tsx';
 import { CreditosPage } from './pages/member/CreditosPage.tsx';
+import { CoursePage } from './pages/member/CoursePage.tsx';
+import { LessonPage } from './pages/member/LessonPage.tsx';
 
 // Admin pages
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx';
@@ -39,6 +42,8 @@ import { AdminNovaOfertaPage } from './pages/admin/AdminNovaOfertaPage.tsx';
 import { AdminTurmasPage } from './pages/admin/AdminTurmasPage.tsx';
 import { AdminUsuariosPage } from './pages/admin/AdminUsuariosPage.tsx';
 import { AdminStripePage } from './pages/admin/AdminStripePage.tsx';
+import { AdminCursosPage } from './pages/admin/AdminCursosPage.tsx';
+import { AdminCursoDetailPage } from './pages/admin/AdminCursoDetailPage.tsx';
 
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
@@ -65,6 +70,8 @@ export default function App() {
           }
         >
           <Route path="/formacao" element={<FormacaoPage />} />
+          <Route path="/formacao/curso/:id" element={<CoursePage />} />
+          <Route path="/formacao/aula/:lessonId" element={<LessonPage />} />
           <Route path="/ferramentas" element={<FerramentasPage />} />
           <Route path="/consultorias" element={<ConsultoriasPage />} />
           <Route path="/consultorias/:id" element={<ConsultoriaDetailPage />} />
@@ -75,12 +82,14 @@ export default function App() {
         {/* ── Admin App ── */}
         <Route
           element={
-            <ProtectedRoute>
+            <AdminRoute>
               <AdminShell />
-            </ProtectedRoute>
+            </AdminRoute>
           }
         >
           <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/cursos" element={<AdminCursosPage />} />
+          <Route path="/admin/cursos/:id" element={<AdminCursoDetailPage />} />
           <Route path="/admin/ofertas" element={<AdminOfertasPage />} />
           <Route path="/admin/ofertas/nova" element={<AdminNovaOfertaPage />} />
           <Route path="/admin/turmas" element={<AdminTurmasPage />} />

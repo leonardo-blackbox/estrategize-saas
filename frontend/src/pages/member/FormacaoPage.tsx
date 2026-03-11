@@ -1,34 +1,19 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { staggerContainer, staggerItem } from '../../lib/motion.ts';
 import { cn } from '../../lib/cn.ts';
 import { isDaysUrgent } from '../../lib/dates.ts';
 import { Modal } from '../../components/ui/Modal.tsx';
+import {
+  getCatalog,
+  getContinueWatching,
+  type CatalogCourse,
+  type ContinueWatchingItem,
+} from '../../api/courses.ts';
 
-// --- MOCKS ---
-
-const continueLearning = {
-  id: 'curso-1',
-  title: 'Estratégia Empresarial Avançada',
-  module: 'Módulo 3: Análise Competitiva',
-  lesson: 'Aula 7: Cinco Forças de Porter',
-  progress: 68,
-  thumbnail: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1470&auto=format&fit=crop',
-};
-
-const mockCourses = [
-  { id: 'curso-1', title: 'Estratégia Empresarial Avançada', lessons: 24, progress: 68, status: 'active' as const, thumbnail: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1470&auto=format&fit=crop' },
-  { id: 'curso-2', title: 'Liderança e Gestão de Equipes', lessons: 18, progress: 14, status: 'active' as const, thumbnail: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=1470&auto=format&fit=crop' },
-  { id: 'curso-3', title: 'Operações e Logística', lessons: 10, progress: 100, status: 'completed' as const, thumbnail: 'https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?q=80&w=1470&auto=format&fit=crop' },
-  { id: 'curso-4', title: 'Growth & Escala', lessons: 12, progress: 0, status: 'drip' as const, dripDate: '2026-03-15', thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1470&auto=format&fit=crop' },
-  { id: 'curso-5', title: 'Finanças para Decisores', lessons: 16, progress: 35, status: 'expiring' as const, expiryDate: '2026-02-27', thumbnail: 'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?q=80&w=1470&auto=format&fit=crop' },
-  { id: 'curso-6', title: 'Inteligência Artificial Corporativa', lessons: 8, progress: 0, status: 'locked' as const, requiredOffer: 'Plano Pro', thumbnail: null }, // testing gradient fallback
-  { id: 'curso-7', title: 'Marketing de Conteúdo', lessons: 20, progress: 0, status: 'active' as const, thumbnail: 'https://images.unsplash.com/photo-1432821596592-e2c18b78144f?q=80&w=1470&auto=format&fit=crop' },
-  { id: 'curso-8', title: 'Vendas B2B Complexas', lessons: 15, progress: 0, status: 'locked' as const, requiredOffer: 'Plano Ent', thumbnail: 'https://images.unsplash.com/photo-1556761175-5973dc0f32d7?q=80&w=1470&auto=format&fit=crop' },
-  { id: 'curso-9', title: 'Cultura Organizacional', lessons: 14, progress: 100, status: 'completed' as const, thumbnail: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1470&auto=format&fit=crop' },
-  { id: 'curso-10', title: 'Mentalidade de Founder', lessons: 6, progress: 0, status: 'drip' as const, dripDate: '2026-04-10', thumbnail: 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?q=80&w=1470&auto=format&fit=crop' },
-];
+// --- STATIC CONTENT (product-managed) ---
 
 const mockJourney = [
   { id: 'j1', step: 'Etapa 1/6', title: 'Fundamentos do Consultor', description: 'O baseamento para iniciar sua jornada digital com o pé direito.', recommended: true, cta: 'Continuar' },
@@ -53,13 +38,84 @@ const mockMaterials: Material[] = [
   { id: 'm2', title: 'Proposta Comercial Premium', type: 'Template', description: 'Template em Notion para enviar propostas formatadas de alto valor percebido.', uploadedAt: '15 Jan 2026', size: '1.1 MB', downloadUrl: '#' },
   { id: 'm3', title: 'Mapa Mental: Funil B2B', type: 'Imagem', description: 'Estrutura visual de um funil de conversão outbound para empresas corporativas.', uploadedAt: '03 Fev 2026', size: '4.8 MB', downloadUrl: '#' },
   { id: 'm4', title: 'Script de Vendas Consultivas', type: 'PDF', description: 'O roteiro exato que usamos para fechar contratos high-ticket.', uploadedAt: '10 Fev 2026', size: '1.8 MB', downloadUrl: '#' },
-  { id: 'm5', title: 'Calculadora de Precificação', type: 'Template', description: 'Planilha inteligente para precificar sua hora e pacotes baseados na margem de lucro.', uploadedAt: '20 Fev 2026', size: '500 KB' }, // sem link
+  { id: 'm5', title: 'Calculadora de Precificação', type: 'Template', description: 'Planilha inteligente para precificar sua hora e pacotes baseados na margem de lucro.', uploadedAt: '20 Fev 2026', size: '500 KB' },
 ];
+
+// --- DATA MAPPING ---
+
+type CourseStatus = 'active' | 'locked' | 'drip' | 'expiring' | 'completed';
+
+interface CourseCardData {
+  id: string;
+  title: string;
+  lessons: number;
+  status: CourseStatus;
+  thumbnail: string | null;
+  requiredOffer?: string;
+  dripDate?: string;
+  expiryDate?: string;
+}
+
+function mapCatalogToCard(course: CatalogCourse): CourseCardData {
+  const { access } = course;
+  let status: CourseStatus = 'active';
+
+  if (!access.allowed) {
+    if (access.reason === 'drip_locked') {
+      status = 'drip';
+    } else {
+      status = 'locked';
+    }
+  } else if (access.expiresAt && isDaysUrgent(access.expiresAt)) {
+    status = 'expiring';
+  }
+
+  return {
+    id: course.id,
+    title: course.title,
+    lessons: course.total_lessons,
+    status,
+    thumbnail: course.cover_url ?? null,
+    requiredOffer: status === 'locked' ? 'Plano superior' : undefined,
+    dripDate: access.unlocksAt ? new Date(access.unlocksAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : undefined,
+    expiryDate: access.expiresAt ? new Date(access.expiresAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : undefined,
+  };
+}
+
+interface ContinueLearningData {
+  courseId: string;
+  lessonId: string;
+  title: string;
+  module: string;
+  lesson: string;
+  progress: number;
+  thumbnail: string | null;
+}
+
+function mapContinueWatching(items: ContinueWatchingItem[]): ContinueLearningData | null {
+  if (!items.length) return null;
+  const item = items[0];
+  const { lessons: lesson } = item;
+  const course = lesson.modules.courses;
+  const pct = lesson.duration_secs && item.watched_secs
+    ? Math.min(Math.round((item.watched_secs / lesson.duration_secs) * 100), 99)
+    : 0;
+
+  return {
+    courseId: course.id,
+    lessonId: lesson.id,
+    title: course.title,
+    module: lesson.modules.title,
+    lesson: lesson.title,
+    progress: pct,
+    thumbnail: course.cover_url ?? null,
+  };
+}
 
 // --- COMPONENTS ---
 
 function EntitlementBadge({ status, requiredOffer, dripDate, expiryDate }: {
-  status: 'active' | 'locked' | 'drip' | 'expiring' | 'completed';
+  status: CourseStatus;
   requiredOffer?: string;
   dripDate?: string;
   expiryDate?: string;
@@ -70,7 +126,7 @@ function EntitlementBadge({ status, requiredOffer, dripDate, expiryDate }: {
   if (status === 'locked') {
     return (
       <span className={cn(baseStyle, "bg-[var(--color-bg-primary)]/80 border-[var(--color-border-subtle)] text-[var(--color-text-secondary)]")}>
-        Requer {requiredOffer}
+        {requiredOffer ?? 'Bloqueado'}
       </span>
     );
   }
@@ -101,6 +157,20 @@ function EntitlementBadge({ status, requiredOffer, dripDate, expiryDate }: {
   return null;
 }
 
+function CourseCardSkeleton() {
+  return (
+    <div className="w-[85vw] sm:w-auto shrink-0 snap-center sm:snap-align-none h-full animate-pulse">
+      <div className="flex flex-col min-h-[300px] rounded-[24px] overflow-hidden bg-[var(--color-bg-secondary)] border border-[var(--color-border-subtle)]">
+        <div className="h-44 sm:h-48 bg-[var(--color-bg-elevated)]" />
+        <div className="p-6 space-y-3">
+          <div className="h-5 w-3/4 rounded bg-[var(--color-bg-elevated)]" />
+          <div className="h-4 w-1/4 rounded bg-[var(--color-bg-elevated)]" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // --- MAIN PAGE ---
 
 export function FormacaoPage() {
@@ -108,7 +178,19 @@ export function FormacaoPage() {
   const [showAllMaterials, setShowAllMaterials] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
 
-  // If prefers reduced motion, disable stagger
+  const { data: catalogRaw = [], isLoading: catalogLoading } = useQuery({
+    queryKey: ['catalog'],
+    queryFn: getCatalog,
+  });
+
+  const { data: continueWatchingRaw = [] } = useQuery({
+    queryKey: ['continue-watching'],
+    queryFn: getContinueWatching,
+  });
+
+  const courses = catalogRaw.map(mapCatalogToCard);
+  const continueLearning = mapContinueWatching(continueWatchingRaw);
+
   const containerVariants = prefersReducedMotion ? { initial: { opacity: 0 }, animate: { opacity: 1 } } : staggerContainer;
   const itemVariants = prefersReducedMotion ? { initial: { opacity: 0 }, animate: { opacity: 1 } } : staggerItem;
 
@@ -135,63 +217,65 @@ export function FormacaoPage() {
         </div>
 
         {/* 1. Continue Learning Hero */}
-        <motion.div variants={itemVariants}>
-          <Link
-            to={`/formacao/curso/${continueLearning.id}`}
-            className={cn(
-              'group relative block overflow-hidden rounded-[24px]',
-              'bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]',
-              'transition-all duration-300 hover:border-[var(--color-border-default)]',
-              'shadow-[0_4px_24px_rgba(0,0,0,0.15)]'
-            )}
-          >
-            {/* Image Background */}
-            <div className="absolute inset-0 z-0 pointer-events-none">
-              <img
-                src={continueLearning.thumbnail}
-                alt={continueLearning.title}
-                className="w-full h-full object-cover opacity-50 grayscale mix-blend-luminosity motion-safe:group-hover:scale-[1.02] motion-safe:group-hover:opacity-60 transition-all duration-[800ms] ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
-            </div>
-
-            <div className="relative z-10 p-6 sm:p-10 flex flex-col justify-end min-h-[360px] sm:min-h-[440px]">
-              <div className="text-[12px] font-semibold text-[var(--color-text-tertiary)] uppercase tracking-widest mb-3">
-                Continuar aprendendo
+        {continueLearning && (
+          <motion.div variants={itemVariants}>
+            <Link
+              to={`/formacao/aula/${continueLearning.lessonId}`}
+              className={cn(
+                'group relative block overflow-hidden rounded-[24px]',
+                'bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]',
+                'transition-all duration-300 hover:border-[var(--color-border-default)]',
+                'shadow-[0_4px_24px_rgba(0,0,0,0.15)]'
+              )}
+            >
+              <div className="absolute inset-0 z-0 pointer-events-none">
+                {continueLearning.thumbnail && (
+                  <img
+                    src={continueLearning.thumbnail}
+                    alt={continueLearning.title}
+                    className="w-full h-full object-cover opacity-50 grayscale mix-blend-luminosity motion-safe:group-hover:scale-[1.02] motion-safe:group-hover:opacity-60 transition-all duration-[800ms] ease-out"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
               </div>
-              <h2 className="text-[28px] sm:text-[40px] font-semibold tracking-tight text-[var(--color-text-primary)] leading-tight mb-2 max-w-2xl">
-                {continueLearning.title}
-              </h2>
-              <p className="text-[15px] sm:text-[17px] text-[var(--color-text-secondary)] mb-8">
-                {continueLearning.module} &middot; {continueLearning.lesson}
-              </p>
 
-              {/* Progress bar and CTA row */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <div className="flex-1 w-full max-w-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-1 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[var(--color-text-primary)] rounded-full motion-safe:transition-all motion-safe:duration-500 ease-out"
-                        style={{ width: `${continueLearning.progress}%` }}
-                      />
+              <div className="relative z-10 p-6 sm:p-10 flex flex-col justify-end min-h-[360px] sm:min-h-[440px]">
+                <div className="text-[12px] font-semibold text-[var(--color-text-tertiary)] uppercase tracking-widest mb-3">
+                  Continuar aprendendo
+                </div>
+                <h2 className="text-[28px] sm:text-[40px] font-semibold tracking-tight text-[var(--color-text-primary)] leading-tight mb-2 max-w-2xl">
+                  {continueLearning.title}
+                </h2>
+                <p className="text-[15px] sm:text-[17px] text-[var(--color-text-secondary)] mb-8">
+                  {continueLearning.module} &middot; {continueLearning.lesson}
+                </p>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div className="flex-1 w-full max-w-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 h-1 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[var(--color-text-primary)] rounded-full motion-safe:transition-all motion-safe:duration-500 ease-out"
+                          style={{ width: `${continueLearning.progress}%` }}
+                        />
+                      </div>
+                      <span className="text-[12px] font-medium text-[var(--color-text-secondary)]">
+                        {continueLearning.progress}%
+                      </span>
                     </div>
-                    <span className="text-[12px] font-medium text-[var(--color-text-secondary)]">
-                      {continueLearning.progress}%
-                    </span>
+                  </div>
+
+                  <div className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--color-text-primary)] px-6 py-3 text-[15px] font-semibold text-[var(--color-bg-primary)] motion-safe:transition-transform motion-safe:duration-200 active:scale-95 hover:opacity-90 min-w-[140px] min-h-[44px]">
+                    Continuar
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                    </svg>
                   </div>
                 </div>
-
-                <div className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--color-text-primary)] px-6 py-3 text-[15px] font-semibold text-[var(--color-bg-primary)] motion-safe:transition-transform motion-safe:duration-200 active:scale-95 hover:opacity-90 min-w-[140px] min-h-[44px]">
-                  Continuar
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                  </svg>
-                </div>
               </div>
-            </div>
-          </Link>
-        </motion.div>
+            </Link>
+          </motion.div>
+        )}
 
         {/* 2. Cursos Section */}
         <motion.div variants={itemVariants} className="mt-12 sm:mt-16 -mx-4 sm:mx-0">
@@ -202,95 +286,106 @@ export function FormacaoPage() {
           </div>
 
           <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory px-4 sm:px-0 pb-6 sm:pb-0 scrollbar-none">
-            {mockCourses.map((course) => (
-              <div
-                key={course.id}
-                className="w-[85vw] sm:w-auto shrink-0 snap-center sm:snap-align-none h-full"
-              >
-                <Link
-                  to={course.status === 'locked' ? '#' : `/formacao/curso/${course.id}`}
-                  className={cn(
-                    'relative flex flex-col h-full min-h-[300px] rounded-[24px] overflow-hidden',
-                    'bg-[var(--color-bg-secondary)] border border-[var(--color-border-subtle)]',
-                    'transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-white',
-                    course.status === 'locked'
-                      ? 'opacity-[0.6] cursor-not-allowed filter grayscale-[50%]'
-                      : 'hover:border-[var(--color-border-default)] hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] cursor-pointer'
-                  )}
-                  onClick={course.status === 'locked' ? (e) => e.preventDefault() : undefined}
-                >
-                  {/* Thumbnail area */}
-                  <div className="relative h-44 sm:h-48 w-full bg-[var(--color-bg-tertiary)] overflow-hidden">
-                    {course.thumbnail ? (
-                      <img
-                        src={course.thumbnail}
-                        alt={course.title}
-                        className="w-full h-full object-cover grayscale mix-blend-luminosity opacity-40 motion-safe:group-hover:scale-[1.03] motion-safe:group-hover:opacity-60 transition-all duration-[600ms] ease-out"
-                      />
-                    ) : (
-                      <div className="w-full h-full opacity-60 bg-gradient-to-br from-[#161616] to-[#0a0a0a]" />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-secondary)] via-[var(--color-bg-secondary)]/10 to-transparent opacity-95" />
+            {catalogLoading
+              ? [1, 2, 3].map((i) => <CourseCardSkeleton key={i} />)
+              : courses.length === 0
+                ? (
+                  <div className="col-span-3 py-12 text-center">
+                    <p className="text-[15px] text-[var(--color-text-tertiary)]">
+                      Nenhum curso disponível no momento.
+                    </p>
+                  </div>
+                )
+                : courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="w-[85vw] sm:w-auto shrink-0 snap-center sm:snap-align-none h-full"
+                  >
+                    <Link
+                      to={course.status === 'locked' || course.status === 'drip' ? '#' : `/formacao/curso/${course.id}`}
+                      className={cn(
+                        'relative flex flex-col h-full min-h-[300px] rounded-[24px] overflow-hidden',
+                        'bg-[var(--color-bg-secondary)] border border-[var(--color-border-subtle)]',
+                        'transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-white',
+                        course.status === 'locked' || course.status === 'drip'
+                          ? 'opacity-[0.6] cursor-not-allowed filter grayscale-[50%]'
+                          : 'hover:border-[var(--color-border-default)] hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] cursor-pointer'
+                      )}
+                      onClick={course.status === 'locked' || course.status === 'drip' ? (e) => e.preventDefault() : undefined}
+                    >
+                      {/* Thumbnail area */}
+                      <div className="relative h-44 sm:h-48 w-full bg-[var(--color-bg-tertiary)] overflow-hidden">
+                        {course.thumbnail ? (
+                          <img
+                            src={course.thumbnail}
+                            alt={course.title}
+                            className="w-full h-full object-cover grayscale mix-blend-luminosity opacity-40 motion-safe:group-hover:scale-[1.03] motion-safe:group-hover:opacity-60 transition-all duration-[600ms] ease-out"
+                          />
+                        ) : (
+                          <div className="w-full h-full opacity-60 bg-gradient-to-br from-[#161616] to-[#0a0a0a]" />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-secondary)] via-[var(--color-bg-secondary)]/10 to-transparent opacity-95" />
 
-                    <div className="absolute top-4 right-4 z-10">
-                      <EntitlementBadge
-                        status={course.status}
-                        requiredOffer={course.requiredOffer}
-                        dripDate={course.dripDate}
-                        expiryDate={course.expiryDate}
-                      />
-                    </div>
+                        <div className="absolute top-4 right-4 z-10">
+                          <EntitlementBadge
+                            status={course.status}
+                            requiredOffer={course.requiredOffer}
+                            dripDate={course.dripDate}
+                            expiryDate={course.expiryDate}
+                          />
+                        </div>
 
-                    {course.status === 'locked' && (
-                      <div className="absolute inset-0 flex items-center justify-center z-10">
-                        <div className="h-12 w-12 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center border border-[rgba(255,255,255,0.08)]">
-                          <svg className="h-5 w-5 text-[#f5f5f7]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                          </svg>
+                        {(course.status === 'locked' || course.status === 'drip') && (
+                          <div className="absolute inset-0 flex items-center justify-center z-10">
+                            <div className="h-12 w-12 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center border border-[rgba(255,255,255,0.08)]">
+                              <svg className="h-5 w-5 text-[#f5f5f7]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                              </svg>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Course info */}
+                      <div className="p-6 flex flex-col flex-1 bg-[var(--color-bg-secondary)] relative z-10">
+                        <h3 className="text-[18px] font-semibold leading-snug tracking-tight text-[var(--color-text-primary)] mb-1">
+                          {course.title}
+                        </h3>
+                        <p className="text-[14px] text-[var(--color-text-tertiary)] mb-6">
+                          {course.lessons} aulas
+                        </p>
+
+                        <div className="mt-auto">
+                          {course.status === 'completed' ? (
+                            <div className="flex items-center gap-2 text-[13px] font-medium text-[var(--color-text-secondary)]">
+                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                              </svg>
+                              Concluído
+                            </div>
+                          ) : course.status === 'locked' ? (
+                            <Link
+                              to="/planos"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[var(--color-text-primary)] underline underline-offset-2 hover:opacity-70 transition-opacity"
+                            >
+                              Ver planos disponíveis →
+                            </Link>
+                          ) : course.status === 'drip' ? (
+                            <div className="text-[13px] font-medium text-[var(--color-text-tertiary)]">
+                              Em breve
+                            </div>
+                          ) : (
+                            <div className="text-[13px] font-medium text-[var(--color-text-primary)]">
+                              Começar curso
+                            </div>
+                          )}
                         </div>
                       </div>
-                    )}
+                    </Link>
                   </div>
-
-                  {/* Course info */}
-                  <div className="p-6 flex flex-col flex-1 bg-[var(--color-bg-secondary)] relative z-10">
-                    <h3 className="text-[18px] font-semibold leading-snug tracking-tight text-[var(--color-text-primary)] mb-1">
-                      {course.title}
-                    </h3>
-                    <p className="text-[14px] text-[var(--color-text-tertiary)] mb-6">
-                      {course.lessons} aulas
-                    </p>
-
-                    <div className="mt-auto">
-                      {course.status !== 'locked' && course.progress > 0 ? (
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 h-1 bg-[rgba(255,255,255,0.08)] rounded-full overflow-hidden">
-                            <div
-                              className={cn(
-                                "h-full rounded-full motion-safe:transition-all motion-safe:duration-500 ease-out",
-                                course.progress === 100 ? "bg-[var(--color-text-primary)]" : "bg-[var(--color-text-secondary)]"
-                              )}
-                              style={{ width: `${course.progress}%` }}
-                            />
-                          </div>
-                          <span className="text-[12px] font-medium text-[var(--color-text-secondary)]">
-                            {course.progress}%
-                          </span>
-                        </div>
-                      ) : course.status !== 'locked' ? (
-                        <div className="text-[13px] font-medium text-[var(--color-text-primary)]">
-                          Começar curso
-                        </div>
-                      ) : (
-                        <div className="text-[13px] font-medium text-[var(--color-text-tertiary)]">
-                          Indisponível no seu plano
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            ))}
+                ))
+            }
           </div>
         </motion.div>
 
@@ -383,7 +478,6 @@ export function FormacaoPage() {
                 onClick={() => setSelectedMaterial(material)}
                 className="group flex flex-col md:flex-row md:items-center gap-4 rounded-[20px] border border-[var(--color-border-subtle)] bg-[var(--color-bg-secondary)] p-5 text-left transition-all duration-200 hover:border-[var(--color-border-default)] hover:bg-[var(--color-bg-elevated)] min-h-[80px] outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
-                {/* Icon based on type */}
                 <div className="shrink-0 h-12 w-12 rounded-full bg-[var(--color-bg-active)] flex items-center justify-center border border-[var(--color-border-subtle)] text-[var(--color-text-primary)]">
                   {material.type === 'PDF' && (
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

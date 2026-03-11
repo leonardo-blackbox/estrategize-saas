@@ -50,7 +50,7 @@ export function MemberSidebar() {
   return (
     <aside
       className={cn(
-        'hidden lg:flex lg:w-[220px] lg:flex-col lg:fixed lg:inset-y-0',
+        'hidden lg:flex lg:w-[220px] lg:flex-col lg:fixed lg:inset-y-0 lg:z-20',
         'glass-subtle',
       )}
     >

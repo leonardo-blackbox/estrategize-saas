@@ -6,9 +6,10 @@ import { cn } from '../../lib/cn.ts';
 
 const adminNavItems = [
   { to: '/admin', label: 'Dashboard', end: true },
+  { to: '/admin/cursos', label: 'Cursos' },
   { to: '/admin/ofertas', label: 'Ofertas' },
   { to: '/admin/turmas', label: 'Turmas' },
-  { to: '/admin/usuarios', label: 'Usuarios' },
+  { to: '/admin/usuarios', label: 'Usuários' },
   { to: '/admin/stripe', label: 'Stripe Logs' },
 ];
 
