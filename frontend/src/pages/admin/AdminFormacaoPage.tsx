@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { staggerContainer, staggerItem } from '../../lib/motion.ts';
@@ -24,6 +24,7 @@ export function AdminFormacaoPage() {
   const [editTitle, setEditTitle] = useState('');
   const [managingSection, setManagingSection] = useState<any | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [openStatusDropdown, setOpenStatusDropdown] = useState<string | null>(null);
 
   const { data: sections = [], isLoading } = useQuery({
     queryKey: ['admin-formacao-sections'],
@@ -83,7 +84,7 @@ export function AdminFormacaoPage() {
     >
       <motion.div variants={staggerItem} className="flex items-center justify-between">
         <div>
-          <h1 className="text-base font-semibold text-[var(--text-primary)]">Formação</h1>
+          <h1 className="text-base font-semibold text-[var(--text-primary)]">Seções</h1>
           <p className="text-xs text-[var(--text-tertiary)] mt-0.5">
             Organize as seções exibidas na área de membros.
           </p>
@@ -178,17 +179,17 @@ export function AdminFormacaoPage() {
 
                 {/* Actions */}
                 <div className="shrink-0 flex items-center gap-2">
-                  <button
-                    onClick={() => updateMutation.mutate({ id: section.id, data: { is_active: !section.is_active } })}
-                    className={cn(
-                      'text-[10px] font-semibold uppercase px-2 py-0.5 rounded transition-colors',
-                      section.is_active
-                        ? 'bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25'
-                        : 'bg-[var(--bg-hover)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]',
-                    )}
-                  >
-                    {section.is_active ? 'Ativa' : 'Inativa'}
-                  </button>
+                  <StatusDropdown
+                    isActive={section.is_active}
+                    isOpen={openStatusDropdown === section.id}
+                    isPending={updateMutation.isPending}
+                    onToggle={() => setOpenStatusDropdown((prev) => prev === section.id ? null : section.id)}
+                    onSelect={(active) => {
+                      updateMutation.mutate({ id: section.id, data: { is_active: active } });
+                      setOpenStatusDropdown(null);
+                    }}
+                    onClickOutside={() => setOpenStatusDropdown(null)}
+                  />
                   <Button
                     size="sm"
                     variant="ghost"
@@ -270,6 +271,99 @@ export function AdminFormacaoPage() {
         />
       )}
     </motion.div>
+  );
+}
+
+// ─── StatusDropdown ────────────────────────────────────────────
+function StatusDropdown({
+  isActive,
+  isOpen,
+  isPending,
+  onToggle,
+  onSelect,
+  onClickOutside,
+}: {
+  isActive: boolean;
+  isOpen: boolean;
+  isPending: boolean;
+  onToggle: () => void;
+  onSelect: (active: boolean) => void;
+  onClickOutside: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onClickOutside();
+      }
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isOpen, onClickOutside]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={onToggle}
+        disabled={isPending}
+        className={cn(
+          'flex items-center gap-1 text-[10px] font-semibold uppercase px-2 py-0.5 rounded transition-colors',
+          isActive
+            ? 'bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25'
+            : 'bg-[var(--bg-hover)] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]',
+        )}
+      >
+        {isActive ? 'Ativa' : 'Inativa'}
+        <svg
+          className={cn('h-2.5 w-2.5 transition-transform', isOpen && 'rotate-180')}
+          fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-1 z-50 min-w-[110px] rounded-[var(--radius-md)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] shadow-lg overflow-hidden">
+          <button
+            onClick={() => onSelect(true)}
+            className={cn(
+              'w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors text-left',
+              isActive
+                ? 'text-emerald-500 bg-emerald-500/10'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]',
+            )}
+          >
+            <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', isActive ? 'bg-emerald-500' : 'bg-[var(--text-muted)]')} />
+            Ativo
+            {isActive && (
+              <svg className="ml-auto h-3 w-3 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+            )}
+          </button>
+          <div className="h-px bg-[var(--border-hairline)]" />
+          <button
+            onClick={() => onSelect(false)}
+            className={cn(
+              'w-full flex items-center gap-2 px-3 py-2 text-xs transition-colors text-left',
+              !isActive
+                ? 'text-[var(--text-secondary)] bg-[var(--bg-hover)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]',
+            )}
+          >
+            <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', !isActive ? 'bg-[var(--text-tertiary)]' : 'bg-[var(--text-muted)]')} />
+            Inativo
+            {!isActive && (
+              <svg className="ml-auto h-3 w-3 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+            )}
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
