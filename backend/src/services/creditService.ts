@@ -174,6 +174,9 @@ export async function grantCredits(
   type: 'purchase' | 'monthly_grant' = 'purchase',
   description = 'Manual credit grant',
 ): Promise<string> {
+  if (amount <= 0) {
+    throw new Error('amount must be greater than 0');
+  }
   const db = ensureAdmin();
 
   const { data, error } = await db.rpc('grant_credits', {

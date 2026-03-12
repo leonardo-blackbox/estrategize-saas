@@ -1,6 +1,10 @@
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../stores/authStore.ts';
 import { CreditsPill } from '../compound/CreditsPill.tsx';
 import { cn } from '../../lib/cn.ts';
+import { useIsAdmin } from '../../hooks/useProfile.ts';
+import { fetchBalance } from '../../api/credits.ts';
 
 interface HeaderProps {
   className?: string;
@@ -8,6 +12,15 @@ interface HeaderProps {
 
 export function Header({ className }: HeaderProps) {
   const { user, signOut } = useAuthStore();
+  const isAdmin = useIsAdmin();
+
+  const { data: balanceData } = useQuery({
+    queryKey: ['credit-balance'],
+    queryFn: fetchBalance,
+    staleTime: 60_000,
+  });
+
+  const creditBalance = balanceData?.data?.available ?? 0;
 
   return (
     <header
@@ -29,9 +42,23 @@ export function Header({ className }: HeaderProps) {
         </div>
       </div>
 
-      {/* Right: Credits + User */}
+      {/* Right: Credits + Admin badge + User */}
       <div className="flex items-center gap-3">
-        <CreditsPill balance={42} />
+        <CreditsPill balance={creditBalance} />
+
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className={cn(
+              'rounded-[var(--radius-pill)] px-2.5 py-0.5 text-[10px] font-semibold tracking-wide',
+              'ring-1 ring-inset ring-[var(--border-default)]',
+              'text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+              'hover:bg-[var(--bg-hover)] transition-all duration-150',
+            )}
+          >
+            Admin
+          </Link>
+        )}
 
         <div className="flex items-center gap-2">
           <span className="hidden sm:inline text-xs text-[var(--text-tertiary)] truncate max-w-[160px]">

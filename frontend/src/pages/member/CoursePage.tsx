@@ -117,12 +117,12 @@ export function CoursePage() {
             'shadow-[0_4px_24px_rgba(0,0,0,0.15)]',
           )}
         >
-          {course.cover_url && (
+          {(course.banner_url ?? course.cover_url) && (
             <div className="absolute inset-0">
               <img
-                src={course.cover_url}
+                src={course.banner_url ?? course.cover_url}
                 alt={course.title}
-                className="w-full h-full object-cover opacity-30 grayscale mix-blend-luminosity"
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
             </div>

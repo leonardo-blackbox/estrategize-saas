@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../lib/cn.ts';
 
@@ -70,7 +71,7 @@ export function Modal({ open, onClose, children, className, sheet = false }: Mod
     }
   }, [open]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
@@ -134,6 +135,7 @@ export function Modal({ open, onClose, children, className, sheet = false }: Mod
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

@@ -1,21 +1,33 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../stores/authStore.ts';
 import { useThemeStore } from '../../stores/themeStore.ts';
 import { staggerContainer, staggerItem } from '../../lib/motion.ts';
 import { ThemeToggle } from '../../components/ui/ThemeToggle.tsx';
 import { cn } from '../../lib/cn.ts';
+import { fetchBalance } from '../../api/credits.ts';
 
 export function ContaPage() {
   const { user } = useAuthStore();
   const { theme } = useThemeStore();
 
+  const { data: balanceData } = useQuery({
+    queryKey: ['credit-balance'],
+    queryFn: fetchBalance,
+    staleTime: 60_000,
+  });
+
+  const creditValue = balanceData?.data?.available != null
+    ? `${balanceData.data.available} créditos`
+    : '—';
+
   const sections = [
     {
-      title: 'Creditos',
-      description: 'Gerencie seus creditos e veja o historico de uso.',
+      title: 'Créditos',
+      description: 'Gerencie seus créditos e veja o histórico de uso.',
       to: '/creditos',
-      value: '42 creditos',
+      value: creditValue,
     },
     {
       title: 'Plano Atual',

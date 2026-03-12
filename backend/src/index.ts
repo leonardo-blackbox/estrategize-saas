@@ -11,6 +11,9 @@ import coursesRouter from './routes/courses.js';
 import webhooksRouter from './routes/webhooks.js';
 import adminCoursesRouter from './routes/admin/courses.js';
 import adminUsersRouter from './routes/admin/users.js';
+import formacaoRouter from './routes/admin/formacao.js';
+import adminTurmasRouter from './routes/admin/turmas.js';
+import adminOfertasRouter from './routes/admin/ofertas.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
 const app = express();
@@ -116,6 +119,9 @@ app.use('/api/courses', coursesRouter);
 // Admin routes (stricter rate limit)
 app.use('/api/admin/courses', adminLimit, adminCoursesRouter);
 app.use('/api/admin/users', adminLimit, adminUsersRouter);
+app.use('/api/admin/formacao', adminLimit, formacaoRouter);
+app.use('/api/admin/turmas', adminLimit, adminTurmasRouter);
+app.use('/api/admin/ofertas', adminLimit, adminOfertasRouter);
 
 // Webhooks
 app.use('/api/webhooks', webhookLimit, webhooksRouter);
@@ -160,18 +166,31 @@ async function bootstrapAdmin() {
       return;
     }
 
-    const { data: profile } = await supabaseAdmin
+    // Upsert profile — cria se não existir, sempre garante role=admin
+    const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
-      .select('role')
+      .select('id, role')
       .eq('id', adminUser.id)
-      .single();
+      .maybeSingle();
 
-    if (profile && profile.role !== 'admin') {
+    if (!existingProfile) {
+      // Perfil não existe — inserir com role=admin
+      const { error: insertError } = await supabaseAdmin
+        .from('profiles')
+        .insert({ id: adminUser.id, role: 'admin' });
+      if (insertError) {
+        console.error('Admin bootstrap: failed to create profile', insertError.message);
+      } else {
+        console.log(`✓ Admin bootstrap: criou profile para ${adminEmail} como admin`);
+      }
+    } else if (existingProfile.role !== 'admin') {
       await supabaseAdmin
         .from('profiles')
         .update({ role: 'admin' })
         .eq('id', adminUser.id);
-      console.log(`✓ Admin bootstrap: promoted ${adminEmail} to admin`);
+      console.log(`✓ Admin bootstrap: promoveu ${adminEmail} para admin`);
+    } else {
+      console.log(`✓ Admin bootstrap: ${adminEmail} já é admin`);
     }
   } catch (err) {
     console.error('Admin bootstrap error:', err);

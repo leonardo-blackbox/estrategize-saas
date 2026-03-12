@@ -98,6 +98,29 @@ describe('getBalance', () => {
 
     await expect(getBalance('user-1')).rejects.toThrow('Failed to get credit balance');
   });
+
+  it('returns correct available balance with mix of consume, reserve, and release', async () => {
+    // Scenario: 30 purchased, 5 consumed, 3 reserved (pending), 2 released
+    // available = 30 + 2 - 5 - 3 = 24
+    mockRpc.mockResolvedValue({
+      data: [
+        {
+          available: 24,
+          reserved: 3,
+          total_consumed: 5,
+          consumed_this_month: 5,
+          transaction_count: 4,
+        },
+      ],
+      error: null,
+    });
+
+    const balance = await getBalance('user-1');
+
+    expect(balance.available).toBe(24);
+    expect(balance.reserved).toBe(3);
+    expect(balance.total_consumed).toBe(5);
+  });
 });
 
 // ============================================================================
@@ -288,6 +311,16 @@ describe('grantCredits', () => {
     });
 
     await expect(grantCredits('user-1', 10)).rejects.toThrow('Failed to grant credits');
+  });
+
+  it('throws when amount is zero', async () => {
+    await expect(grantCredits('user-1', 0)).rejects.toThrow('amount must be greater than 0');
+    expect(mockRpc).not.toHaveBeenCalled();
+  });
+
+  it('throws when amount is negative', async () => {
+    await expect(grantCredits('user-1', -5)).rejects.toThrow('amount must be greater than 0');
+    expect(mockRpc).not.toHaveBeenCalled();
   });
 });
 

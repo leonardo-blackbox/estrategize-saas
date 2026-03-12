@@ -1,8 +1,25 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import multer from 'multer';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/admin.js';
+
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const BUCKET = process.env.STORAGE_BUCKET_COURSES ?? 'course-covers';
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter: (_req, file, cb) => {
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Tipo de arquivo inválido. Use JPEG, PNG ou WebP.'));
+    }
+  },
+});
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
@@ -13,6 +30,7 @@ const courseSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().optional(),
   cover_url: z.string().url().optional().nullable(),
+  banner_url: z.string().url().optional().nullable(),
   status: z.enum(['draft', 'published', 'archived']).optional(),
   sort_order: z.number().int().min(0).optional(),
 });
@@ -43,7 +61,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { data, error } = await supabaseAdmin!
     .from('courses')
-    .select(`*, modules (*, lessons (*, lesson_attachments (*)))`)
+    .select(`*, modules (*, lessons (*, lesson_attachments (*), lesson_links (*)))`)
     .eq('id', req.params.id)
     .single();
   if (error || !data) return res.status(404).json({ error: 'Not found' });
@@ -93,6 +111,125 @@ router.post('/:id/archive', async (req, res) => {
     .single();
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
+});
+
+// ─── COVER IMAGE UPLOAD ────────────────────────────────────────
+
+router.post('/:id/cover', (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'Arquivo muito grande. Tamanho máximo: 5 MB.' });
+    }
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    next();
+  });
+}, async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
+  }
+
+  const courseId = req.params.id;
+
+  const ext = req.file.originalname.split('.').pop() ?? 'jpg';
+  const storagePath = `courses/${courseId}/${Date.now()}-cover.${ext}`;
+
+  const { error: uploadError } = await supabaseAdmin!.storage
+    .from(BUCKET)
+    .upload(storagePath, req.file.buffer, {
+      contentType: req.file.mimetype,
+      upsert: true,
+    });
+
+  if (uploadError) {
+    return res.status(500).json({ error: uploadError.message });
+  }
+
+  const { data: publicData } = supabaseAdmin!.storage
+    .from(BUCKET)
+    .getPublicUrl(storagePath);
+
+  const coverUrl = publicData.publicUrl;
+
+  // Update DB only if course already exists (create flow uses pendingId before course is saved)
+  const { data: existing } = await supabaseAdmin!
+    .from('courses')
+    .select('id')
+    .eq('id', courseId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error: updateError } = await supabaseAdmin!
+      .from('courses')
+      .update({ cover_url: coverUrl })
+      .eq('id', courseId);
+
+    if (updateError) {
+      return res.status(500).json({ error: updateError.message });
+    }
+  }
+
+  res.json({ cover_url: coverUrl });
+});
+
+// ─── BANNER IMAGE UPLOAD ───────────────────────────────────────
+
+router.post('/:id/banner', (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'Arquivo muito grande. Tamanho máximo: 5 MB.' });
+    }
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    next();
+  });
+}, async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Nenhum arquivo enviado.' });
+  }
+
+  const courseId = req.params.id;
+  const ext = req.file.originalname.split('.').pop() ?? 'jpg';
+  const storagePath = `courses/${courseId}/banner-${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabaseAdmin!.storage
+    .from(BUCKET)
+    .upload(storagePath, req.file.buffer, {
+      contentType: req.file.mimetype,
+      upsert: true,
+    });
+
+  if (uploadError) {
+    return res.status(500).json({ error: uploadError.message });
+  }
+
+  const { data: publicData } = supabaseAdmin!.storage
+    .from(BUCKET)
+    .getPublicUrl(storagePath);
+
+  const bannerUrl = publicData.publicUrl;
+
+  // Update DB only if course already exists (create flow uses pendingId)
+  const { data: existing } = await supabaseAdmin!
+    .from('courses')
+    .select('id')
+    .eq('id', courseId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error: updateError } = await supabaseAdmin!
+      .from('courses')
+      .update({ banner_url: bannerUrl })
+      .eq('id', courseId);
+
+    if (updateError) {
+      return res.status(500).json({ error: updateError.message });
+    }
+  }
+
+  res.json({ banner_url: bannerUrl });
 });
 
 // ─── MODULES CRUD ──────────────────────────────────────────────
@@ -212,6 +349,77 @@ router.delete('/attachments/:id', async (req, res) => {
     .eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
+});
+
+// ─── LESSON LINKS ───────────────────────────────────────────────
+
+const linkSchema = z.object({
+  type: z.enum(['link', 'button']),
+  label: z.string().min(1).max(200),
+  url: z.string().url(),
+  sort_order: z.number().int().min(0).optional(),
+});
+
+router.post('/lessons/:lessonId/links', async (req, res) => {
+  const parsed = linkSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+  const { data, error } = await supabaseAdmin!
+    .from('lesson_links')
+    .insert({ ...parsed.data, lesson_id: req.params.lessonId })
+    .select()
+    .single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json(data);
+});
+
+router.put('/lessons/links/:linkId', async (req, res) => {
+  const parsed = linkSchema.partial().safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+  const { data, error } = await supabaseAdmin!
+    .from('lesson_links')
+    .update(parsed.data)
+    .eq('id', req.params.linkId)
+    .select()
+    .single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+router.delete('/lessons/links/:linkId', async (req, res) => {
+  const { error } = await supabaseAdmin!
+    .from('lesson_links')
+    .delete()
+    .eq('id', req.params.linkId);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
+// ─── COURSE SALES CONFIG ────────────────────────────────────────
+
+const salesSchema = z.object({
+  sales_url: z.string().url().optional().nullable(),
+  offer_badge_enabled: z.boolean().optional(),
+  offer_badge_text: z.string().max(30).optional().nullable(),
+});
+
+router.patch('/:id/sales', async (req, res) => {
+  const parsed = salesSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+  const { data, error } = await supabaseAdmin!
+    .from('courses')
+    .update(parsed.data)
+    .eq('id', req.params.id)
+    .select('id, sales_url, offer_badge_enabled, offer_badge_text')
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return res.status(404).json({ error: 'Course not found' });
+    return res.status(500).json({ error: error.message });
+  }
+  res.json(data);
 });
 
 export default router;

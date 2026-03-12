@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -14,14 +14,17 @@ import { Badge } from '../../components/ui/Badge.tsx';
 import { Button } from '../../components/ui/Button.tsx';
 import { Modal } from '../../components/ui/Modal.tsx';
 import { Input } from '../../components/ui/Input.tsx';
+import { CourseCoverUpload } from '../../components/admin/CourseCoverUpload.tsx';
+import { CourseBannerUpload } from '../../components/admin/CourseBannerUpload.tsx';
 
 interface CourseFormData {
   title: string;
   description: string;
   cover_url: string;
+  banner_url: string;
 }
 
-const initialForm: CourseFormData = { title: '', description: '', cover_url: '' };
+const initialForm: CourseFormData = { title: '', description: '', cover_url: '', banner_url: '' };
 
 const statusVariant: Record<string, 'success' | 'locked' | 'default'> = {
   published: 'success',
@@ -39,6 +42,14 @@ export function AdminCursosPage() {
   const qc = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState<CourseFormData>(initialForm);
+  // Stable temp ID used as the upload path before the course is created
+  const pendingIdRef = useRef<string>(crypto.randomUUID());
+
+  const openCreate = () => {
+    pendingIdRef.current = crypto.randomUUID();
+    setForm(initialForm);
+    setShowCreate(true);
+  };
 
   const { data: courses = [], isLoading } = useQuery({
     queryKey: ['admin-courses'],
@@ -70,6 +81,7 @@ export function AdminCursosPage() {
       title: form.title,
       description: form.description || undefined,
       cover_url: form.cover_url || undefined,
+      banner_url: form.banner_url || undefined,
     });
   };
 
@@ -88,7 +100,7 @@ export function AdminCursosPage() {
               Gerencie cursos, módulos e aulas.
             </p>
           </div>
-          <Button size="sm" onClick={() => setShowCreate(true)}>
+          <Button size="sm" onClick={openCreate}>
             + Novo curso
           </Button>
         </motion.div>
@@ -105,7 +117,7 @@ export function AdminCursosPage() {
             className="rounded-[var(--radius-md)] p-12 bg-[var(--bg-surface-1)] border border-[var(--border-hairline)] text-center"
           >
             <p className="text-sm text-[var(--text-tertiary)]">Nenhum curso criado ainda.</p>
-            <Button size="sm" className="mt-4" onClick={() => setShowCreate(true)}>
+            <Button size="sm" className="mt-4" onClick={openCreate}>
               Criar primeiro curso
             </Button>
           </motion.div>
@@ -204,18 +216,22 @@ export function AdminCursosPage() {
                 className="w-full rounded-[var(--radius-sm)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none focus:ring-1 focus:ring-[var(--text-primary)]"
               />
             </div>
-            <Input
-              label="URL da capa"
-              value={form.cover_url}
-              onChange={(e) => setForm((f) => ({ ...f, cover_url: e.target.value }))}
-              placeholder="https://..."
+            <CourseCoverUpload
+              courseId={pendingIdRef.current}
+              currentUrl={form.cover_url}
+              onUploaded={(url) => setForm((f) => ({ ...f, cover_url: url }))}
+            />
+            <CourseBannerUpload
+              courseId={pendingIdRef.current}
+              currentUrl={form.banner_url}
+              onUploaded={(url) => setForm((f) => ({ ...f, banner_url: url }))}
             />
           </div>
 
           <div className="flex gap-2 pt-2">
             <Button
               onClick={handleCreate}
-              disabled={!form.title.trim() || createMutation.isPending}
+              disabled={!form.title.trim() || !form.cover_url || !form.banner_url || createMutation.isPending}
               className="flex-1"
             >
               {createMutation.isPending ? 'Criando...' : 'Criar curso'}

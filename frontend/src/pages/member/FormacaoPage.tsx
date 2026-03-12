@@ -9,8 +9,10 @@ import { Modal } from '../../components/ui/Modal.tsx';
 import {
   getCatalog,
   getContinueWatching,
+  getFormacaoSections,
   type CatalogCourse,
   type ContinueWatchingItem,
+  type FormationSection,
 } from '../../api/courses.ts';
 
 // --- STATIC CONTENT (product-managed) ---
@@ -54,6 +56,8 @@ interface CourseCardData {
   requiredOffer?: string;
   dripDate?: string;
   expiryDate?: string;
+  salesUrl?: string | null;
+  offerBadgeText?: string | null;
 }
 
 function mapCatalogToCard(course: CatalogCourse): CourseCardData {
@@ -79,6 +83,8 @@ function mapCatalogToCard(course: CatalogCourse): CourseCardData {
     requiredOffer: status === 'locked' ? 'Plano superior' : undefined,
     dripDate: access.unlocksAt ? new Date(access.unlocksAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : undefined,
     expiryDate: access.expiresAt ? new Date(access.expiresAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : undefined,
+    salesUrl: course.sales_url ?? null,
+    offerBadgeText: course.offer_badge_enabled ? (course.offer_badge_text ?? null) : null,
   };
 }
 
@@ -114,11 +120,12 @@ function mapContinueWatching(items: ContinueWatchingItem[]): ContinueLearningDat
 
 // --- COMPONENTS ---
 
-function EntitlementBadge({ status, requiredOffer, dripDate, expiryDate }: {
+function EntitlementBadge({ status, requiredOffer, dripDate, expiryDate, offerBadgeText }: {
   status: CourseStatus;
   requiredOffer?: string;
   dripDate?: string;
   expiryDate?: string;
+  offerBadgeText?: string | null;
 }) {
   const isUrgent = status === 'expiring' && isDaysUrgent(expiryDate);
   const baseStyle = "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border";
@@ -126,7 +133,7 @@ function EntitlementBadge({ status, requiredOffer, dripDate, expiryDate }: {
   if (status === 'locked') {
     return (
       <span className={cn(baseStyle, "bg-[var(--color-bg-primary)]/80 border-[var(--color-border-subtle)] text-[var(--color-text-secondary)]")}>
-        {requiredOffer ?? 'Bloqueado'}
+        {offerBadgeText ?? requiredOffer ?? 'Bloqueado'}
       </span>
     );
   }
@@ -159,15 +166,122 @@ function EntitlementBadge({ status, requiredOffer, dripDate, expiryDate }: {
 
 function CourseCardSkeleton() {
   return (
-    <div className="w-[85vw] sm:w-auto shrink-0 snap-center sm:snap-align-none h-full animate-pulse">
-      <div className="flex flex-col min-h-[300px] rounded-[24px] overflow-hidden bg-[var(--color-bg-secondary)] border border-[var(--color-border-subtle)]">
-        <div className="h-44 sm:h-48 bg-[var(--color-bg-elevated)]" />
-        <div className="p-6 space-y-3">
-          <div className="h-5 w-3/4 rounded bg-[var(--color-bg-elevated)]" />
-          <div className="h-4 w-1/4 rounded bg-[var(--color-bg-elevated)]" />
-        </div>
-      </div>
+    <div className="w-[45vw] sm:w-auto shrink-0 snap-center sm:snap-align-none">
+      <div className="aspect-[2/3] rounded-[16px] animate-pulse bg-[var(--color-bg-secondary)]" />
     </div>
+  );
+}
+
+// --- SECTION BLOCK ---
+
+function CourseCard({ course }: { course: CourseCardData }) {
+  const isBlocked = course.status === 'locked' || course.status === 'drip';
+  return (
+    <div className="w-[45vw] sm:w-auto shrink-0 snap-center sm:snap-align-none">
+      <Link
+        to={isBlocked ? '#' : `/formacao/curso/${course.id}`}
+        className={cn(
+          'relative block rounded-[16px] overflow-hidden aspect-[2/3]',
+          'group outline-none focus-visible:ring-2 focus-visible:ring-white',
+          'bg-[var(--color-bg-elevated)]',
+          isBlocked
+            ? 'cursor-not-allowed'
+            : 'cursor-pointer motion-safe:hover:-translate-y-1 transition-transform duration-300',
+        )}
+        onClick={isBlocked ? (e) => e.preventDefault() : undefined}
+      >
+        {/* Full-bleed cover image */}
+        {course.thumbnail ? (
+          <img
+            src={course.thumbnail}
+            alt={course.title}
+            className="absolute inset-0 w-full h-full object-cover motion-safe:group-hover:scale-[1.05] transition-transform duration-500 ease-out"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1c1c1e] to-[#0a0a0a]" />
+        )}
+
+        {/* Bottom gradient for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+        {/* Blocked overlay */}
+        {isBlocked && (
+          <div className="absolute inset-0 bg-black/50" />
+        )}
+
+        {/* Status badge — top right */}
+        <div className="absolute top-2.5 right-2.5 z-10">
+          <EntitlementBadge
+            status={course.status}
+            requiredOffer={course.requiredOffer}
+            dripDate={course.dripDate}
+            expiryDate={course.expiryDate}
+            offerBadgeText={course.offerBadgeText}
+          />
+        </div>
+
+        {/* Lock icon — centered */}
+        {isBlocked && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="h-10 w-10 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center border border-white/10">
+              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+              </svg>
+            </div>
+          </div>
+        )}
+
+        {/* Purchase CTA — bottom of card for blocked courses with sales_url */}
+        {isBlocked && course.salesUrl && (
+          <a
+            href={course.salesUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-3 left-3 right-3 z-20 inline-flex items-center justify-center rounded-full bg-white/90 text-black text-[12px] font-bold py-1.5 hover:bg-white transition-colors"
+          >
+            Comprar
+          </a>
+        )}
+
+        {/* Text overlay — bottom */}
+        <div className={cn('absolute left-0 right-0 z-10 p-3', isBlocked && course.salesUrl ? 'bottom-10' : 'bottom-0')}>
+          <h3 className="text-[13px] font-semibold leading-tight text-white line-clamp-2 mb-0.5">
+            {course.title}
+          </h3>
+          <p className="text-[11px] text-white/55">
+            {course.lessons} aulas
+          </p>
+        </div>
+      </Link>
+    </div>
+  );
+}
+
+function SectionBlock({ title, courses, loading }: { title: string; courses: CourseCardData[]; loading: boolean }) {
+  return (
+    <motion.div variants={staggerItem} className="mt-12 sm:mt-16 -mx-4 sm:mx-0">
+      <div className="px-4 sm:px-0 mb-6">
+        <h3 className="text-[22px] font-semibold tracking-tight text-[var(--color-text-primary)]">
+          {title}
+        </h3>
+      </div>
+
+      <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory px-4 sm:px-0 pb-4 sm:pb-0 scrollbar-none">
+        {loading
+          ? [1, 2, 3].map((i) => <CourseCardSkeleton key={i} />)
+          : courses.length === 0
+            ? (
+              <div className="col-span-3 py-12 text-center">
+                <p className="text-[15px] text-[var(--color-text-tertiary)]">
+                  Nenhum curso disponível no momento.
+                </p>
+              </div>
+            )
+            : courses.map((course) => <CourseCard key={course.id} course={course} />)
+        }
+      </div>
+    </motion.div>
   );
 }
 
@@ -183,12 +297,19 @@ export function FormacaoPage() {
     queryFn: getCatalog,
   });
 
+  const { data: sectionsRaw = [], isLoading: sectionsLoading } = useQuery({
+    queryKey: ['formacao-sections'],
+    queryFn: getFormacaoSections,
+  });
+
   const { data: continueWatchingRaw = [] } = useQuery({
     queryKey: ['continue-watching'],
     queryFn: getContinueWatching,
   });
 
   const courses = catalogRaw.map(mapCatalogToCard);
+  const sectionsData = sectionsRaw as FormationSection[];
+  const hasSections = sectionsData.length > 0;
   const continueLearning = mapContinueWatching(continueWatchingRaw);
 
   const containerVariants = prefersReducedMotion ? { initial: { opacity: 0 }, animate: { opacity: 1 } } : staggerContainer;
@@ -277,117 +398,25 @@ export function FormacaoPage() {
           </motion.div>
         )}
 
-        {/* 2. Cursos Section */}
-        <motion.div variants={itemVariants} className="mt-12 sm:mt-16 -mx-4 sm:mx-0">
-          <div className="px-4 sm:px-0 mb-6">
-            <h3 className="text-[22px] font-semibold tracking-tight text-[var(--color-text-primary)]">
-              Seus Cursos
-            </h3>
-          </div>
-
-          <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory px-4 sm:px-0 pb-6 sm:pb-0 scrollbar-none">
-            {catalogLoading
-              ? [1, 2, 3].map((i) => <CourseCardSkeleton key={i} />)
-              : courses.length === 0
-                ? (
-                  <div className="col-span-3 py-12 text-center">
-                    <p className="text-[15px] text-[var(--color-text-tertiary)]">
-                      Nenhum curso disponível no momento.
-                    </p>
-                  </div>
-                )
-                : courses.map((course) => (
-                  <div
-                    key={course.id}
-                    className="w-[85vw] sm:w-auto shrink-0 snap-center sm:snap-align-none h-full"
-                  >
-                    <Link
-                      to={course.status === 'locked' || course.status === 'drip' ? '#' : `/formacao/curso/${course.id}`}
-                      className={cn(
-                        'relative flex flex-col h-full min-h-[300px] rounded-[24px] overflow-hidden',
-                        'bg-[var(--color-bg-secondary)] border border-[var(--color-border-subtle)]',
-                        'transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-white',
-                        course.status === 'locked' || course.status === 'drip'
-                          ? 'opacity-[0.6] cursor-not-allowed filter grayscale-[50%]'
-                          : 'hover:border-[var(--color-border-default)] hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] cursor-pointer'
-                      )}
-                      onClick={course.status === 'locked' || course.status === 'drip' ? (e) => e.preventDefault() : undefined}
-                    >
-                      {/* Thumbnail area */}
-                      <div className="relative h-44 sm:h-48 w-full bg-[var(--color-bg-tertiary)] overflow-hidden">
-                        {course.thumbnail ? (
-                          <img
-                            src={course.thumbnail}
-                            alt={course.title}
-                            className="w-full h-full object-cover grayscale mix-blend-luminosity opacity-40 motion-safe:group-hover:scale-[1.03] motion-safe:group-hover:opacity-60 transition-all duration-[600ms] ease-out"
-                          />
-                        ) : (
-                          <div className="w-full h-full opacity-60 bg-gradient-to-br from-[#161616] to-[#0a0a0a]" />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-secondary)] via-[var(--color-bg-secondary)]/10 to-transparent opacity-95" />
-
-                        <div className="absolute top-4 right-4 z-10">
-                          <EntitlementBadge
-                            status={course.status}
-                            requiredOffer={course.requiredOffer}
-                            dripDate={course.dripDate}
-                            expiryDate={course.expiryDate}
-                          />
-                        </div>
-
-                        {(course.status === 'locked' || course.status === 'drip') && (
-                          <div className="absolute inset-0 flex items-center justify-center z-10">
-                            <div className="h-12 w-12 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center border border-[rgba(255,255,255,0.08)]">
-                              <svg className="h-5 w-5 text-[#f5f5f7]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                              </svg>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Course info */}
-                      <div className="p-6 flex flex-col flex-1 bg-[var(--color-bg-secondary)] relative z-10">
-                        <h3 className="text-[18px] font-semibold leading-snug tracking-tight text-[var(--color-text-primary)] mb-1">
-                          {course.title}
-                        </h3>
-                        <p className="text-[14px] text-[var(--color-text-tertiary)] mb-6">
-                          {course.lessons} aulas
-                        </p>
-
-                        <div className="mt-auto">
-                          {course.status === 'completed' ? (
-                            <div className="flex items-center gap-2 text-[13px] font-medium text-[var(--color-text-secondary)]">
-                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                              </svg>
-                              Concluído
-                            </div>
-                          ) : course.status === 'locked' ? (
-                            <Link
-                              to="/planos"
-                              onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[var(--color-text-primary)] underline underline-offset-2 hover:opacity-70 transition-opacity"
-                            >
-                              Ver planos disponíveis →
-                            </Link>
-                          ) : course.status === 'drip' ? (
-                            <div className="text-[13px] font-medium text-[var(--color-text-tertiary)]">
-                              Em breve
-                            </div>
-                          ) : (
-                            <div className="text-[13px] font-medium text-[var(--color-text-primary)]">
-                              Começar curso
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-                ))
-            }
-          </div>
-        </motion.div>
+        {/* 2. Cursos Sections (dynamic or fallback) */}
+        {sectionsLoading ? (
+          <SectionBlock title="Seus Cursos" courses={[]} loading={true} />
+        ) : hasSections ? (
+          sectionsData.map((section) => (
+            <SectionBlock
+              key={section.id}
+              title={section.title}
+              courses={section.courses.map(mapCatalogToCard)}
+              loading={false}
+            />
+          ))
+        ) : (
+          <SectionBlock
+            title="Seus Cursos"
+            courses={courses}
+            loading={catalogLoading}
+          />
+        )}
 
         {/* 3. Jornada do Consultor Digital */}
         <motion.div variants={itemVariants} className="mt-12 sm:mt-16 -mx-4 sm:mx-0">
