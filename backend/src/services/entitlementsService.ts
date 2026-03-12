@@ -222,6 +222,7 @@ export async function getUserCoursesCatalog(userId: string) {
     .from('courses')
     .select(`
       id, title, description, cover_url, status, sort_order,
+      sales_url, offer_badge_enabled, offer_badge_text,
       modules (
         id,
         lessons (id)
@@ -247,6 +248,9 @@ export async function getUserCoursesCatalog(userId: string) {
         cover_url: course.cover_url,
         sort_order: course.sort_order,
         total_lessons: totalLessons,
+        sales_url: (course as any).sales_url ?? null,
+        offer_badge_enabled: (course as any).offer_badge_enabled ?? false,
+        offer_badge_text: (course as any).offer_badge_text ?? null,
         access,
       };
     }),

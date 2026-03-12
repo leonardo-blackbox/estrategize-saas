@@ -89,7 +89,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'Área de Membros',
     icon: <IconPlay />,
     items: [
-      { to: '/admin/cursos', label: 'Cursos' },
+      { to: '/admin/cursos', label: 'Seções' },
       { to: '/admin/formacao', label: 'Formação' },
       { to: '/admin/usuarios', label: 'Usuários' },
       { to: '/admin/turmas', label: 'Turmas' },
