@@ -499,9 +499,7 @@ function ManageSectionCoursesModal({
     queryFn: adminListCourses,
   });
 
-  const currentCourseIds = new Set(
-    (section.formation_section_courses ?? []).map((sc: any) => sc.courses?.id).filter(Boolean),
-  );
+  const currentCourseIds = (section.formation_section_courses ?? []).map((sc: any) => sc.courses?.id).filter(Boolean) as string[];
 
   const [selected, setSelected] = useState<Set<string>>(new Set(currentCourseIds));
   const allCourses = Array.isArray(allCoursesData) ? allCoursesData : [];

@@ -14,9 +14,9 @@ interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary: [
-    'bg-[var(--text-primary)] text-[var(--bg-base)]',
-    'hover:opacity-90',
-    'active:opacity-80',
+    'bg-[var(--accent)] text-[var(--accent-text)]',
+    'hover:bg-[var(--accent-hover)]',
+    'active:opacity-90',
     'shadow-[var(--shadow-soft)]',
   ].join(' '),
   secondary: [

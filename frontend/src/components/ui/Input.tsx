@@ -29,7 +29,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             'text-[16px] text-[var(--text-primary)]', /* 16px prevents iOS Safari zoom */
             'placeholder:text-[var(--text-muted)]',
             'ring-1 ring-inset ring-[var(--border-default)]',
-            'focus:ring-2 focus:ring-[var(--text-primary)]',
+            'focus:ring-2 focus:ring-[var(--accent)]',
             'focus:outline-none',
             'transition-shadow duration-[var(--duration-fast)]',
             'disabled:opacity-40 disabled:cursor-not-allowed',
@@ -74,7 +74,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             'text-[16px] text-[var(--text-primary)]',
             'placeholder:text-[var(--text-muted)]',
             'ring-1 ring-inset ring-[var(--border-default)]',
-            'focus:ring-2 focus:ring-[var(--text-primary)]',
+            'focus:ring-2 focus:ring-[var(--accent)]',
             'focus:outline-none',
             'transition-shadow duration-[var(--duration-fast)]',
             'resize-none',

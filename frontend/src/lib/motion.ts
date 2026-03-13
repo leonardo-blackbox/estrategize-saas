@@ -65,23 +65,23 @@ export const staggerContainer: Variants = {
   initial: {},
   animate: {
     transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.05,
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
     },
   },
 };
 
-// ── Stagger Item (fade + slide up) ──
+// ── Stagger Item (fade + slide up — more dramatic) ──
 export const staggerItem: Variants = {
   initial: {
     opacity: 0,
-    y: 12,
+    y: 30,
   },
   animate: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.35,
+      duration: 0.5,
       ease: easeOutExpo,
     },
   },
@@ -91,13 +91,47 @@ export const staggerItem: Variants = {
 export const scrollReveal: Variants = {
   hidden: {
     opacity: 0,
-    y: 20,
+    y: 30,
   },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
+      duration: 0.6,
+      ease: easeOutExpo,
+    },
+  },
+};
+
+// ── Scroll Scale In (for cards) ──
+export const scrollScaleIn: Variants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.95,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
       duration: 0.5,
+      ease: easeOutExpo,
+    },
+  },
+};
+
+// ── Hero Parallax ──
+export const heroParallax: Variants = {
+  initial: {
+    opacity: 0,
+    y: 40,
+    scale: 0.96,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.7,
       ease: easeOutExpo,
     },
   },
@@ -112,7 +146,7 @@ export const buttonPress = {
 // ── Card Hover Tilt (desktop only, max 2 deg) ──
 export const cardHover = {
   whileHover: {
-    y: -2,
+    y: -4,
     transition: transitionNormal,
   },
 };

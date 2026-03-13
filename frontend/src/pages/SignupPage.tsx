@@ -48,18 +48,18 @@ export function SignupPage() {
           className="w-full max-w-md text-center space-y-4"
         >
           <motion.h2 variants={staggerItem} className="text-[24px] font-semibold tracking-tight text-[var(--text-primary)]">
-            Check your email
+            Verifique seu email
           </motion.h2>
           <motion.p variants={staggerItem} className="text-[15px] text-[var(--text-secondary)]">
-            We sent a confirmation link to{' '}
+            Enviamos um link de confirmação para{' '}
             <strong className="text-[var(--text-primary)] font-semibold">{email}</strong>.
           </motion.p>
           <motion.div variants={staggerItem}>
             <Link
               to="/login"
-              className="text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
+              className="text-[13px] text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium"
             >
-              Back to login
+              Voltar ao login
             </Link>
           </motion.div>
         </motion.div>
@@ -76,11 +76,14 @@ export function SignupPage() {
         className="w-full max-w-md space-y-8"
       >
         <motion.div variants={staggerItem} className="text-center">
+          <div className="mx-auto h-16 w-16 rounded-[var(--radius-lg)] bg-[var(--accent)] flex items-center justify-center mb-5">
+            <span className="text-2xl font-bold text-[var(--accent-text)]">E</span>
+          </div>
           <h1 className="text-[28px] font-semibold tracking-tight text-[var(--text-primary)]">
-            Create Account
+            Criar Conta
           </h1>
           <p className="text-[15px] text-[var(--text-secondary)] mt-2">
-            Start using Iris Platform
+            Comece a usar o Estrategize
           </p>
         </motion.div>
 
@@ -92,12 +95,12 @@ export function SignupPage() {
             <AuthErrorMessage />
 
             <Input
-              label="Full Name"
+              label="Nome completo"
               id="fullName"
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Your name"
+              placeholder="Seu nome"
             />
 
             <Input
@@ -118,7 +121,7 @@ export function SignupPage() {
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Minimum 6 characters"
+              placeholder="Mínimo 6 caracteres"
             />
 
             <Button
@@ -127,18 +130,18 @@ export function SignupPage() {
               fullWidth
               size="lg"
             >
-              {submitting ? 'Creating account...' : 'Sign Up'}
+              {submitting ? 'Criando conta...' : 'Criar Conta'}
             </Button>
           </form>
         </motion.div>
 
         <motion.p variants={staggerItem} className="text-center text-[13px] text-[var(--text-tertiary)]">
-          Already have an account?{' '}
+          Já tem uma conta?{' '}
           <Link
             to="/login"
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
+            className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium"
           >
-            Sign in
+            Entrar
           </Link>
         </motion.p>
       </motion.div>

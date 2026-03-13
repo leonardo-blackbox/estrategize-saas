@@ -9,7 +9,6 @@ import {
   adminArchiveCourse,
 } from '../../api/courses.ts';
 import { staggerContainer, staggerItem } from '../../lib/motion.ts';
-import { cn } from '../../lib/cn.ts';
 import { Badge } from '../../components/ui/Badge.tsx';
 import { Button } from '../../components/ui/Button.tsx';
 import { Modal } from '../../components/ui/Modal.tsx';

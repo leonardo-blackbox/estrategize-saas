@@ -36,19 +36,19 @@ export function ForgotPasswordPage() {
           className="w-full max-w-md text-center space-y-4"
         >
           <motion.h2 variants={staggerItem} className="text-[24px] font-semibold tracking-tight text-[var(--text-primary)]">
-            Email sent
+            Email enviado
           </motion.h2>
           <motion.p variants={staggerItem} className="text-[15px] text-[var(--text-secondary)]">
-            If an account exists for{' '}
+            Se existe uma conta para{' '}
             <strong className="text-[var(--text-primary)] font-semibold">{email}</strong>,
-            you will receive a password reset link.
+            você receberá um link para redefinir a senha.
           </motion.p>
           <motion.div variants={staggerItem}>
             <Link
               to="/login"
-              className="text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
+              className="text-[13px] text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium"
             >
-              Back to login
+              Voltar ao login
             </Link>
           </motion.div>
         </motion.div>
@@ -65,11 +65,14 @@ export function ForgotPasswordPage() {
         className="w-full max-w-md space-y-8"
       >
         <motion.div variants={staggerItem} className="text-center">
+          <div className="mx-auto h-16 w-16 rounded-[var(--radius-lg)] bg-[var(--accent)] flex items-center justify-center mb-5">
+            <span className="text-2xl font-bold text-[var(--accent-text)]">E</span>
+          </div>
           <h1 className="text-[28px] font-semibold tracking-tight text-[var(--text-primary)]">
-            Reset Password
+            Redefinir Senha
           </h1>
           <p className="text-[15px] text-[var(--text-secondary)] mt-2">
-            Enter your email and we&apos;ll send a reset link
+            Digite seu email e enviaremos um link de redefinição
           </p>
         </motion.div>
 
@@ -96,7 +99,7 @@ export function ForgotPasswordPage() {
               fullWidth
               size="lg"
             >
-              {submitting ? 'Sending...' : 'Send Reset Link'}
+              {submitting ? 'Enviando...' : 'Enviar Link'}
             </Button>
           </form>
         </motion.div>
@@ -104,9 +107,9 @@ export function ForgotPasswordPage() {
         <motion.p variants={staggerItem} className="text-center text-[13px] text-[var(--text-tertiary)]">
           <Link
             to="/login"
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
+            className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium"
           >
-            Back to login
+            Voltar ao login
           </Link>
         </motion.p>
       </motion.div>

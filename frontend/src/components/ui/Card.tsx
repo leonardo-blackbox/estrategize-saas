@@ -14,11 +14,13 @@ export function Card({ children, variant = 'default', className, as: Tag = 'div'
     <Tag
       className={cn(
         'rounded-[var(--radius-card)] p-6',
-        'transition-colors duration-[var(--duration-normal)]',
+        'transition-all duration-[var(--duration-normal)]',
         variant === 'default' && [
           'bg-[var(--bg-surface-1)]',
           'border border-[var(--border-hairline)]',
           'shadow-[var(--shadow-soft)]',
+          'hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-0.5',
+          'hover:border-[var(--accent-subtle)]',
         ],
         variant === 'glass' && 'glass',
         className,

@@ -6,6 +6,7 @@ import { staggerContainer, staggerItem } from '../../lib/motion.ts';
 import { cn } from '../../lib/cn.ts';
 import { isDaysUrgent } from '../../lib/dates.ts';
 import { Modal } from '../../components/ui/Modal.tsx';
+import { ScrollReveal } from '../../components/motion/ScrollReveal.tsx';
 import {
   getCatalog,
   getContinueWatching,
@@ -369,7 +370,7 @@ export function FormacaoPage() {
                     className="w-full h-full object-cover opacity-50 grayscale mix-blend-luminosity motion-safe:group-hover:scale-[1.02] motion-safe:group-hover:opacity-60 transition-all duration-[800ms] ease-out"
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-base)] via-[var(--bg-base)]/80 to-transparent" />
               </div>
 
               <div className="relative z-10 p-6 sm:p-10 flex flex-col justify-end min-h-[360px] sm:min-h-[440px]">
@@ -398,7 +399,7 @@ export function FormacaoPage() {
                     </div>
                   </div>
 
-                  <div className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--color-text-primary)] px-6 py-3 text-[15px] font-semibold text-[var(--color-bg-primary)] motion-safe:transition-transform motion-safe:duration-200 active:scale-95 hover:opacity-90 min-w-[140px] min-h-[44px]">
+                  <div className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--accent)] px-6 py-3 text-[15px] font-semibold text-[var(--accent-text)] motion-safe:transition-transform motion-safe:duration-200 active:scale-95 hover:bg-[var(--accent-hover)] min-w-[140px] min-h-[44px]">
                     Continuar
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -431,7 +432,7 @@ export function FormacaoPage() {
         )}
 
         {/* 3. Jornada do Consultor Digital */}
-        <motion.div variants={itemVariants} className="mt-12 sm:mt-16 -mx-4 sm:mx-0">
+        <ScrollReveal delay={0.1}>
           <div className="px-4 sm:px-0 mb-6 flex flex-col gap-1">
             <h3 className="text-[22px] font-semibold tracking-tight text-[var(--color-text-primary)]">
               Jornada do Consultor Digital
@@ -458,7 +459,7 @@ export function FormacaoPage() {
                       {item.step}
                     </span>
                     {item.recommended && (
-                      <span className="inline-flex items-center rounded-sm bg-[var(--color-text-primary)]/10 px-2 py-0.5 text-[10px] font-bold text-[var(--color-text-primary)] uppercase tracking-wider">
+                      <span className="inline-flex items-center rounded-sm bg-[var(--accent-subtle)] px-2 py-0.5 text-[10px] font-bold text-[var(--accent)] uppercase tracking-wider">
                         Recomendado
                       </span>
                     )}
@@ -476,7 +477,7 @@ export function FormacaoPage() {
                     className={cn(
                       "mt-auto inline-flex items-center justify-center rounded-full px-4 py-2.5 text-[14px] font-semibold transition-all duration-200 outline-none focus-visible:ring-2 min-h-[44px]",
                       item.recommended
-                        ? "bg-[var(--color-text-primary)] text-[var(--color-bg-primary)] hover:opacity-90 active:scale-95"
+                        ? "bg-[var(--accent)] text-[var(--accent-text)] hover:bg-[var(--accent-hover)] active:scale-95"
                         : item.cta === 'Trancado'
                           ? "bg-[var(--color-bg-active)] text-[var(--color-text-tertiary)] cursor-not-allowed opacity-60"
                           : "bg-[var(--color-bg-active)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] active:scale-95"
@@ -488,10 +489,10 @@ export function FormacaoPage() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </ScrollReveal>
 
         {/* 4. Materiais (Downloads) */}
-        <motion.div variants={itemVariants} className="mt-12 sm:mt-16">
+        <ScrollReveal delay={0.15}>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
             <div className="flex flex-col gap-1">
               <h3 className="text-[22px] font-semibold tracking-tight text-[var(--color-text-primary)]">
@@ -558,7 +559,7 @@ export function FormacaoPage() {
               </button>
             ))}
           </div>
-        </motion.div>
+        </ScrollReveal>
       </motion.div>
 
       {/* 5. Material Download Modal */}

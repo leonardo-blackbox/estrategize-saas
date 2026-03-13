@@ -72,7 +72,7 @@ export function BottomTabs() {
                 'text-[10px] font-medium transition-all duration-200 tracking-tight',
                 'active:scale-[0.92]',
                 isActive
-                  ? 'text-[var(--text-primary)] font-semibold'
+                  ? 'text-[var(--accent)] font-semibold'
                   : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]',
               )
             }
@@ -91,7 +91,7 @@ export function BottomTabs() {
                 'text-[10px] font-medium transition-all duration-200 tracking-tight',
                 'active:scale-[0.92]',
                 isActive
-                  ? 'text-[var(--text-primary)] font-semibold'
+                  ? 'text-[var(--accent)] font-semibold'
                   : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]',
               )
             }

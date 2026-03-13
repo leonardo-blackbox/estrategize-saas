@@ -44,11 +44,14 @@ export function LoginPage() {
         className="w-full max-w-md space-y-8"
       >
         <motion.div variants={staggerItem} className="text-center">
+          <div className="mx-auto h-16 w-16 rounded-[var(--radius-lg)] bg-[var(--accent)] flex items-center justify-center mb-5">
+            <span className="text-2xl font-bold text-[var(--accent-text)]">E</span>
+          </div>
           <h1 className="text-[28px] font-semibold tracking-tight text-[var(--text-primary)]">
-            Iris Platform
+            Estrategize
           </h1>
           <p className="text-[15px] text-[var(--text-secondary)] mt-2">
-            Sign in to your account
+            Entre na sua conta
           </p>
         </motion.div>
 
@@ -86,7 +89,7 @@ export function LoginPage() {
               fullWidth
               size="lg"
             >
-              {submitting ? 'Signing in...' : 'Sign In'}
+              {submitting ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
         </motion.div>
@@ -95,18 +98,18 @@ export function LoginPage() {
           <p>
             <Link
               to="/forgot-password"
-              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
             >
-              Forgot your password?
+              Esqueceu a senha?
             </Link>
           </p>
           <p>
-            Don&apos;t have an account?{' '}
+            Não tem uma conta?{' '}
             <Link
               to="/signup"
-              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium"
+              className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors font-medium"
             >
-              Sign up
+              Criar conta
             </Link>
           </p>
         </motion.div>

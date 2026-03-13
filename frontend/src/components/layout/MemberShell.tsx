@@ -1,16 +1,15 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { Header } from './Header.tsx';
+import { AppleNav } from './AppleNav.tsx';
 import { BottomTabs } from './BottomTabs.tsx';
-import { MemberSidebar } from './MemberSidebar.tsx';
 import { InteractiveBackground } from '../compound/InteractiveBackground.tsx';
 import { PageTransition } from '../motion/PageTransition.tsx';
 
 /**
  * MemberShell
  * Main layout for authenticated member pages.
- * - Mobile: Header + content + BottomTabs
- * - Desktop: Sidebar + Header + content
+ * - Desktop: Apple-style centered top nav + content (no sidebar)
+ * - Mobile: AppleNav (compact) + content + BottomTabs
  * - InteractiveBackground only on /formacao
  */
 export function MemberShell() {
@@ -22,16 +21,14 @@ export function MemberShell() {
       {/* Interactive background (only on /formacao) */}
       {showBackground && <InteractiveBackground />}
 
-      {/* Desktop sidebar */}
-      <MemberSidebar />
+      {/* Apple-style centered nav */}
+      <AppleNav />
 
-      {/* Main area */}
-      <div className="lg:pl-[220px] relative z-10">
-        <Header />
-
+      {/* Main area — offset for fixed nav */}
+      <div className="relative z-10 pt-[calc(var(--apple-nav-height)+24px)]">
         {/* Page content with bottom padding for mobile tabs */}
         <main
-          className="px-4 sm:px-6 py-4 sm:py-6 pb-[calc(var(--bottom-tabs-height)+var(--safe-area-bottom)+16px)] lg:pb-6"
+          className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-[calc(var(--bottom-tabs-height)+var(--safe-area-bottom)+16px)] lg:pb-6 max-w-6xl mx-auto"
         >
           <AnimatePresence mode="wait">
             <PageTransition key={location.pathname}>
