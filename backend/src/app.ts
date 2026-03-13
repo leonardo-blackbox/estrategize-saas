@@ -54,15 +54,19 @@ const adminLimit = rateLimit({
 
 // ─── CORS ────────────────────────────────────────────────────────
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
+  process.env.FRONTEND_URL?.trim(),
+  'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
-];
+].filter(Boolean) as string[];
 
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin) return cb(null, true);
+    // Allow exact matches
     if (allowedOrigins.includes(origin)) return cb(null, true);
+    // Allow all Vercel preview/production deployments
+    if (origin.endsWith('.vercel.app')) return cb(null, true);
     cb(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
