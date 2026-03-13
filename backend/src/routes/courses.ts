@@ -137,6 +137,24 @@ router.get('/sections', requireAuth, async (req: AuthenticatedRequest, res) => {
   }
 });
 
+// ─── GET /api/courses/home-settings — configurações da home ───
+router.get('/home-settings', requireAuth, async (_req, res) => {
+  try {
+    if (!supabaseAdmin) return res.status(503).json({ error: 'DB unavailable' });
+
+    const { data } = await supabaseAdmin
+      .from('home_settings')
+      .select('title, subtitle')
+      .limit(1)
+      .maybeSingle();
+
+    res.json(data ?? { title: 'Formação', subtitle: null });
+  } catch (err) {
+    console.error('GET /api/courses/home-settings error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // ─── GET /api/courses/:id — detalhe do curso ──────────────────
 router.get('/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
   try {

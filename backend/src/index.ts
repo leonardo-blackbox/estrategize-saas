@@ -14,6 +14,7 @@ import adminUsersRouter from './routes/admin/users.js';
 import formacaoRouter from './routes/admin/formacao.js';
 import adminTurmasRouter from './routes/admin/turmas.js';
 import adminOfertasRouter from './routes/admin/ofertas.js';
+import adminHomeRouter from './routes/admin/home.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
 const app = express();
@@ -122,6 +123,7 @@ app.use('/api/admin/users', adminLimit, adminUsersRouter);
 app.use('/api/admin/formacao', adminLimit, formacaoRouter);
 app.use('/api/admin/turmas', adminLimit, adminTurmasRouter);
 app.use('/api/admin/ofertas', adminLimit, adminOfertasRouter);
+app.use('/api/admin/home', adminLimit, adminHomeRouter);
 
 // Webhooks
 app.use('/api/webhooks', webhookLimit, webhooksRouter);

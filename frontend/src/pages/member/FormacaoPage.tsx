@@ -10,6 +10,7 @@ import {
   getCatalog,
   getContinueWatching,
   getFormacaoSections,
+  getHomeSettings,
   type CatalogCourse,
   type ContinueWatchingItem,
   type FormationSection,
@@ -292,6 +293,12 @@ export function FormacaoPage() {
   const [showAllMaterials, setShowAllMaterials] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
 
+  const { data: homeSettings } = useQuery({
+    queryKey: ['home-settings'],
+    queryFn: getHomeSettings,
+    staleTime: 10 * 60 * 1000,
+  });
+
   const { data: catalogRaw = [], isLoading: catalogLoading } = useQuery({
     queryKey: ['catalog'],
     queryFn: getCatalog,
@@ -331,10 +338,15 @@ export function FormacaoPage() {
         animate="animate"
         className="relative z-10 w-full max-w-6xl mx-auto pb-24 lg:pb-12"
       >
-        <div className="flex items-center justify-between mb-8 sm:mb-12">
+        <div className={homeSettings?.subtitle ? 'mb-4 sm:mb-6' : 'mb-8 sm:mb-12'}>
           <h1 className="text-[32px] sm:text-[40px] font-semibold tracking-tight text-[var(--color-text-primary)]">
-            Formação
+            {homeSettings?.title ?? 'Formação'}
           </h1>
+          {homeSettings?.subtitle && (
+            <p className="text-[17px] text-[var(--color-text-secondary)] mt-2">
+              {homeSettings.subtitle}
+            </p>
+          )}
         </div>
 
         {/* 1. Continue Learning Hero */}

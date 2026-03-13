@@ -90,7 +90,7 @@ const NAV_GROUPS: NavGroup[] = [
     icon: <IconPlay />,
     items: [
       { to: '/admin/cursos', label: 'Conteúdos' },
-      { to: '/admin/formacao', label: 'Seções' },
+      { to: '/admin/home', label: 'Home' },
       { to: '/admin/usuarios', label: 'Usuários' },
       { to: '/admin/turmas', label: 'Turmas' },
     ],

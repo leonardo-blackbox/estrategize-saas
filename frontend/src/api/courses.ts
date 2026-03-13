@@ -301,6 +301,21 @@ export async function adminUpdateUserProfile(
   return client.patch(`/api/admin/users/${id}`, { json: data }).json();
 }
 
+// ─── Home Settings ─────────────────────────────────────────────
+
+export interface HomeSettings {
+  title: string;
+  subtitle: string | null;
+}
+
+export async function getHomeSettings(): Promise<HomeSettings> {
+  return client.get('/api/courses/home-settings').json();
+}
+
+export async function adminUpdateHomeSettings(data: { title: string; subtitle?: string | null }): Promise<HomeSettings> {
+  return client.put('/api/admin/home/settings', { json: data }).json();
+}
+
 // ─── Formation Sections (member) ───────────────────────────────
 
 export interface FormationSection {

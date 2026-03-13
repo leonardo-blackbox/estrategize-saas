@@ -46,6 +46,7 @@ import { AdminCursosPage } from './pages/admin/AdminCursosPage.tsx';
 import { AdminCursoDetailPage } from './pages/admin/AdminCursoDetailPage.tsx';
 import { AdminUserDetailPage } from './pages/admin/AdminUserDetailPage.tsx';
 import { AdminFormacaoPage } from './pages/admin/AdminFormacaoPage.tsx';
+import { AdminHomePage } from './pages/admin/AdminHomePage.tsx';
 
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
@@ -99,6 +100,7 @@ export default function App() {
           <Route path="/admin/usuarios/:id" element={<AdminUserDetailPage />} />
           <Route path="/admin/stripe" element={<AdminStripePage />} />
           <Route path="/admin/formacao" element={<AdminFormacaoPage />} />
+          <Route path="/admin/home" element={<AdminHomePage />} />
         </Route>
 
         {/* ── Legacy routes (preserved, using old DashboardLayout) ── */}
