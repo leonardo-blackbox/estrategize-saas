@@ -76,9 +76,11 @@ export function SignupPage() {
         className="w-full max-w-md space-y-8"
       >
         <motion.div variants={staggerItem} className="text-center">
-          <div className="mx-auto h-16 w-16 rounded-[var(--radius-lg)] bg-[var(--accent)] flex items-center justify-center mb-5">
-            <span className="text-2xl font-bold text-[var(--accent-text)]">E</span>
-          </div>
+          <img
+            src="/img/logo-auth.png"
+            alt="Estrategize"
+            className="mx-auto h-16 w-16 object-contain mb-5"
+          />
           <h1 className="text-[28px] font-semibold tracking-tight text-[var(--text-primary)]">
             Criar Conta
           </h1>

@@ -79,7 +79,7 @@
   --text-primary: #f0f5f4;
   --text-secondary: #8ba8a6;
   --text-tertiary: #5e807d;
-  --text-muted: #3d5c59;
+  --text-muted: #4e706d;
 
   /* Borders */
   --border-hairline: rgba(255, 255, 255, 0.06);
@@ -154,7 +154,7 @@
   --bottom-tabs-height: 72px;
 
   /* Apple nav */
-  --apple-nav-height: 52px;
+  --apple-nav-height: 48px;
 
   /* Interactive background (mouse tracking) */
   --mouse-x: 50%;
@@ -250,12 +250,7 @@ body {
               color var(--duration-normal) var(--ease-out-expo);
 }
 
-/* iOS safe area support */
-@supports (padding: env(safe-area-inset-bottom)) {
-  body {
-    padding-top: var(--safe-area-top);
-  }
-}
+/* iOS safe area support — handled per-component (AppleNav, BottomTabs, MemberShell) */
 
 /* ========================================
    Scrollbar Styles
@@ -362,7 +357,7 @@ body {
 
 .apple-nav {
   position: fixed;
-  top: 12px;
+  top: calc(12px + env(safe-area-inset-top, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;

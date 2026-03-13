@@ -20,7 +20,7 @@ export function Card({ children, variant = 'default', className, as: Tag = 'div'
           'border border-[var(--border-hairline)]',
           'shadow-[var(--shadow-soft)]',
           'hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-0.5',
-          'hover:border-[var(--accent-subtle)]',
+          'hover:border-[var(--border-strong)]',
         ],
         variant === 'glass' && 'glass',
         className,

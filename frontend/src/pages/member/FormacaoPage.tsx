@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { staggerContainer, staggerItem } from '../../lib/motion.ts';
+import { staggerContainer } from '../../lib/motion.ts';
 import { cn } from '../../lib/cn.ts';
 import { isDaysUrgent } from '../../lib/dates.ts';
 import { Modal } from '../../components/ui/Modal.tsx';
@@ -104,6 +104,8 @@ function mapContinueWatching(items: ContinueWatchingItem[]): ContinueLearningDat
   if (!items.length) return null;
   const item = items[0];
   const { lessons: lesson } = item;
+  // Guard against orphaned progress records with missing relations
+  if (!lesson?.modules?.courses) return null;
   const course = lesson.modules.courses;
   const pct = lesson.duration_secs && item.watched_secs
     ? Math.min(Math.round((item.watched_secs / lesson.duration_secs) * 100), 99)
@@ -262,14 +264,19 @@ function CourseCard({ course }: { course: CourseCardData }) {
 
 function SectionBlock({ title, courses, loading }: { title: string; courses: CourseCardData[]; loading: boolean }) {
   return (
-    <motion.div variants={staggerItem} className="mt-12 sm:mt-16 -mx-4 sm:mx-0">
-      <div className="px-4 sm:px-0 mb-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="mt-12 sm:mt-16 -mx-5 sm:mx-0"
+    >
+      <div className="px-5 sm:px-0 mb-6">
         <h3 className="text-[22px] font-semibold tracking-tight text-[var(--color-text-primary)]">
           {title}
         </h3>
       </div>
 
-      <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory px-4 sm:px-0 pb-4 sm:pb-0 scrollbar-none">
+      <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory px-5 sm:px-0 pb-4 sm:pb-0 scrollbar-none">
         {loading
           ? [1, 2, 3].map((i) => <CourseCardSkeleton key={i} />)
           : courses.length === 0
@@ -321,7 +328,6 @@ export function FormacaoPage() {
   const continueLearning = mapContinueWatching(continueWatchingRaw);
 
   const containerVariants = prefersReducedMotion ? { initial: { opacity: 0 }, animate: { opacity: 1 } } : staggerContainer;
-  const itemVariants = prefersReducedMotion ? { initial: { opacity: 0 }, animate: { opacity: 1 } } : staggerItem;
 
   const materialsList = showAllMaterials ? mockMaterials : mockMaterials.slice(0, 4);
 
@@ -352,7 +358,11 @@ export function FormacaoPage() {
 
         {/* 1. Continue Learning Hero */}
         {continueLearning && (
-          <motion.div variants={itemVariants}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          >
             <Link
               to={`/formacao/aula/${continueLearning.lessonId}`}
               className={cn(
@@ -442,7 +452,7 @@ export function FormacaoPage() {
             </p>
           </div>
 
-          <div className="flex overflow-x-auto snap-x snap-mandatory px-4 sm:px-0 pb-6 sm:pb-0 scrollbar-none gap-4">
+          <div className="flex overflow-x-auto snap-x snap-mandatory px-5 sm:px-0 pb-6 sm:pb-0 scrollbar-none gap-4">
             {mockJourney.map((item) => (
               <div
                 key={item.id}

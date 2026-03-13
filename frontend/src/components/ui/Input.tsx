@@ -33,7 +33,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             'focus:outline-none',
             'transition-shadow duration-[var(--duration-fast)]',
             'disabled:opacity-40 disabled:cursor-not-allowed',
-            error && 'ring-[var(--color-error)] focus:ring-[var(--color-error)]',
+            error && 'ring-2 ring-[var(--color-error)] focus:ring-[var(--color-error)]',
             className,
           )}
           {...props}
@@ -79,7 +79,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             'transition-shadow duration-[var(--duration-fast)]',
             'resize-none',
             'disabled:opacity-40 disabled:cursor-not-allowed',
-            error && 'ring-[var(--color-error)] focus:ring-[var(--color-error)]',
+            error && 'ring-2 ring-[var(--color-error)] focus:ring-[var(--color-error)]',
             className,
           )}
           {...props}

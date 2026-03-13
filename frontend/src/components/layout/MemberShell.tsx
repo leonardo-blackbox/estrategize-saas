@@ -17,18 +17,18 @@ export function MemberShell() {
   const showBackground = location.pathname === '/formacao' || location.pathname.startsWith('/formacao/');
 
   return (
-    <div className="min-h-[100dvh] bg-[var(--bg-base)] transition-colors duration-[var(--duration-normal)]">
+    <div className="min-h-[100dvh] bg-[var(--bg-base)] transition-colors duration-[var(--duration-normal)] overflow-x-hidden">
       {/* Interactive background (only on /formacao) */}
       {showBackground && <InteractiveBackground />}
 
       {/* Apple-style centered nav */}
       <AppleNav />
 
-      {/* Main area — offset for fixed nav */}
-      <div className="relative z-10 pt-[calc(var(--apple-nav-height)+24px)]">
+      {/* Main area — offset for fixed nav + safe area */}
+      <div className="relative" style={{ paddingTop: 'calc(var(--apple-nav-height) + env(safe-area-inset-top, 0px) + 24px)' }}>
         {/* Page content with bottom padding for mobile tabs */}
         <main
-          className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pb-[calc(var(--bottom-tabs-height)+var(--safe-area-bottom)+16px)] lg:pb-6 max-w-6xl mx-auto"
+          className="px-5 sm:px-8 lg:px-10 py-4 sm:py-6 pb-[calc(var(--bottom-tabs-height)+var(--safe-area-bottom)+16px)] lg:pb-6 max-w-6xl mx-auto"
         >
           <AnimatePresence mode="wait">
             <PageTransition key={location.pathname}>

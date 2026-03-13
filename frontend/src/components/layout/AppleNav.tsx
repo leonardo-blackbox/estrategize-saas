@@ -10,17 +10,17 @@ import { ThemeToggle } from '../ui/ThemeToggle.tsx';
 import { cn } from '../../lib/cn.ts';
 
 /**
- * AppleNav
- * Apple-inspired centered pill navigation fixed at the top.
- * - Desktop: nav links centered, logo left, actions right
- * - Mobile: logo + credits only (nav via BottomTabs)
+ * AppleNav — Apple-style centered pill navigation
+ *
+ * Layout: [Logo] ---- [nav links absolutely centered] ---- [actions]
+ * The center links use absolute positioning for true centering.
+ * Left/right blocks have z-10 so they sit above the center overlay.
  */
 
 const navItems = [
   { to: '/formacao', label: 'Formação' },
   { to: '/ferramentas', label: 'Ferramentas' },
   { to: '/consultorias', label: 'Consultorias' },
-  { to: '/creditos', label: 'Créditos' },
   { to: '/conta', label: 'Conta' },
 ];
 
@@ -46,7 +46,7 @@ export function AppleNav() {
   return (
     <motion.nav
       className={cn(
-        'fixed top-3 left-1/2 -translate-x-1/2 z-100',
+        'fixed left-1/2 -translate-x-1/2 z-[100]',
         'w-[calc(100%-24px)] max-w-[860px]',
         'h-12',
         'rounded-full',
@@ -63,19 +63,27 @@ export function AppleNav() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       style={{
+        top: 'calc(12px + env(safe-area-inset-top, 0px))',
         boxShadow: scrolled
           ? 'inset 0 0.5px 0 0 var(--glass-highlight), 0 4px 24px rgba(0,0,0,0.12)'
           : 'inset 0 0.5px 0 0 var(--glass-highlight), 0 2px 12px rgba(0,0,0,0.04)',
       }}
     >
-      {/* Left — Logo */}
-      <div className="flex items-center shrink-0 pl-2.5 pr-3">
-        <div className="h-7 w-7 rounded-lg bg-[var(--accent)] flex items-center justify-center">
-          <span className="text-[11px] font-bold text-[var(--accent-text)] leading-none">E</span>
-        </div>
+      {/* Left — Logo (z-10 to sit above center links) */}
+      <div className="flex items-center shrink-0 pl-2 pr-3 z-10">
+        <img
+          src="/img/logo-nav-dark.png"
+          alt="Estrategize"
+          className="h-7 w-7 rounded-lg object-contain dark:hidden"
+        />
+        <img
+          src="/img/logo-nav-light.png"
+          alt="Estrategize"
+          className="h-7 w-7 rounded-lg object-contain hidden dark:block"
+        />
       </div>
 
-      {/* Center — Nav links (desktop), absolutely centered */}
+      {/* Center — Nav links absolutely centered within the pill */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="hidden lg:flex items-center gap-0.5 pointer-events-auto">
           {navItems.map((item) => (
@@ -84,7 +92,7 @@ export function AppleNav() {
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  'px-3.5 py-1.5 rounded-full text-[13px] font-medium leading-none',
+                  'px-3 py-1.5 rounded-full text-[13px] font-medium leading-none whitespace-nowrap',
                   'transition-all duration-150',
                   isActive
                     ? 'bg-[var(--accent)] text-[var(--accent-text)] shadow-sm'
@@ -103,9 +111,14 @@ export function AppleNav() {
         </span>
       </div>
 
-      {/* Right — Actions */}
-      <div className="flex items-center gap-1.5 shrink-0 pr-1">
-        <CreditsPill balance={creditBalance} />
+      {/* Right — Actions (z-10 to sit above center links) */}
+      <div className="flex items-center gap-1.5 shrink-0 pr-1 z-10">
+        <NavLink
+          to="/creditos"
+          className="contents"
+        >
+          <CreditsPill balance={creditBalance} />
+        </NavLink>
 
         {isAdmin && (
           <NavLink
