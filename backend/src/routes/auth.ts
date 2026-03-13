@@ -171,7 +171,7 @@ router.get('/profile', requireAuth, async (req: AuthenticatedRequest, res) => {
 
   const { data: profile, error } = await supabaseAdmin
     .from('profiles')
-    .select('id, full_name, role, created_at')
+    .select('id, full_name, role, created_at, avatar_url')
     .eq('id', req.userId!)
     .single();
 
@@ -187,6 +187,39 @@ router.get('/profile', requireAuth, async (req: AuthenticatedRequest, res) => {
     ...profile,
     email: authUser?.user?.email ?? null,
   });
+});
+
+const updateProfileSchema = z.object({
+  full_name: z.string().min(1).max(100).optional(),
+  avatar_url: z.string().url().nullable().optional(),
+}).refine((d) => Object.keys(d).length > 0, { message: 'At least one field required' });
+
+// PATCH /auth/profile — allows user to update own full_name and avatar_url
+router.patch('/profile', requireAuth, async (req: AuthenticatedRequest, res) => {
+  if (!supabaseAdmin) {
+    res.status(503).json({ error: 'DB unavailable' });
+    return;
+  }
+
+  const parsed = updateProfileSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0].message });
+    return;
+  }
+
+  const { data: profile, error } = await supabaseAdmin
+    .from('profiles')
+    .update(parsed.data)
+    .eq('id', req.userId!)
+    .select('id, full_name, role, created_at, avatar_url')
+    .single();
+
+  if (error) {
+    res.status(500).json({ error: 'Failed to update profile' });
+    return;
+  }
+
+  res.json(profile);
 });
 
 export default router;

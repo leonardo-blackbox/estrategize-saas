@@ -8,6 +8,7 @@ export interface UserProfile {
   role: 'member' | 'admin';
   email: string | null;
   created_at: string;
+  avatar_url: string | null;
 }
 
 async function fetchProfile(): Promise<UserProfile> {
