@@ -7,9 +7,6 @@ import { AdminRoute } from './components/AdminRoute.tsx';
 // Theme store import — side-effect: applies data-theme on <html> at module load
 import './stores/themeStore.ts';
 
-// Legacy layout (kept for zero-breakage migration)
-import { DashboardLayout } from './components/layout/DashboardLayout.tsx';
-
 // New layouts
 import { MemberShell } from './components/layout/MemberShell.tsx';
 import { AdminShell } from './components/layout/AdminShell.tsx';
@@ -18,12 +15,6 @@ import { AdminShell } from './components/layout/AdminShell.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { SignupPage } from './pages/SignupPage.tsx';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage.tsx';
-
-// Legacy pages (still accessible)
-import { ConsultanciesPage } from './pages/ConsultanciesPage.tsx';
-import { PlansPage } from './pages/PlansPage.tsx';
-import { SettingsPage } from './pages/SettingsPage.tsx';
-import { CreditsPage } from './pages/CreditsPage.tsx';
 
 // New member pages
 import { FormacaoPage } from './pages/member/FormacaoPage.tsx';
@@ -101,21 +92,6 @@ export default function App() {
           <Route path="/admin/stripe" element={<AdminStripePage />} />
           <Route path="/admin/formacao" element={<AdminFormacaoPage />} />
           <Route path="/admin/home" element={<AdminHomePage />} />
-        </Route>
-
-        {/* ── Legacy routes (preserved, using old DashboardLayout) ── */}
-        <Route
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/dashboard" element={<Navigate to="/formacao" replace />} />
-          <Route path="/consultancies" element={<ConsultanciesPage />} />
-          <Route path="/credits" element={<CreditsPage />} />
-          <Route path="/plans" element={<PlansPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
         </Route>
 
         {/* ── Catch-all redirect ── */}

@@ -103,18 +103,6 @@ export function ContaPage() {
       to: '/creditos',
       value: creditValue,
     },
-    {
-      title: 'Plano Atual',
-      description: 'Veja e gerencie sua assinatura.',
-      to: '#',
-      value: 'Plano Pro',
-    },
-    {
-      title: 'Entitlements',
-      description: 'Veja seus acessos a cursos e ferramentas.',
-      to: '#',
-      value: '3 cursos, 4 ferramentas',
-    },
   ];
 
   return (

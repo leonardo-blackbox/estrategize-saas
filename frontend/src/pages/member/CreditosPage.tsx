@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { staggerContainer, staggerItem } from '../../lib/motion.ts';
@@ -15,7 +16,12 @@ const TX_LABEL: Record<string, string> = {
 
 const CREDIT_TYPES = new Set(['purchase', 'monthly_grant', 'release']);
 
+type Transaction = Awaited<ReturnType<typeof fetchTransactions>>['data'][number];
+
 export function CreditosPage() {
+  const [offset, setOffset] = useState(0);
+  const [allTxs, setAllTxs] = useState<Transaction[]>([]);
+
   const { data: balanceData, isLoading: balanceLoading } = useQuery({
     queryKey: ['credit-balance'],
     queryFn: fetchBalance,
@@ -23,12 +29,19 @@ export function CreditosPage() {
   });
 
   const { data: txData, isLoading: txLoading } = useQuery({
-    queryKey: ['credit-transactions'],
-    queryFn: () => fetchTransactions(20, 0),
+    queryKey: ['credit-transactions', offset],
+    queryFn: () => fetchTransactions(20, offset),
   });
+
+  useEffect(() => {
+    if (!txData) return;
+    const incoming = txData.data ?? [];
+    setAllTxs((prev) => (offset === 0 ? incoming : [...prev, ...incoming]));
+  }, [txData, offset]);
 
   const balance = balanceData?.data;
   const transactions = txData?.data ?? [];
+  const hasMore = (txData as { hasMore?: boolean } | undefined)?.hasMore ?? transactions.length === 20;
 
   return (
     <motion.div
@@ -78,19 +91,19 @@ export function CreditosPage() {
       {/* Transaction ledger */}
       <motion.div variants={staggerItem}>
         <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-3">Histórico</h3>
-        {txLoading ? (
+        {txLoading && offset === 0 ? (
           <div className="space-y-1">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-14 animate-pulse rounded-[var(--radius-md)] bg-[var(--bg-surface-1)]" />
             ))}
           </div>
-        ) : transactions.length === 0 ? (
+        ) : allTxs.length === 0 ? (
           <div className="rounded-[var(--radius-md)] p-8 bg-[var(--bg-surface-1)] border border-[var(--border-hairline)] text-center">
             <p className="text-sm text-[var(--text-tertiary)]">Nenhuma transação registrada.</p>
           </div>
         ) : (
           <div className="space-y-1">
-            {transactions.map((tx) => {
+            {allTxs.map((tx) => {
               const isCredit = CREDIT_TYPES.has(tx.type);
               const displayAmount = isCredit ? `+${tx.amount}` : `-${tx.amount}`;
               return (
@@ -121,6 +134,16 @@ export function CreditosPage() {
                 </div>
               );
             })}
+
+            {hasMore && (
+              <button
+                onClick={() => setOffset((o) => o + 20)}
+                disabled={txLoading}
+                className="w-full py-3 text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors disabled:opacity-50"
+              >
+                {txLoading ? 'Carregando…' : 'Carregar mais'}
+              </button>
+            )}
           </div>
         )}
       </motion.div>
