@@ -26,6 +26,12 @@ import { CreditosPage } from './pages/member/CreditosPage.tsx';
 import { CoursePage } from './pages/member/CoursePage.tsx';
 import { LessonPage } from './pages/member/LessonPage.tsx';
 
+// Aplicações pages
+import AplicacoesPage from './pages/member/aplicacoes/AplicacoesPage.tsx';
+import { EditorPage } from './pages/member/aplicacoes/EditorPage.tsx';
+import RespostasPage from './pages/member/aplicacoes/RespostasPage.tsx';
+import FormPublicoPage from './pages/public/FormPublicoPage.tsx';
+
 // Admin pages
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx';
 import { AdminOfertasPage } from './pages/admin/AdminOfertasPage.tsx';
@@ -54,6 +60,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/f/:slug" element={<FormPublicoPage />} />
 
         {/* ── Member App (new UI) ── */}
         <Route
@@ -67,11 +74,23 @@ export default function App() {
           <Route path="/formacao/curso/:id" element={<CoursePage />} />
           <Route path="/formacao/aula/:lessonId" element={<LessonPage />} />
           <Route path="/ferramentas" element={<FerramentasPage />} />
+          <Route path="/aplicacoes" element={<AplicacoesPage />} />
+          <Route path="/aplicacoes/:id/respostas" element={<RespostasPage />} />
           <Route path="/consultorias" element={<ConsultoriasPage />} />
           <Route path="/consultorias/:id" element={<ConsultoriaDetailPage />} />
           <Route path="/conta" element={<ContaPage />} />
           <Route path="/creditos" element={<CreditosPage />} />
         </Route>
+
+        {/* ── Editor (full-viewport, sem MemberShell) ── */}
+        <Route
+          path="/aplicacoes/:id/editor"
+          element={
+            <ProtectedRoute>
+              <EditorPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* ── Admin App ── */}
         <Route

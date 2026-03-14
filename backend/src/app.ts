@@ -15,6 +15,8 @@ import formacaoRouter from './routes/admin/formacao.js';
 import adminTurmasRouter from './routes/admin/turmas.js';
 import adminOfertasRouter from './routes/admin/ofertas.js';
 import adminHomeRouter from './routes/admin/home.js';
+import applicationsRouter from './routes/applications.js';
+import publicFormsRouter from './routes/public/forms.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
 export const app = express();
@@ -105,6 +107,8 @@ app.use('/api/admin/turmas', adminLimit, adminTurmasRouter);
 app.use('/api/admin/ofertas', adminLimit, adminOfertasRouter);
 app.use('/api/admin/home', adminLimit, adminHomeRouter);
 app.use('/api/webhooks', webhookLimit, webhooksRouter);
+app.use('/api/applications', applicationsRouter);
+app.use('/public/forms', publicFormsRouter);
 
 app.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
   res.json({ user_id: req.userId });
