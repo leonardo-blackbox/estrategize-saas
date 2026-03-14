@@ -23,6 +23,7 @@ export function useProfile() {
     queryFn: fetchProfile,
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 min
+    refetchOnMount: 'always',  // always refetch role-sensitive data on mount
   });
 }
 

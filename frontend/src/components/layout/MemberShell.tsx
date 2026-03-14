@@ -2,43 +2,32 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { AppleNav } from './AppleNav.tsx';
 import { BottomTabs } from './BottomTabs.tsx';
-import { InteractiveBackground } from '../compound/InteractiveBackground.tsx';
 import { PageTransition } from '../motion/PageTransition.tsx';
 
 /**
  * MemberShell
- * Main layout for authenticated member pages.
- * - Desktop: Apple-style centered top nav + content (no sidebar)
+ * - Desktop: Apple-style fixed top nav + full-width content
  * - Mobile: AppleNav (compact) + content + BottomTabs
- * - InteractiveBackground only on /formacao
+ *
+ * pt-[120px] = Espaçamento generoso para o conteúdo flutuar abaixo do menu fixo (Apple style).
  */
 export function MemberShell() {
   const location = useLocation();
-  const showBackground = location.pathname === '/formacao' || location.pathname.startsWith('/formacao/');
 
   return (
     <div className="min-h-[100dvh] bg-[var(--bg-base)] transition-colors duration-[var(--duration-normal)] overflow-x-hidden">
-      {/* Interactive background (only on /formacao) */}
-      {showBackground && <InteractiveBackground />}
-
-      {/* Apple-style centered nav */}
+      {/* Fixed pill nav — stays at top always */}
       <AppleNav />
 
-      {/* Main area — offset for fixed nav + safe area */}
-      <div className="relative" style={{ paddingTop: 'calc(var(--apple-nav-height) + env(safe-area-inset-top, 0px) + 24px)' }}>
-        {/* Page content with bottom padding for mobile tabs */}
-        <main
-          className="px-5 sm:px-8 lg:px-10 py-4 sm:py-6 pb-[calc(var(--bottom-tabs-height)+var(--safe-area-bottom)+16px)] lg:pb-6 max-w-6xl mx-auto"
-        >
-          <AnimatePresence mode="wait">
-            <PageTransition key={location.pathname}>
-              <Outlet />
-            </PageTransition>
-          </AnimatePresence>
-        </main>
-      </div>
+      {/* Content — padded top so it starts BELOW the fixed nav */}
+      <main className="pt-[120px] pb-[calc(var(--bottom-tabs-height,56px)+env(safe-area-inset-bottom,0px)+16px)] lg:pb-8 px-5 sm:px-8 lg:px-12">
+        <AnimatePresence mode="wait">
+          <PageTransition key={location.pathname}>
+            <Outlet />
+          </PageTransition>
+        </AnimatePresence>
+      </main>
 
-      {/* Mobile bottom tabs */}
       <BottomTabs />
     </div>
   );
