@@ -192,7 +192,7 @@ export function ConsultoriasPage() {
         variants={staggerContainer}
         initial="initial"
         animate="animate"
-        className="max-w-4xl mx-auto space-y-6"
+        className="max-w-5xl mx-auto space-y-6"
       >
         {/* Header */}
         <motion.div variants={staggerItem} className="flex items-center justify-between gap-4">

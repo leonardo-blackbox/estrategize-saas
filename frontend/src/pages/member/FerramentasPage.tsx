@@ -141,7 +141,7 @@ export function FerramentasPage() {
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="max-w-4xl mx-auto space-y-8"
+      className="max-w-5xl mx-auto space-y-8"
     >
       {/* Page header */}
       <motion.div variants={staggerItem}>

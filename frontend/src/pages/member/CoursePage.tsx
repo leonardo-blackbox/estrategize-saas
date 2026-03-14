@@ -47,7 +47,7 @@ export function CoursePage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6 animate-pulse">
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-6 animate-pulse">
         <div className="h-64 rounded-[24px] bg-[var(--color-bg-elevated)]" />
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
@@ -60,7 +60,7 @@ export function CoursePage() {
 
   if (isError || !data) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+      <div className="max-w-5xl mx-auto px-4 py-16 text-center">
         <p className="text-[var(--color-text-secondary)]">Curso não encontrado.</p>
         <Link to="/formacao" className="mt-4 inline-block text-[var(--color-text-primary)] underline">
           Voltar à Formação
@@ -93,7 +93,7 @@ export function CoursePage() {
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="max-w-4xl mx-auto pb-24 lg:pb-12"
+      className="max-w-5xl mx-auto pb-24 lg:pb-12"
     >
       {/* Back */}
       <motion.div variants={staggerItem} className="mb-6">

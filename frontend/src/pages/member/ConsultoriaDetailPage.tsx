@@ -40,7 +40,7 @@ function SkeletonBlock({ className }: { className?: string }) {
 
 function ConsultancySkeleton() {
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex items-center gap-2">
         <SkeletonBlock className="h-3 w-24" />
         <span className="text-[var(--text-tertiary)]">/</span>
@@ -231,7 +231,7 @@ export function ConsultoriaDetailPage() {
 
   if (isConsultancyError || !consultancyData?.data) {
     return (
-      <div className="max-w-4xl mx-auto space-y-4">
+      <div className="max-w-5xl mx-auto space-y-4">
         <div className="flex items-center gap-2 text-xs text-[var(--text-tertiary)]">
           <Link to="/consultorias" className="hover:text-[var(--text-secondary)] transition-colors">
             Consultorias
@@ -264,7 +264,7 @@ export function ConsultoriaDetailPage() {
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="max-w-4xl mx-auto space-y-6"
+      className="max-w-5xl mx-auto space-y-6"
     >
       {/* Breadcrumb */}
       <motion.div variants={staggerItem} className="flex items-center gap-2 text-xs text-[var(--text-tertiary)]">

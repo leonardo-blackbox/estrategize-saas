@@ -48,7 +48,7 @@ export function CreditosPage() {
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="max-w-2xl mx-auto space-y-6"
+      className="max-w-3xl mx-auto space-y-6"
     >
       <motion.div variants={staggerItem}>
         <h1 className="text-lg font-semibold text-[var(--text-primary)]">Créditos</h1>

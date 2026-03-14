@@ -337,7 +337,7 @@ export function FormacaoPage() {
         variants={containerVariants}
         initial="initial"
         animate="animate"
-        className="w-full max-w-6xl mx-auto pb-24 lg:pb-12"
+        className="w-full max-w-5xl mx-auto pb-24 lg:pb-12"
       >
         <div className={homeSettings?.subtitle ? 'mb-4 sm:mb-6' : 'mb-8 sm:mb-12'}>
           <h1 className="text-[32px] sm:text-[40px] font-semibold tracking-tight text-[var(--color-text-primary)]">
