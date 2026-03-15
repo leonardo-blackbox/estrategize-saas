@@ -32,3 +32,6 @@ Thumbs.db
 .claude/settings.local.json
 .aios/install-log.txt
 .mcp.json
+
+# Legacy installer subfolder (AIOS installer artifact — não faz parte do projeto)
+estrategize-saas/
