@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import Papa from 'papaparse';
@@ -11,6 +11,7 @@ import {
   type ResponseWithAnswers,
   type ApplicationField,
 } from '../../../api/applications.ts';
+import type { ApplicationShellContext } from './ApplicationShell.tsx';
 
 // ─────────────────────────────────────────────
 // Helpers
@@ -577,6 +578,7 @@ type ViewMode = 'individual' | 'tabela';
 
 export default function RespostasPage() {
   const { id } = useParams<{ id: string }>();
+  useOutletContext<ApplicationShellContext>();
   const [viewMode, setViewMode] = useState<ViewMode>('individual');
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [navDirection, setNavDirection] = useState<'forward' | 'back'>('forward');
@@ -657,7 +659,7 @@ export default function RespostasPage() {
   return (
     <div
       style={{
-        height: '100vh',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         background: 'var(--bg-base)',
@@ -665,127 +667,82 @@ export default function RespostasPage() {
         overflow: 'hidden',
       }}
     >
-      {/* ── Topbar ── */}
+      {/* ── Toolbar interno ── */}
       <div
         style={{
-          height: 56,
+          padding: '8px 16px',
+          borderBottom: '1px solid var(--border-hairline)',
           display: 'flex',
           alignItems: 'center',
-          padding: '0 20px',
-          gap: 16,
-          borderBottom: '1px solid var(--border-hairline)',
+          justifyContent: 'space-between',
           background: 'var(--bg-surface-1)',
           flexShrink: 0,
-          zIndex: 10,
         }}
       >
-        <Link
-          to="/aplicacoes"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 13,
-            color: 'var(--text-tertiary)',
-            textDecoration: 'none',
-            transition: 'color 0.15s',
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.color = 'var(--text-tertiary)';
-          }}
-        >
-          ← Aplicações
-        </Link>
-
-        <div
-          style={{
-            width: 1,
-            height: 16,
-            background: 'var(--border-hairline)',
-            flexShrink: 0,
-          }}
-        />
-
         <span
           style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: 'var(--text-primary)',
-            letterSpacing: '-0.01em',
-            flex: 1,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {appLoading ? '...' : (application?.title ?? 'Respostas')}
-        </span>
-
-        {/* View toggle */}
-        <div
-          style={{
-            display: 'flex',
-            background: 'var(--bg-base)',
-            border: '1px solid var(--border-hairline)',
-            borderRadius: 8,
-            padding: 2,
-            gap: 2,
-          }}
-        >
-          {(['individual', 'tabela'] as ViewMode[]).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setViewMode(mode)}
-              style={{
-                padding: '4px 12px',
-                borderRadius: 6,
-                fontSize: 12,
-                fontWeight: 500,
-                border: 'none',
-                cursor: 'pointer',
-                background: viewMode === mode ? 'var(--bg-surface-1)' : 'transparent',
-                color: viewMode === mode ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                transition: 'background 0.15s, color 0.15s',
-                textTransform: 'capitalize',
-              }}
-            >
-              {mode.charAt(0).toUpperCase() + mode.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Export */}
-        <button
-          onClick={handleExport}
-          disabled={isExporting || responses.length === 0}
-          style={{
-            padding: '6px 14px',
-            borderRadius: 8,
             fontSize: 12,
-            fontWeight: 500,
-            background: 'transparent',
-            border: '1px solid var(--border-hairline)',
-            color: responses.length === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
-            cursor: responses.length === 0 ? 'not-allowed' : 'pointer',
-            opacity: isExporting ? 0.6 : 1,
-            transition: 'color 0.15s, border-color 0.15s',
-          }}
-          onMouseEnter={(e) => {
-            if (responses.length > 0) {
-              (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)';
-              (e.currentTarget as HTMLElement).style.borderColor = 'var(--text-tertiary)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)';
-            (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-hairline)';
+            fontWeight: 600,
+            color: 'var(--text-tertiary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
           }}
         >
-          {isExporting ? 'Exportando...' : 'Exportar CSV'}
-        </button>
+          {isLoading ? '...' : `${responses.length} resposta${responses.length !== 1 ? 's' : ''}`}
+        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* View toggle */}
+          <div
+            style={{
+              display: 'flex',
+              background: 'var(--bg-base)',
+              border: '1px solid var(--border-hairline)',
+              borderRadius: 8,
+              padding: 2,
+              gap: 2,
+            }}
+          >
+            {(['individual', 'tabela'] as ViewMode[]).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                style={{
+                  padding: '4px 12px',
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: viewMode === mode ? 'var(--bg-surface-1)' : 'transparent',
+                  color: viewMode === mode ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                  transition: 'background 0.15s, color 0.15s',
+                  textTransform: 'capitalize',
+                }}
+              >
+                {mode.charAt(0).toUpperCase() + mode.slice(1)}
+              </button>
+            ))}
+          </div>
+          {/* Export */}
+          <button
+            onClick={handleExport}
+            disabled={isExporting || responses.length === 0}
+            style={{
+              padding: '6px 14px',
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 500,
+              background: 'transparent',
+              border: '1px solid var(--border-hairline)',
+              color: responses.length === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
+              cursor: responses.length === 0 ? 'not-allowed' : 'pointer',
+              opacity: isExporting ? 0.6 : 1,
+              transition: 'color 0.15s, border-color 0.15s',
+            }}
+          >
+            {isExporting ? 'Exportando...' : 'Exportar CSV'}
+          </button>
+        </div>
       </div>
 
       {/* ── Body ── */}

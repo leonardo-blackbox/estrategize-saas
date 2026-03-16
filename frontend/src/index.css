@@ -1,111 +1,172 @@
 @import "tailwindcss";
 
 /* ========================================
-   ESTRATEGIZE — Premium Design Tokens
-   Apple-Inspired, Green Identity, Dual Theme
+   IRIS — Premium Design System v2
+   Apple-Inspired · Green Identity · Dual Theme
    ======================================== */
 
-/* ── Light Theme (default — Diurno) ── */
+/* ── Light Theme ── */
 :root,
 [data-theme="light"] {
   /* Base surfaces */
-  --bg-base: #ffffff;
+  --bg-base:      #ffffff;
   --bg-surface-1: #f5f5f7;
   --bg-surface-2: #eef0f2;
-  --bg-elevated: #ffffff;
-  --bg-hover: #e8e8ed;
-  --bg-active: #d1d1d6;
+  --bg-elevated:  #ffffff;
+  --bg-hover:     #e8e8ed;
+  --bg-active:    #d1d1d6;
 
-  /* Accent — Estrategize Green (from logo) */
-  --accent: #0f4c4d;
-  --accent-hover: #1a6b6e;
-  --accent-light: #238285;
+  /* Accent — Estrategize Green */
+  --accent:        #0f4c4d;
+  --accent-hover:  #1a6b6e;
+  --accent-light:  #238285;
   --accent-subtle: rgba(15, 76, 77, 0.08);
-  --accent-muted: rgba(15, 76, 77, 0.04);
-  --accent-text: #ffffff;
+  --accent-muted:  rgba(15, 76, 77, 0.04);
+  --accent-text:   #ffffff;
 
   /* Text */
-  --text-primary: #1d1d1f;
+  --text-primary:   #1d1d1f;
   --text-secondary: #6e6e73;
-  --text-tertiary: #86868b;
-  --text-muted: #aeaeb2;
+  --text-tertiary:  #86868b;
+  --text-muted:     #aeaeb2;
 
   /* Borders — hairline Apple style */
   --border-hairline: rgba(0, 0, 0, 0.06);
-  --border-default: rgba(0, 0, 0, 0.10);
-  --border-strong: rgba(0, 0, 0, 0.18);
+  --border-default:  rgba(0, 0, 0, 0.10);
+  --border-strong:   rgba(0, 0, 0, 0.18);
 
   /* Glass */
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(0, 0, 0, 0.06);
-  --glass-highlight: rgba(255, 255, 255, 0.6);
+  --glass-bg:        rgba(255, 255, 255, 0.80);
+  --glass-border:    rgba(0, 0, 0, 0.06);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
 
-  /* Shadows */
-  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-elev: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
-  --shadow-card-hover: 0 8px 32px rgba(15, 76, 77, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
+  /* Shadows — layered system */
+  --shadow-xs:         0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-soft:       0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-elev:       0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 8px 32px rgba(15, 76, 77, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-modal:      0 24px 80px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-glow:       0 0 24px rgba(15, 76, 77, 0.20), 0 0 8px rgba(15, 76, 77, 0.12);
 
   /* Selection */
-  --selection-bg: rgba(15, 76, 77, 0.15);
+  --selection-bg:   rgba(15, 76, 77, 0.15);
   --selection-text: #1d1d1f;
 
   /* Scrollbar */
-  --scrollbar-thumb: rgba(0, 0, 0, 0.10);
+  --scrollbar-thumb:       rgba(0, 0, 0, 0.10);
   --scrollbar-thumb-hover: rgba(0, 0, 0, 0.18);
 
   /* Focus ring */
   --focus-ring: rgba(15, 76, 77, 0.5);
+
+  /* Input specifics */
+  --input-bg:       #ffffff;
+  --input-bg-focus: rgba(15, 76, 77, 0.02);
 }
 
-/* ── Dark Theme (Noturno — green-tinted) ── */
+/* ── Dark Theme ── */
 [data-theme="dark"] {
-  /* Base surfaces — deep green, almost black */
-  --bg-base: #0a1f1f;
+  /* Base surfaces — deep green-black */
+  --bg-base:      #0a1f1f;
   --bg-surface-1: #0f2a2a;
   --bg-surface-2: #143333;
-  --bg-elevated: #183d3d;
-  --bg-hover: #1e4a4a;
-  --bg-active: #255858;
+  --bg-elevated:  #183d3d;
+  --bg-hover:     #1e4a4a;
+  --bg-active:    #255858;
 
-  /* Accent — bright green for contrast */
-  --accent: #2dd4a8;
-  --accent-hover: #5ae8c3;
-  --accent-light: #7ef0d4;
+  /* Accent — bright teal for contrast */
+  --accent:        #2dd4a8;
+  --accent-hover:  #5ae8c3;
+  --accent-light:  #7ef0d4;
   --accent-subtle: rgba(45, 212, 168, 0.12);
-  --accent-muted: rgba(45, 212, 168, 0.06);
-  --accent-text: #0a1f1f;
+  --accent-muted:  rgba(45, 212, 168, 0.06);
+  --accent-text:   #0a1f1f;
 
   /* Text */
-  --text-primary: #f0f5f4;
+  --text-primary:   #f0f5f4;
   --text-secondary: #8ba8a6;
-  --text-tertiary: #5e807d;
-  --text-muted: #4e706d;
+  --text-tertiary:  #5e807d;
+  --text-muted:     #4e706d;
 
   /* Borders */
   --border-hairline: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.10);
-  --border-strong: rgba(255, 255, 255, 0.18);
+  --border-default:  rgba(255, 255, 255, 0.10);
+  --border-strong:   rgba(255, 255, 255, 0.18);
 
   /* Glass — green-tinted */
-  --glass-bg: rgba(15, 42, 42, 0.78);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(45, 212, 168, 0.04);
+  --glass-bg:        rgba(15, 42, 42, 0.85);
+  --glass-border:    rgba(45, 212, 168, 0.10);
+  --glass-highlight: rgba(45, 212, 168, 0.06);
 
   /* Shadows */
-  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-elev: 0 4px 24px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3);
-  --shadow-card-hover: 0 8px 32px rgba(45, 212, 168, 0.08), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-xs:         0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-soft:       0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-elev:       0 4px 24px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 8px 32px rgba(45, 212, 168, 0.10), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-modal:      0 24px 80px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-glow:       0 0 24px rgba(45, 212, 168, 0.25), 0 0 8px rgba(45, 212, 168, 0.15);
 
   /* Selection */
-  --selection-bg: rgba(45, 212, 168, 0.20);
+  --selection-bg:   rgba(45, 212, 168, 0.20);
   --selection-text: #f0f5f4;
 
   /* Scrollbar */
-  --scrollbar-thumb: rgba(255, 255, 255, 0.08);
+  --scrollbar-thumb:       rgba(255, 255, 255, 0.08);
   --scrollbar-thumb-hover: rgba(255, 255, 255, 0.14);
 
   /* Focus ring */
   --focus-ring: rgba(45, 212, 168, 0.5);
+
+  /* Input specifics */
+  --input-bg:       var(--bg-surface-1);
+  --input-bg-focus: rgba(45, 212, 168, 0.04);
+}
+
+/* ── Admin theme (forced OLED dark) ── */
+[data-admin="true"] {
+  --bg-base:      #050505;
+  --bg-surface-1: #0a0a0a;
+  --bg-surface-2: #111111;
+  --bg-elevated:  #161616;
+  --bg-hover:     #2c2c2e;
+  --bg-active:    #3a3a3c;
+
+  --accent:        #2dd4a8;
+  --accent-hover:  #5ae8c3;
+  --accent-light:  #7ef0d4;
+  --accent-subtle: rgba(45, 212, 168, 0.12);
+  --accent-muted:  rgba(45, 212, 168, 0.06);
+  --accent-text:   #050505;
+
+  --text-primary:   #e5e5e7;
+  --text-secondary: #a1a1a6;
+  --text-tertiary:  #6e6e73;
+  --text-muted:     #48484a;
+
+  --border-hairline: rgba(255, 255, 255, 0.05);
+  --border-default:  rgba(255, 255, 255, 0.10);
+  --border-strong:   rgba(255, 255, 255, 0.18);
+
+  --glass-bg:        rgba(28, 28, 30, 0.85);
+  --glass-border:    rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.04);
+
+  --shadow-xs:         0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-soft:       0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-elev:       0 4px 24px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 8px 32px rgba(45, 212, 168, 0.06), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-modal:      0 24px 80px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-glow:       0 0 24px rgba(45, 212, 168, 0.20), 0 0 8px rgba(45, 212, 168, 0.12);
+
+  --scrollbar-thumb:       rgba(255, 255, 255, 0.08);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.14);
+
+  --focus-ring:     rgba(45, 212, 168, 0.5);
+  --selection-bg:   rgba(45, 212, 168, 0.20);
+  --selection-text: #ffffff;
+
+  --input-bg:       var(--bg-surface-1);
+  --input-bg-focus: rgba(45, 212, 168, 0.04);
 }
 
 /* ── Theme-agnostic tokens ── */
@@ -113,121 +174,127 @@
   /* Semantic status */
   --color-success: #34c759;
   --color-warning: #ff9f0a;
-  --color-error: #ff3b30;
+  --color-error:   #ff3b30;
+  --color-info:    #0a84ff;
 
   /* Radius — Apple Squircle scale */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-card: 24px;
+  --radius-xs:    4px;
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    16px;
+  --radius-xl:    20px;
+  --radius-card:  24px;
   --radius-modal: 28px;
-  --radius-pill: 9999px;
+  --radius-pill:  9999px;
 
-  /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
+  /* Spacing — 4px base */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
   --space-2xl: 48px;
   --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  /* Typography scale */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   16px;
+  --text-lg:   18px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+  --text-3xl:  30px;
+  --text-4xl:  36px;
+  --text-5xl:  48px;
+
+  /* Letter spacing */
+  --tracking-tight:  -0.025em;
+  --tracking-snug:   -0.015em;
+  --tracking-normal:  0em;
+  --tracking-wide:    0.025em;
+  --tracking-widest:  0.08em;
+
+  /* Line height */
+  --leading-none:    1;
+  --leading-tight:   1.25;
+  --leading-snug:    1.375;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.625;
+
+  /* Font weight */
+  --weight-light:     300;
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
 
   /* Typography — SF Pro → Inter fallback */
   --font-sans: "SF Pro Display", "SF Pro Text", "Inter", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", monospace;
 
-  /* Motion */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Gradients */
+  --gradient-brand:    linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+  --gradient-surface:  linear-gradient(180deg, var(--bg-surface-1) 0%, var(--bg-base) 100%);
+  --gradient-glass:    linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%);
+  --gradient-shimmer:  linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+
+  /* Blur levels */
+  --blur-sm:  8px;
+  --blur-md:  20px;
+  --blur-lg:  40px;
+  --blur-xl:  60px;
+
+  /* Motion — Apple-grade easing */
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-fast: 150ms;
+  --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-expo:   cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out:    cubic-bezier(0.45, 0, 0.55, 1);
+
+  --duration-xfast:  100ms;
+  --duration-fast:   150ms;
   --duration-normal: 250ms;
-  --duration-slow: 400ms;
+  --duration-slow:   400ms;
+  --duration-xslow:  600ms;
 
   /* Safe areas */
-  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-top:    env(safe-area-inset-top, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-left: env(safe-area-inset-left, 0px);
-  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-left:   env(safe-area-inset-left, 0px);
+  --safe-area-right:  env(safe-area-inset-right, 0px);
 
-  /* Bottom tabs */
+  /* Layout */
   --bottom-tabs-height: 72px;
-
-  /* Apple nav */
-  --apple-nav-height: 48px;
+  --apple-nav-height:   48px;
 
   /* Interactive background (mouse tracking) */
   --mouse-x: 50%;
   --mouse-y: 50%;
 
-  /* ── LEGACY COMPAT — maps old var names to new tokens ── */
-  --color-bg-primary: var(--bg-base);
-  --color-bg-secondary: var(--bg-surface-1);
-  --color-bg-tertiary: var(--bg-surface-2);
-  --color-bg-elevated: var(--bg-elevated);
-  --color-bg-hover: var(--bg-hover);
-  --color-bg-active: var(--bg-active);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
+  /* ── LEGACY COMPAT ── */
+  --color-bg-primary:    var(--bg-base);
+  --color-bg-secondary:  var(--bg-surface-1);
+  --color-bg-tertiary:   var(--bg-surface-2);
+  --color-bg-elevated:   var(--bg-elevated);
+  --color-bg-hover:      var(--bg-hover);
+  --color-bg-active:     var(--bg-active);
+  --color-text-primary:  var(--text-primary);
+  --color-text-secondary:var(--text-secondary);
   --color-text-tertiary: var(--text-tertiary);
-  --color-text-muted: var(--text-muted);
+  --color-text-muted:    var(--text-muted);
   --color-border-subtle: var(--border-hairline);
-  --color-border-default: var(--border-default);
+  --color-border-default:var(--border-default);
   --color-border-strong: var(--border-strong);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
+  --color-accent:        var(--accent);
+  --color-accent-hover:  var(--accent-hover);
   --color-accent-subtle: var(--accent-subtle);
-  --color-accent-muted: var(--accent-muted);
-  --shadow-sm: var(--shadow-soft);
-  --shadow-md: var(--shadow-elev);
-  --shadow-lg: var(--shadow-elev);
-  --shadow-glow: none;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
-}
-
-/* ========================================
-   Admin theme overrides (forced dark)
-   ======================================== */
-
-[data-admin="true"] {
-  --bg-base: #050505;
-  --bg-surface-1: #0a0a0a;
-  --bg-surface-2: #111111;
-  --bg-elevated: #161616;
-  --bg-hover: #2c2c2e;
-  --bg-active: #3a3a3c;
-
-  --accent: #2dd4a8;
-  --accent-hover: #5ae8c3;
-  --accent-light: #7ef0d4;
-  --accent-subtle: rgba(45, 212, 168, 0.12);
-  --accent-muted: rgba(45, 212, 168, 0.06);
-  --accent-text: #050505;
-
-  --text-primary: #e5e5e7;
-  --text-secondary: #a1a1a6;
-  --text-tertiary: #6e6e73;
-  --text-muted: #48484a;
-
-  --border-hairline: rgba(255, 255, 255, 0.05);
-  --border-default: rgba(255, 255, 255, 0.10);
-  --border-strong: rgba(255, 255, 255, 0.18);
-
-  --glass-bg: rgba(28, 28, 30, 0.80);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.04);
-
-  --scrollbar-thumb: rgba(255, 255, 255, 0.08);
-  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.14);
-
-  --focus-ring: rgba(45, 212, 168, 0.5);
-  --selection-bg: rgba(45, 212, 168, 0.20);
-  --selection-text: #ffffff;
-
-  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-elev: 0 4px 24px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3);
-  --shadow-card-hover: 0 8px 32px rgba(45, 212, 168, 0.06), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --color-accent-muted:  var(--accent-muted);
+  --shadow-sm:    var(--shadow-soft);
+  --shadow-md:    var(--shadow-elev);
+  --shadow-lg:    var(--shadow-elev);
+  --radius-full:  9999px;
 }
 
 /* ========================================
@@ -239,41 +306,37 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
 }
 
 body {
   font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
   background: var(--bg-base);
   color: var(--text-primary);
   min-height: 100dvh;
-  transition: background-color var(--duration-normal) var(--ease-out-expo),
-              color var(--duration-normal) var(--ease-out-expo);
+  transition:
+    background-color var(--duration-normal) var(--ease-out-expo),
+    color var(--duration-normal) var(--ease-out-expo);
 }
 
-/* iOS safe area support — handled per-component (AppleNav, BottomTabs, MemberShell) */
-
 /* ========================================
-   Scrollbar Styles
+   Scrollbar
    ======================================== */
 
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
+.scrollbar-none::-webkit-scrollbar { display: none; }
 
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
 }
-.scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
+.scrollbar-thin::-webkit-scrollbar { width: 6px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
 .scrollbar-thin::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: 3px;
@@ -287,9 +350,7 @@ body {
    ======================================== */
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -298,7 +359,7 @@ body {
 }
 
 /* ========================================
-   Selection
+   Selection & Focus
    ======================================== */
 
 ::selection {
@@ -306,28 +367,27 @@ body {
   color: var(--selection-text);
 }
 
-/* ========================================
-   Focus visible (keyboard navigation)
-   ======================================== */
-
 :focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 /* ========================================
-   Apple Glass utility classes
+   Glass — Spatial UI / VisionOS style
    ======================================== */
 
 .glass {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  box-shadow: inset 0 0.5px 0 0 var(--glass-highlight);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  backdrop-filter: blur(40px) saturate(180%);
+  box-shadow:
+    inset 0 0.5px 0 0 var(--glass-highlight),
+    inset 0 -0.5px 0 0 rgba(0,0,0,0.04),
+    var(--shadow-soft);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(180%);
+  backdrop-filter: blur(var(--blur-lg)) saturate(180%);
 }
 
-/* Fallback when backdrop-filter is not supported */
 @supports not (backdrop-filter: blur(1px)) {
   .glass {
     background: var(--bg-surface-2);
@@ -340,8 +400,8 @@ body {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: inset 0 0.5px 0 0 var(--glass-highlight);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(150%);
+  backdrop-filter: blur(var(--blur-md)) saturate(150%);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -351,8 +411,40 @@ body {
   }
 }
 
+.glass-strong {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 0 var(--glass-highlight),
+    inset 0 -1px 0 0 rgba(0,0,0,0.06),
+    var(--shadow-elev);
+  -webkit-backdrop-filter: blur(var(--blur-xl)) saturate(200%);
+  backdrop-filter: blur(var(--blur-xl)) saturate(200%);
+}
+
 /* ========================================
-   Apple Nav — Centered pill top bar
+   Surface utilities
+   ======================================== */
+
+.surface-1 {
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-xs);
+}
+
+.surface-2 {
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-hairline);
+}
+
+.surface-elevated {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-elev);
+}
+
+/* ========================================
+   Apple Nav — Floating pill
    ======================================== */
 
 .apple-nav {
@@ -369,15 +461,25 @@ body {
   border: 1px solid var(--glass-border);
   box-shadow:
     inset 0 0.5px 0 0 var(--glass-highlight),
-    0 4px 24px rgba(0, 0, 0, 0.08);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  backdrop-filter: blur(40px) saturate(180%);
+    0 4px 24px rgba(0, 0, 0, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(180%);
+  backdrop-filter: blur(var(--blur-lg)) saturate(180%);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 8px 0 20px;
-  transition: opacity var(--duration-normal) var(--ease-out-expo),
-              transform var(--duration-normal) var(--ease-out-expo);
+  transition:
+    opacity var(--duration-normal) var(--ease-out-expo),
+    transform var(--duration-normal) var(--ease-out-expo),
+    box-shadow var(--duration-normal) var(--ease-out-expo);
+}
+
+.apple-nav:hover {
+  box-shadow:
+    inset 0 0.5px 0 0 var(--glass-highlight),
+    0 8px 32px rgba(0, 0, 0, 0.10),
+    0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 @supports not (backdrop-filter: blur(1px)) {
@@ -389,14 +491,15 @@ body {
 }
 
 /* ========================================
-   Scroll reveal base (used by ScrollReveal component)
+   Scroll reveal
    ======================================== */
 
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s var(--ease-out-expo),
-              transform 0.6s var(--ease-out-expo);
+  transform: translateY(20px);
+  transition:
+    opacity 0.5s var(--ease-out-expo),
+    transform 0.5s var(--ease-out-expo);
 }
 
 .scroll-reveal.visible {
@@ -404,22 +507,136 @@ body {
   transform: translateY(0);
 }
 
+.scroll-reveal-scale {
+  opacity: 0;
+  transform: scale(0.96) translateY(12px);
+  transition:
+    opacity 0.5s var(--ease-out-expo),
+    transform 0.5s var(--ease-spring);
+}
+
+.scroll-reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
 /* ========================================
-   Accent utility classes
+   Glow effects
    ======================================== */
 
-.text-accent {
-  color: var(--accent);
+.glow-accent {
+  box-shadow: var(--shadow-glow);
 }
 
-.bg-accent {
-  background-color: var(--accent);
+.glow-accent-text {
+  text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
-.border-accent {
-  border-color: var(--accent);
+/* ========================================
+   Gradient utilities
+   ======================================== */
+
+.gradient-brand {
+  background: var(--gradient-brand);
 }
 
-.ring-accent {
-  --tw-ring-color: var(--accent);
+.gradient-text {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ========================================
+   Skeleton / Shimmer
+   ======================================== */
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface-1) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-surface-1) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ========================================
+   Animations
+   ======================================== */
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-scale {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in       { animation: fade-in 0.4s var(--ease-out-expo) both; }
+.animate-fade-in-scale { animation: fade-in-scale 0.3s var(--ease-spring) both; }
+
+/* ========================================
+   Accent utilities
+   ======================================== */
+
+.text-accent   { color: var(--accent); }
+.bg-accent     { background-color: var(--accent); }
+.border-accent { border-color: var(--accent); }
+.ring-accent   { --tw-ring-color: var(--accent); }
+
+/* ========================================
+   Typography utilities
+   ======================================== */
+
+.text-balance  { text-wrap: balance; }
+.text-pretty   { text-wrap: pretty; }
+
+/* Heading defaults */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+/* ========================================
+   Interactive states
+   ======================================== */
+
+.interactive {
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-out-expo),
+    box-shadow var(--duration-fast) var(--ease-out-expo),
+    opacity var(--duration-fast) var(--ease-out-expo);
+}
+
+.interactive:hover  { transform: translateY(-1px); }
+.interactive:active { transform: translateY(0) scale(0.99); }
+
+/* ========================================
+   Divider
+   ======================================== */
+
+.divider {
+  height: 1px;
+  background: var(--border-hairline);
+}
+
+.divider-strong {
+  height: 1px;
+  background: var(--border-default);
 }

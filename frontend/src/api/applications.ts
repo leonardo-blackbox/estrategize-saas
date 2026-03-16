@@ -152,8 +152,10 @@ interface FieldsResponse {
 }
 
 interface ResponsesResponse {
-  data: ResponseWithAnswers[];
-  total: number;
+  data: {
+    responses: ResponseWithAnswers[];
+    pagination: { page: number; limit: number; total: number; pages: number };
+  };
 }
 
 interface PublicFormResponse {
@@ -225,7 +227,7 @@ export async function fetchResponses(
   const res = await client
     .get(`/api/applications/${id}/responses?page=${page}&limit=${limit}`)
     .json<ResponsesResponse>();
-  return { data: res.data, total: res.total };
+  return { data: res.data.responses, total: res.data.pagination.total };
 }
 
 export async function exportResponses(id: string): Promise<ResponseWithAnswers[]> {

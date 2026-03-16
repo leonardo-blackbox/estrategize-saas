@@ -21,8 +21,8 @@ router.use(publicFormLimit);
 
 const answerItemSchema = z.object({
   field_id:    z.string().uuid(),
-  field_type:  z.string().min(1),
-  field_title: z.string().min(1),
+  field_type:  z.string().optional().default(''),
+  field_title: z.string().optional().default(''),
   value:       z.unknown(),
 });
 
@@ -75,8 +75,8 @@ router.get('/:slug', async (req, res) => {
   }
 });
 
-// POST /public/forms/:slug/submit  — submit a completed response
-router.post('/:slug/submit', async (req, res) => {
+// POST /api/forms/:slug/responses  — submit a completed response
+router.post('/:slug/responses', async (req, res) => {
   const parsed = submitSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0].message });

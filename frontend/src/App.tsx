@@ -28,8 +28,11 @@ import { LessonPage } from './pages/member/LessonPage.tsx';
 
 // Aplicações pages
 import AplicacoesPage from './pages/member/aplicacoes/AplicacoesPage.tsx';
+import { ApplicationShell } from './pages/member/aplicacoes/ApplicationShell.tsx';
 import { EditorPage } from './pages/member/aplicacoes/EditorPage.tsx';
 import RespostasPage from './pages/member/aplicacoes/RespostasPage.tsx';
+import CompartilharPage from './pages/member/aplicacoes/CompartilharPage.tsx';
+import OpcoesPage from './pages/member/aplicacoes/OpcoesPage.tsx';
 import FormPublicoPage from './pages/public/FormPublicoPage.tsx';
 
 // Admin pages
@@ -75,22 +78,27 @@ export default function App() {
           <Route path="/formacao/aula/:lessonId" element={<LessonPage />} />
           <Route path="/ferramentas" element={<FerramentasPage />} />
           <Route path="/aplicacoes" element={<AplicacoesPage />} />
-          <Route path="/aplicacoes/:id/respostas" element={<RespostasPage />} />
           <Route path="/consultorias" element={<ConsultoriasPage />} />
           <Route path="/consultorias/:id" element={<ConsultoriaDetailPage />} />
           <Route path="/conta" element={<ContaPage />} />
           <Route path="/creditos" element={<CreditosPage />} />
         </Route>
 
-        {/* ── Editor (full-viewport, sem MemberShell) ── */}
+        {/* ── Application Shell (full-viewport, sem MemberShell) ── */}
         <Route
-          path="/aplicacoes/:id/editor"
+          path="/aplicacoes/:id"
           element={
             <ProtectedRoute>
-              <EditorPage />
+              <ApplicationShell />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="editor" element={<EditorPage />} />
+          <Route path="opcoes" element={<OpcoesPage />} />
+          <Route path="compartilhar" element={<CompartilharPage />} />
+          <Route path="respostas" element={<RespostasPage />} />
+          <Route index element={<Navigate to="respostas" replace />} />
+        </Route>
 
         {/* ── Admin App ── */}
         <Route

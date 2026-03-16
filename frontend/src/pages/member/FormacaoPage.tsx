@@ -436,7 +436,7 @@ export function FormacaoPage() {
         )}
 
         {/* 3. Jornada do Consultor Digital */}
-        <ScrollReveal delay={0.1}>
+        <ScrollReveal delay={0.1} className="mt-12 sm:mt-16">
           <div className="px-4 sm:px-0 mb-6 flex flex-col gap-1">
             <h3 className="text-[22px] font-semibold tracking-tight text-[var(--color-text-primary)]">
               Jornada do Consultor Digital
@@ -496,7 +496,7 @@ export function FormacaoPage() {
         </ScrollReveal>
 
         {/* 4. Materiais (Downloads) */}
-        <ScrollReveal delay={0.15}>
+        <ScrollReveal delay={0.15} className="mt-12 sm:mt-16">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
             <div className="flex flex-col gap-1">
               <h3 className="text-[22px] font-semibold tracking-tight text-[var(--color-text-primary)]">

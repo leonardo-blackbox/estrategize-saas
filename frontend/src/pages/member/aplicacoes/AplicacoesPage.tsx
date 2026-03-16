@@ -486,7 +486,7 @@ function ApplicationCard({ app, onDuplicate, onDelete }: ApplicationCardProps) {
       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      onClick={() => navigate(`/aplicacoes/${app.id}/editor`)}
+      onClick={() => navigate(`/aplicacoes/${app.id}/respostas`)}
       className={cn(
         'group rounded-[var(--radius-md)] overflow-hidden cursor-pointer',
         'bg-[var(--bg-surface-1)]',
