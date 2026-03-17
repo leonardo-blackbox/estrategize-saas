@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "squads": {
+    "ultimate-landingpage": {
+      "source": "gutomec/squads-sh-aios/ultimate-landingpage",
+      "squad": "ultimate-landingpage",
+      "version": "1.0.0",
+      "hash": "71cf6358cf3e95d0",
+      "installedAt": "2026-03-14T01:15:54.482Z",
+      "updatedAt": "2026-03-15T00:00:00.000Z",
+      "agents": [
+        "lp-backend-dev",
+        "lp-copywriter",
+        "lp-design-architect",
+        "lp-frontend-dev",
+        "lp-image-creator",
+        "lp-integrator",
+        "lp-researcher",
+        "lp-reviewer",
+        "lp-strategist"
+      ]
+    },
+    "nirvana-squad-creator": {
+      "source": "gutomec/nirvana-squad-creator",
+      "squad": "nirvana-squad-creator",
+      "version": "1.0.0",
+      "installedAt": "2026-03-15T00:00:00.000Z",
+      "agents": [
+        "squad-analyzer",
+        "squad-agent-creator",
+        "squad-task-creator",
+        "squad-workflow-creator",
+        "squad-optimizer",
+        "squad-validator",
+        "squad-readme-creator",
+        "squad-publisher",
+        "squad-orchestrator"
+      ]
+    }
+  }
+}

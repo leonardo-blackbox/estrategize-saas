@@ -133,6 +133,9 @@ function InputFieldPreview({ field, theme, inputPlaceholder, type = 'text' }: Fi
 }
 
 function LongTextPreview({ field, theme }: FieldPreviewProps) {
+  const opts = !Array.isArray(field.options) ? (field.options as Record<string, unknown>) : {};
+  const placeholder = (opts.placeholder as string | undefined) ?? 'Sua resposta...';
+
   return (
     <div className="flex flex-col justify-center h-full gap-5 px-8">
       <div className="flex flex-col gap-2">
@@ -150,7 +153,7 @@ function LongTextPreview({ field, theme }: FieldPreviewProps) {
         )}
       </div>
       <textarea
-        placeholder="Sua resposta..."
+        placeholder={placeholder}
         disabled
         rows={4}
         className="w-full outline-none bg-transparent border-b-2 pb-2 text-[15px] pointer-events-none resize-none"
@@ -256,6 +259,8 @@ function ThankYouPreview({ field, theme }: FieldPreviewProps) {
 
 function renderFieldPreview(field: LocalField, theme: ThemeConfig, isActive: boolean) {
   const props: FieldPreviewProps = { field, theme, isActive };
+  const opts = !Array.isArray(field.options) ? (field.options as Record<string, unknown>) : {};
+  const placeholder = (opts.placeholder as string | undefined) ?? undefined;
 
   switch (field.type) {
     case 'welcome':
@@ -263,17 +268,17 @@ function renderFieldPreview(field: LocalField, theme: ThemeConfig, isActive: boo
     case 'message':
       return <MessagePreview {...props} />;
     case 'short_text':
-      return <InputFieldPreview {...props} inputPlaceholder="Resposta curta..." />;
+      return <InputFieldPreview {...props} inputPlaceholder={placeholder ?? 'Resposta curta...'} />;
     case 'long_text':
       return <LongTextPreview {...props} />;
     case 'name':
-      return <InputFieldPreview {...props} inputPlaceholder="Seu nome completo..." />;
+      return <InputFieldPreview {...props} inputPlaceholder={placeholder ?? 'Seu nome completo...'} />;
     case 'email':
-      return <InputFieldPreview {...props} type="email" inputPlaceholder="email@exemplo.com" />;
+      return <InputFieldPreview {...props} type="email" inputPlaceholder={placeholder ?? 'email@exemplo.com'} />;
     case 'phone':
-      return <InputFieldPreview {...props} type="tel" inputPlaceholder="(11) 99999-9999" />;
+      return <InputFieldPreview {...props} type="tel" inputPlaceholder={placeholder ?? '(11) 99999-9999'} />;
     case 'number':
-      return <InputFieldPreview {...props} type="number" inputPlaceholder="0" />;
+      return <InputFieldPreview {...props} type="number" inputPlaceholder={placeholder ?? '0'} />;
     case 'date':
       return <InputFieldPreview {...props} type="date" />;
     case 'multiple_choice':

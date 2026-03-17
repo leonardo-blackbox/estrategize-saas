@@ -469,11 +469,79 @@ function MultipleChoiceSettings({ field, index }: FieldSettingsProps) {
 }
 
 // ─────────────────────────────────────────────
+// Small numeric input
+// ─────────────────────────────────────────────
+
+function NumberInput({
+  value,
+  onChange,
+  placeholder,
+  min,
+  max,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+}) {
+  return (
+    <input
+      type="number"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      min={min}
+      max={max}
+      className={cn(
+        'w-full bg-[var(--bg-surface-2)] border border-[var(--border-default)]',
+        'rounded-lg px-3 py-2 text-[13px] text-[var(--text-primary)]',
+        'outline-none focus:border-[var(--accent)] transition-colors',
+      )}
+    />
+  );
+}
+
+function DateInput({
+  value,
+  onChange,
+  label,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  label: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <SectionLabel>{label}</SectionLabel>
+      <input
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(
+          'w-full bg-[var(--bg-surface-2)] border border-[var(--border-default)]',
+          'rounded-lg px-3 py-2 text-[13px] text-[var(--text-primary)]',
+          'outline-none focus:border-[var(--accent)] transition-colors',
+        )}
+      />
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
 // FieldSettings — Generic (text-based fields)
 // ─────────────────────────────────────────────
 
 function GenericFieldSettings({ field, index }: FieldSettingsProps) {
   const { updateField } = useEditorStore();
+  const opts = (field.options as Record<string, unknown>) ?? {};
+
+  const showPlaceholder = ['short_text', 'long_text', 'name', 'email', 'phone', 'number'].includes(
+    field.type,
+  );
+  const showMaxLength = ['short_text', 'long_text'].includes(field.type);
+  const showMinMax = field.type === 'number';
+  const showDateRange = field.type === 'date';
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -492,6 +560,75 @@ function GenericFieldSettings({ field, index }: FieldSettingsProps) {
           placeholder="Instrução ou detalhe adicional..."
         />
       </OptionRow>
+
+      {showPlaceholder && (
+        <OptionRow label="Placeholder">
+          <TextInput
+            value={(opts.placeholder as string) ?? ''}
+            onChange={(v) => updateField(index, { options: { ...opts, placeholder: v || undefined } })}
+            placeholder="Texto de exemplo no campo..."
+          />
+        </OptionRow>
+      )}
+
+      {showMaxLength && (
+        <OptionRow label="Limite de caracteres">
+          <NumberInput
+            value={(opts.maxLength as number | undefined)?.toString() ?? ''}
+            onChange={(v) =>
+              updateField(index, {
+                options: { ...opts, maxLength: v ? Number(v) : undefined },
+              })
+            }
+            placeholder="Sem limite"
+            min={1}
+          />
+        </OptionRow>
+      )}
+
+      {showMinMax && (
+        <div className="flex gap-2">
+          <div className="flex-1 flex flex-col gap-1.5">
+            <SectionLabel>Mínimo</SectionLabel>
+            <NumberInput
+              value={(opts.min as number | undefined)?.toString() ?? ''}
+              onChange={(v) =>
+                updateField(index, { options: { ...opts, min: v ? Number(v) : undefined } })
+              }
+              placeholder="—"
+            />
+          </div>
+          <div className="flex-1 flex flex-col gap-1.5">
+            <SectionLabel>Máximo</SectionLabel>
+            <NumberInput
+              value={(opts.max as number | undefined)?.toString() ?? ''}
+              onChange={(v) =>
+                updateField(index, { options: { ...opts, max: v ? Number(v) : undefined } })
+              }
+              placeholder="—"
+            />
+          </div>
+        </div>
+      )}
+
+      {showDateRange && (
+        <>
+          <DateInput
+            label="Data mínima"
+            value={(opts.minDate as string) ?? ''}
+            onChange={(v) =>
+              updateField(index, { options: { ...opts, minDate: v || undefined } })
+            }
+          />
+          <DateInput
+            label="Data máxima"
+            value={(opts.maxDate as string) ?? ''}
+            onChange={(v) =>
+              updateField(index, { options: { ...opts, maxDate: v || undefined } })
+            }
+          />
+        </>
+      )}
 
       <div
         className="flex items-center justify-between px-3 py-2.5 rounded-lg"

@@ -402,6 +402,11 @@ function TextInput({
   const [focused, setFocused] = useState(false);
   const placeholder =
     (getOptionFromOptions(field, 'placeholder') as string | undefined) || '';
+  const maxLength = getOptionFromOptions(field, 'maxLength') as number | undefined;
+  const min = getOptionFromOptions(field, 'min') as number | undefined;
+  const max = getOptionFromOptions(field, 'max') as number | undefined;
+  const minDate = getOptionFromOptions(field, 'minDate') as string | undefined;
+  const maxDate = getOptionFromOptions(field, 'maxDate') as string | undefined;
 
   return (
     <input
@@ -410,6 +415,9 @@ function TextInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
+      maxLength={maxLength}
+      min={type === 'number' ? min : type === 'date' ? minDate : undefined}
+      max={type === 'number' ? max : type === 'date' ? maxDate : undefined}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={{
@@ -435,6 +443,7 @@ function TextareaInput({
   const [focused, setFocused] = useState(false);
   const placeholder =
     (getOptionFromOptions(field, 'placeholder') as string | undefined) || '';
+  const maxLength = getOptionFromOptions(field, 'maxLength') as number | undefined;
 
   return (
     <textarea
@@ -442,6 +451,7 @@ function TextareaInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
+      maxLength={maxLength}
       rows={4}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
