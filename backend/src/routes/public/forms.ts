@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import rateLimit from 'express-rate-limit';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
+import { notifyNewResponse } from '../../services/emailNotificationService.js';
 
 const router = Router();
 
@@ -32,6 +33,33 @@ const submitSchema = z.object({
 });
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
+
+// POST /api/forms/:slug/events — fire-and-forget event tracking
+router.post('/:slug/events', async (req, res) => {
+  res.json({ ok: true }); // respond immediately
+
+  if (!supabaseAdmin) return;
+
+  const { event, session_token } = req.body as { event: string; session_token?: string };
+  if (!['view', 'start'].includes(event)) return;
+
+  try {
+    const { data: app } = await supabaseAdmin
+      .from('applications')
+      .select('id')
+      .eq('slug', req.params.slug)
+      .eq('status', 'published')
+      .single();
+
+    if (!app) return;
+
+    await supabaseAdmin.from('application_events').insert({
+      application_id: app.id,
+      event_type: event,
+      session_token: session_token || null,
+    });
+  } catch { /* ignore */ }
+});
 
 // GET /public/forms/:slug  — fetch published form + fields
 router.get('/:slug', async (req, res) => {
@@ -143,6 +171,55 @@ router.post('/:slug/responses', async (req, res) => {
     }
 
     res.status(201).json({ data: { response_id: response.id } });
+
+    // Trigger email notification (async, non-blocking)
+    const answersToInsert = answers.map((a) => ({
+      field_id:    a.field_id,
+      field_type:  a.field_type,
+      field_title: a.field_title,
+      value:       a.value ?? null,
+    }));
+    ;(async () => {
+      try {
+        if (!supabaseAdmin) return;
+        const { data: appData } = await supabaseAdmin
+          .from('applications')
+          .select('id, title, settings, user_id')
+          .eq('slug', slug)
+          .single();
+
+        if (!appData) return;
+
+        const settings = appData.settings as Record<string, unknown>;
+        const notifications = settings?.notifications as Record<string, unknown> | undefined;
+        if (!notifications?.emailEnabled) return;
+
+        // Get the user's email
+        const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(appData.user_id as string);
+        if (!user?.email) return;
+
+        const emailTo = (notifications.emailTo as string) || user.email;
+        const emailCc = notifications.emailCc as string | undefined;
+
+        // Format answers for email
+        const emailAnswers = answersToInsert.map((a) => ({
+          field_title: a.field_title || 'Campo',
+          value: a.value,
+        }));
+
+        await notifyNewResponse({
+          to: emailTo,
+          cc: emailCc,
+          applicationTitle: appData.title as string,
+          applicationId: appData.id as string,
+          responseId: response.id,
+          answers: emailAnswers,
+          submittedAt: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.error('[forms] Email notification failed:', err);
+      }
+    })();
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     res.status(500).json({ error: message });

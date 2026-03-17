@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import QRCode from 'qrcode';
 import { cn } from '../../../lib/cn.ts';
 import type { ApplicationShellContext } from './ApplicationShell.tsx';
 
@@ -30,6 +31,8 @@ function generateEmbedCode(
 export default function CompartilharPage() {
   const { application, isLoading } = useOutletContext<ApplicationShellContext>();
 
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
+
   const [copied, setCopied] = useState(false);
   const [embedType, setEmbedType] = useState<EmbedType>('normal');
   const [embedWidth, setEmbedWidth] = useState(100);
@@ -39,6 +42,15 @@ export default function CompartilharPage() {
   const [codeCopied, setCodeCopied] = useState(false);
 
   const publicUrl = application ? `${window.location.origin}/f/${application.slug}` : '';
+
+  useEffect(() => {
+    if (!publicUrl) return;
+    QRCode.toDataURL(publicUrl, {
+      width: 256,
+      margin: 2,
+      color: { dark: '#7c5cfc', light: '#ffffff' },
+    }).then(setQrDataUrl).catch(() => {});
+  }, [publicUrl]);
 
   function handleCopyLink() {
     if (!publicUrl) return;
@@ -119,19 +131,39 @@ export default function CompartilharPage() {
 
             {/* Social links */}
             <div className="flex items-center gap-3 mt-3">
-              {['Facebook', 'Twitter', 'LinkedIn'].map((social) => (
-                <a
-                  key={social}
-                  href="#"
-                  onClick={(e) => e.preventDefault()}
-                  className="text-[12px] text-[var(--text-tertiary)] hover:text-[var(--accent)] transition-colors flex items-center gap-1"
-                >
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M7 1l4 3-4 3M11 4H3a2 2 0 000 4h1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  {social}
-                </a>
-              ))}
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(`${application?.title || 'Formulário'}: ${publicUrl}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[12px] text-[var(--text-tertiary)] hover:text-[#25D366] transition-colors flex items-center gap-1"
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 0.5a5.5 5.5 0 014.58 8.56L12 11.5l-2.52-0.66A5.5 5.5 0 116 0.5z" stroke="currentColor" strokeWidth="1" fill="none" strokeLinecap="round" />
+                </svg>
+                WhatsApp
+              </a>
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(application?.title || 'Formulário')}&url=${encodeURIComponent(publicUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[12px] text-[var(--text-tertiary)] hover:text-[var(--accent)] transition-colors flex items-center gap-1"
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M7 1l4 3-4 3M11 4H3a2 2 0 000 4h1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Twitter/X
+              </a>
+              <a
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(publicUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[12px] text-[var(--text-tertiary)] hover:text-[#0A66C2] transition-colors flex items-center gap-1"
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M7 1l4 3-4 3M11 4H3a2 2 0 000 4h1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                LinkedIn
+              </a>
             </div>
           </section>
 
@@ -263,6 +295,51 @@ export default function CompartilharPage() {
                   {generatedCode}
                 </pre>
               </div>
+            )}
+          </section>
+
+          <div style={{ height: 1, background: 'var(--border-hairline)' }} />
+
+          {/* QR Code section */}
+          <section>
+            <h3 className="text-[13px] font-semibold text-[var(--text-primary)] mb-1">QR Code</h3>
+            <p className="text-[12px] text-[var(--text-secondary)] mb-3">
+              Para compartilhamento offline e materiais impressos.
+            </p>
+            {qrDataUrl ? (
+              <div className="flex flex-col items-center gap-3">
+                <img
+                  src={qrDataUrl}
+                  alt="QR Code do formulário"
+                  style={{
+                    width: 160,
+                    height: 160,
+                    borderRadius: 12,
+                    border: '1px solid var(--border-hairline)',
+                    padding: 8,
+                    background: '#ffffff',
+                  }}
+                />
+                <a
+                  href={qrDataUrl}
+                  download={`qr-${application?.slug || 'form'}.png`}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium',
+                    'bg-[var(--bg-surface-1)] border border-[var(--border-hairline)]',
+                    'text-[var(--text-primary)] hover:border-[var(--accent)] transition-colors cursor-pointer',
+                  )}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Baixar PNG
+                </a>
+              </div>
+            ) : (
+              <div
+                className="h-10 rounded-lg animate-pulse"
+                style={{ background: 'var(--border-hairline)' }}
+              />
             )}
           </section>
         </div>

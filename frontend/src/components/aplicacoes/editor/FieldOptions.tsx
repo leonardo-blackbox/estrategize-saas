@@ -1,4 +1,4 @@
-import { useId, useRef, useEffect } from 'react';
+import { useId, useRef, useEffect, useState } from 'react';
 import { useEditorStore, type LocalField } from '../../../stores/editorStore.ts';
 import { type FieldType, type FieldOption } from '../../../api/applications.ts';
 import { cn } from '../../../lib/cn.ts';
@@ -205,12 +205,175 @@ function ColorPickerRow({ label, value, onChange }: ColorPickerRowProps) {
 // ─────────────────────────────────────────────
 
 function AppearanceSettings() {
-  const { themeConfig, updateTheme } = useEditorStore();
+  const { themeConfig, updateTheme, applicationId } = useEditorStore();
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [bgUploading, setBgUploading] = useState(false);
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !applicationId) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Arquivo muito grande (máx 2MB)');
+      return;
+    }
+    setLogoUploading(true);
+    try {
+      const { uploadApplicationAsset } = await import('../../../api/applications.ts');
+      const { url } = await uploadApplicationAsset(applicationId, 'logo', file);
+      updateTheme({ logoUrl: url });
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao fazer upload da logo');
+    } finally {
+      setLogoUploading(false);
+    }
+  }
+
+  async function handleRemoveLogo() {
+    if (!applicationId) return;
+    try {
+      const { deleteApplicationAsset } = await import('../../../api/applications.ts');
+      await deleteApplicationAsset(applicationId, 'logo');
+      updateTheme({ logoUrl: undefined });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleBgUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !applicationId) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Arquivo muito grande (máx 5MB)');
+      return;
+    }
+    setBgUploading(true);
+    try {
+      const { uploadApplicationAsset } = await import('../../../api/applications.ts');
+      const { url } = await uploadApplicationAsset(applicationId, 'background', file);
+      updateTheme({ backgroundImageUrl: url });
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao fazer upload do fundo');
+    } finally {
+      setBgUploading(false);
+    }
+  }
+
+  async function handleRemoveBg() {
+    if (!applicationId) return;
+    try {
+      const { deleteApplicationAsset } = await import('../../../api/applications.ts');
+      await deleteApplicationAsset(applicationId, 'background');
+      updateTheme({ backgroundImageUrl: undefined, backgroundOverlayOpacity: undefined });
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const FONT_OPTIONS = ['Inter', 'Poppins', 'Playfair Display', 'Roboto', 'Montserrat'];
 
   return (
     <div className="flex flex-col gap-5 p-4">
+      {/* Logo upload */}
+      <div>
+        <label className="text-[12px] font-medium text-[var(--text-secondary)] block mb-2">Logo</label>
+        {themeConfig.logoUrl ? (
+          <div className="flex items-center gap-2">
+            <img
+              src={themeConfig.logoUrl}
+              alt="Logo"
+              className="h-10 w-auto object-contain rounded"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-hairline)', padding: 4 }}
+            />
+            <button
+              onClick={handleRemoveLogo}
+              className="text-[12px] text-[var(--text-tertiary)] hover:text-[#ff453a] transition-colors cursor-pointer"
+            >
+              Remover
+            </button>
+          </div>
+        ) : (
+          <label className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer',
+            'border border-dashed border-[var(--border-hairline)]',
+            'text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+            'hover:border-[var(--accent)] transition-colors',
+            logoUploading && 'opacity-50 pointer-events-none',
+          )}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1v8M4 6l3 3 3-3M2 12h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {logoUploading ? 'Enviando...' : 'Upload logo (PNG, SVG, WebP — máx 2MB)'}
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={handleLogoUpload}
+              disabled={logoUploading}
+            />
+          </label>
+        )}
+      </div>
+
+      {/* Background image upload */}
+      <div>
+        <label className="text-[12px] font-medium text-[var(--text-secondary)] block mb-2">Imagem de fundo</label>
+        {themeConfig.backgroundImageUrl ? (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-12 h-8 rounded object-cover"
+                style={{
+                  backgroundImage: `url(${themeConfig.backgroundImageUrl})`,
+                  backgroundSize: 'cover',
+                  border: '1px solid var(--border-hairline)',
+                }}
+              />
+              <button
+                onClick={handleRemoveBg}
+                className="text-[12px] text-[var(--text-tertiary)] hover:text-[#ff453a] transition-colors cursor-pointer"
+              >
+                Remover
+              </button>
+            </div>
+            <div>
+              <label className="text-[12px] text-[var(--text-secondary)] block mb-1">
+                Opacidade do overlay: {themeConfig.backgroundOverlayOpacity ?? 50}%
+              </label>
+              <input
+                type="range"
+                min={0}
+                max={80}
+                value={themeConfig.backgroundOverlayOpacity ?? 50}
+                onChange={(e) => updateTheme({ backgroundOverlayOpacity: Number(e.target.value) })}
+                className="w-full accent-[var(--accent)]"
+              />
+            </div>
+          </div>
+        ) : (
+          <label className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer',
+            'border border-dashed border-[var(--border-hairline)]',
+            'text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+            'hover:border-[var(--accent)] transition-colors',
+            bgUploading && 'opacity-50 pointer-events-none',
+          )}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1v8M4 6l3 3 3-3M2 12h10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {bgUploading ? 'Enviando...' : 'Upload fundo (JPG, PNG, WebP — máx 5MB)'}
+            <input
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              className="sr-only"
+              onChange={handleBgUpload}
+              disabled={bgUploading}
+            />
+          </label>
+        )}
+      </div>
+
       {/* Colors section */}
       <div className="flex flex-col gap-3">
         <SectionLabel>Cores</SectionLabel>

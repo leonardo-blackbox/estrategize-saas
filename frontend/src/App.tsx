@@ -33,6 +33,8 @@ import { EditorPage } from './pages/member/aplicacoes/EditorPage.tsx';
 import RespostasPage from './pages/member/aplicacoes/RespostasPage.tsx';
 import CompartilharPage from './pages/member/aplicacoes/CompartilharPage.tsx';
 import OpcoesPage from './pages/member/aplicacoes/OpcoesPage.tsx';
+import IntegracaoPage from './pages/member/aplicacoes/IntegracaoPage.tsx';
+import AnalyticsPage from './pages/member/aplicacoes/AnalyticsPage.tsx';
 import FormPublicoPage from './pages/public/FormPublicoPage.tsx';
 
 // Admin pages
@@ -96,6 +98,8 @@ export default function App() {
           <Route path="editor" element={<EditorPage />} />
           <Route path="opcoes" element={<OpcoesPage />} />
           <Route path="compartilhar" element={<CompartilharPage />} />
+          <Route path="integracoes" element={<IntegracaoPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="respostas" element={<RespostasPage />} />
           <Route index element={<Navigate to="respostas" replace />} />
         </Route>

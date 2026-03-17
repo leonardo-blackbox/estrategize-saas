@@ -17,9 +17,15 @@ import adminOfertasRouter from './routes/admin/ofertas.js';
 import adminHomeRouter from './routes/admin/home.js';
 import applicationsRouter from './routes/applications.js';
 import publicFormsRouter from './routes/public/forms.js';
+import assetsRouter from './routes/assets.js';
+import analyticsRouter from './routes/analytics.js';
+import templatesRouter from './routes/templates.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
 export const app = express();
+
+// Trust Railway/Vercel proxy so rate-limiter reads real client IP from X-Forwarded-For
+app.set('trust proxy', 1);
 
 // ─── Rate limiters ────────────────────────────────────────────────
 const generalLimit = rateLimit({
@@ -108,6 +114,9 @@ app.use('/api/admin/ofertas', adminLimit, adminOfertasRouter);
 app.use('/api/admin/home', adminLimit, adminHomeRouter);
 app.use('/api/webhooks', webhookLimit, webhooksRouter);
 app.use('/api/applications', applicationsRouter);
+app.use('/api/applications', assetsRouter);
+app.use('/api/applications', analyticsRouter);
+app.use('/api/templates', templatesRouter);
 app.use('/api/forms', publicFormsRouter);
 
 app.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {

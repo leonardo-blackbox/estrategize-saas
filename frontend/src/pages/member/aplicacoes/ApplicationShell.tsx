@@ -173,6 +173,8 @@ const TABS = [
   { id: 'editor', label: 'Editor' },
   { id: 'opcoes', label: 'Opções' },
   { id: 'compartilhar', label: 'Compartilhar' },
+  { id: 'integracoes', label: 'Integrações' },
+  { id: 'analytics', label: 'Analytics' },
   { id: 'respostas', label: 'Respostas' },
 ] as const;
 

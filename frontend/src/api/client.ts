@@ -58,5 +58,15 @@ export const client = {
 
 /** @deprecated use `client` instead */
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  return client.get(path, { headers: options.headers as Record<string, string> }).json<T>();
+  const method = (options.method ?? 'GET').toUpperCase();
+  const headers = options.headers as Record<string, string> | undefined;
+  const body = options.body ? JSON.parse(options.body as string) : undefined;
+  const opts = { headers, json: body };
+  switch (method) {
+    case 'POST':   return client.post(path, opts).json<T>();
+    case 'PUT':    return client.put(path, opts).json<T>();
+    case 'PATCH':  return client.patch(path, opts).json<T>();
+    case 'DELETE': return client.delete(path, opts).json<T>();
+    default:       return client.get(path, opts).json<T>();
+  }
 }

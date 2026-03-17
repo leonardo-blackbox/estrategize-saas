@@ -1,26 +1,82 @@
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 
+export type ConsultancyPhase =
+  | 'onboarding'
+  | 'diagnosis'
+  | 'delivery'
+  | 'implementation'
+  | 'support'
+  | 'closed';
+
+export type ConsultancyTemplate =
+  | 'none'
+  | 'positioning'
+  | 'educational_product'
+  | 'local_business'
+  | 'full_restructure';
+
+export type ConsultancyPriority = 'low' | 'normal' | 'high' | 'at_risk';
+
 export interface Consultancy {
   id: string;
   user_id: string;
   title: string;
   client_name: string | null;
   status: 'active' | 'archived';
+  // New fields (Epic 5)
+  phase: ConsultancyPhase;
+  instagram: string | null;
+  niche: string | null;
+  start_date: string | null;
+  end_date_estimated: string | null;
+  template: ConsultancyTemplate;
+  implementation_score: number;
+  credits_spent: number;
+  strategic_summary: string | null;
+  real_bottleneck: string | null;
+  next_meeting_at: string | null;
+  priority: ConsultancyPriority;
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface ConsultancyStats {
+  total: number;
+  active: number;
+  onboarding: number;
+  meetings_this_week: number;
+  at_risk: number;
 }
 
 export interface CreateConsultancyInput {
   title: string;
   client_name?: string;
   status?: 'active' | 'archived';
+  // New fields
+  phase?: ConsultancyPhase;
+  instagram?: string;
+  niche?: string;
+  start_date?: string;
+  end_date_estimated?: string;
+  template?: ConsultancyTemplate;
 }
 
 export interface UpdateConsultancyInput {
   title?: string;
   client_name?: string;
   status?: 'active' | 'archived';
+  phase?: ConsultancyPhase;
+  instagram?: string;
+  niche?: string;
+  start_date?: string | null;
+  end_date_estimated?: string | null;
+  template?: ConsultancyTemplate;
+  implementation_score?: number;
+  strategic_summary?: string | null;
+  real_bottleneck?: string | null;
+  next_meeting_at?: string | null;
+  priority?: ConsultancyPriority;
 }
 
 function ensureAdmin() {
@@ -45,6 +101,44 @@ export async function listConsultancies(userId: string): Promise<Consultancy[]> 
   }
 
   return data as Consultancy[];
+}
+
+export async function listConsultanciesWithStats(
+  userId: string,
+): Promise<{ consultancies: Consultancy[]; stats: ConsultancyStats }> {
+  const db = ensureAdmin();
+
+  const { data, error } = await db
+    .from('consultancies')
+    .select('*')
+    .eq('user_id', userId)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(`Failed to list consultancies: ${error.message}`);
+
+  const consultancies = data as Consultancy[];
+
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 7);
+
+  const stats: ConsultancyStats = {
+    total: consultancies.length,
+    active: consultancies.filter((c) => c.status === 'active').length,
+    onboarding: consultancies.filter((c) => c.phase === 'onboarding' && c.status === 'active').length,
+    meetings_this_week: consultancies.filter(
+      (c) =>
+        c.next_meeting_at != null &&
+        new Date(c.next_meeting_at) >= weekStart &&
+        new Date(c.next_meeting_at) <= weekEnd,
+    ).length,
+    at_risk: consultancies.filter((c) => c.priority === 'at_risk').length,
+  };
+
+  return { consultancies, stats };
 }
 
 export async function getConsultancy(
@@ -82,6 +176,12 @@ export async function createConsultancy(
       title: input.title,
       client_name: input.client_name ?? null,
       status: input.status ?? 'active',
+      phase: input.phase ?? 'onboarding',
+      instagram: input.instagram ?? null,
+      niche: input.niche ?? null,
+      start_date: input.start_date ?? null,
+      end_date_estimated: input.end_date_estimated ?? null,
+      template: input.template ?? 'none',
     })
     .select('*')
     .single();
@@ -105,7 +205,7 @@ export async function updateConsultancy(
 
   const { data, error } = await db
     .from('consultancies')
-    .update(input)
+    .update({ ...input, updated_at: new Date().toISOString() })
     .eq('id', consultancyId)
     .eq('user_id', userId)
     .is('deleted_at', null)

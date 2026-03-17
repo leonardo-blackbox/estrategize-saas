@@ -28,6 +28,7 @@ export interface ThemeConfig {
   logoUrl?: string;
   logoPosition: 'left' | 'center' | 'right';
   backgroundImageUrl?: string;
+  backgroundOverlayOpacity?: number;
 }
 
 export interface FormSettings {
@@ -39,6 +40,7 @@ export interface FormSettings {
   thankYouTitle: string;
   thankYouMessage: string;
   estimatedTime?: number;
+  showBranding?: boolean;
 }
 
 export interface FieldOption {
@@ -133,6 +135,8 @@ export const applicationKeys = {
   detail: (id: string) => [...applicationKeys.all, 'detail', id] as const,
   responses: (id: string) => [...applicationKeys.all, 'responses', id] as const,
   public: (slug: string) => ['public-form', slug] as const,
+  analytics: (id: string) => [...applicationKeys.all, 'analytics', id] as const,
+  templates: () => ['templates'] as const,
 };
 
 // ─────────────────────────────────────────────
@@ -253,4 +257,160 @@ export async function submitFormResponse(
     .post(`/api/forms/${slug}/responses`, { json: { answers, metadata } })
     .json<SubmitResponseResult>();
   return res;
+}
+
+// ─────────────────────────────────────────────
+// Tracking & Notifications Config Types
+// ─────────────────────────────────────────────
+
+export interface TrackingConfig {
+  metaPixelId?: string;
+  metaPixelActive: boolean;
+  ga4MeasurementId?: string;
+  ga4Active: boolean;
+  tiktokPixelId?: string;
+  tiktokPixelActive: boolean;
+}
+
+export interface NotificationConfig {
+  emailEnabled: boolean;
+  emailTo?: string;
+  emailCc?: string;
+  digestMode: 'instant' | 'daily';
+}
+
+export interface AnalyticsData {
+  views: number;
+  starts: number;
+  submits: number;
+  total_responses: number;
+  start_rate: number;
+  completion_rate: number;
+  period: string;
+  timeline: Array<{ date: string; views: number; starts: number; submits: number }>;
+}
+
+export interface ApplicationTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+  thumbnail_color: string;
+}
+
+// ─────────────────────────────────────────────
+// API: Tracking Config
+// ─────────────────────────────────────────────
+
+export async function updateTrackingConfig(
+  id: string,
+  tracking: TrackingConfig,
+): Promise<Application> {
+  const res = await client.get(`/api/applications/${id}`).json<ApplicationResponse>();
+  const current = res.data;
+  const updated = await client
+    .put(`/api/applications/${id}`, {
+      json: {
+        settings: {
+          ...current.settings,
+          tracking,
+        },
+      },
+    })
+    .json<ApplicationResponse>();
+  return updated.data;
+}
+
+export async function updateNotificationConfig(
+  id: string,
+  notifications: NotificationConfig,
+): Promise<Application> {
+  const res = await client.get(`/api/applications/${id}`).json<ApplicationResponse>();
+  const current = res.data;
+  const updated = await client
+    .put(`/api/applications/${id}`, {
+      json: {
+        settings: {
+          ...current.settings,
+          notifications,
+        },
+      },
+    })
+    .json<ApplicationResponse>();
+  return updated.data;
+}
+
+// ─────────────────────────────────────────────
+// API: Analytics
+// ─────────────────────────────────────────────
+
+export async function fetchAnalytics(
+  id: string,
+  period: '7d' | '30d' | '90d' = '30d',
+): Promise<AnalyticsData> {
+  const res = await client
+    .get(`/api/applications/${id}/analytics?period=${period}`)
+    .json<{ data: AnalyticsData }>();
+  return res.data;
+}
+
+// ─────────────────────────────────────────────
+// API: Templates
+// ─────────────────────────────────────────────
+
+export async function fetchTemplates(): Promise<ApplicationTemplate[]> {
+  const res = await client.get('/api/templates').json<{ data: ApplicationTemplate[] }>();
+  return res.data;
+}
+
+export async function createFromTemplate(templateId: string): Promise<Application> {
+  const res = await client
+    .post(`/api/templates/${templateId}/create`)
+    .json<ApplicationResponse>();
+  return res.data;
+}
+
+// ─────────────────────────────────────────────
+// API: Assets (logo/background upload)
+// ─────────────────────────────────────────────
+
+export async function uploadApplicationAsset(
+  applicationId: string,
+  assetType: 'logo' | 'background',
+  file: File,
+  opacity?: number,
+): Promise<{ url: string }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (opacity !== undefined) formData.append('opacity', String(opacity));
+
+  const token = (await import('../lib/supabase.ts')).supabase.auth.getSession().then(
+    (s: Awaited<ReturnType<typeof import('../lib/supabase.ts').supabase.auth.getSession>>) => s.data.session?.access_token
+  );
+  const authToken = await token;
+
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/applications/${applicationId}/assets/${assetType}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: formData,
+    },
+  );
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || 'Upload failed');
+  }
+
+  return response.json();
+}
+
+export async function deleteApplicationAsset(
+  applicationId: string,
+  assetType: 'logo' | 'background',
+): Promise<void> {
+  await client.delete(`/api/applications/${applicationId}/assets/${assetType}`);
 }

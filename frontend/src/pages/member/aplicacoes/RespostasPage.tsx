@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
+import { cn } from '../../../lib/cn.ts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import Papa from 'papaparse';
@@ -335,9 +336,11 @@ function IndividualView({
 function TableView({
   responses,
   fields,
+  showUTMColumns = false,
 }: {
   responses: ResponseWithAnswers[];
   fields: ApplicationField[];
+  showUTMColumns?: boolean;
 }) {
   const collectibleFields = fields.filter(
     (f) => f.type !== 'welcome' && f.type !== 'thank_you' && f.type !== 'message',
@@ -426,6 +429,28 @@ function TableView({
                 {f.title}
               </th>
             ))}
+            {showUTMColumns && (
+              <>
+                {['utm_source', 'utm_medium', 'utm_campaign'].map((col) => (
+                  <th
+                    key={col}
+                    style={{
+                      padding: '10px 14px',
+                      textAlign: 'left',
+                      color: 'var(--text-tertiary)',
+                      fontWeight: 600,
+                      fontSize: 11,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      borderBottom: '1px solid var(--border-hairline)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {col}
+                  </th>
+                ))}
+              </>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -482,6 +507,27 @@ function TableView({
                   </td>
                 );
               })}
+              {showUTMColumns && (
+                <>
+                  {(['utm_source', 'utm_medium', 'utm_campaign'] as const).map((col) => (
+                    <td
+                      key={col}
+                      style={{
+                        padding: '12px 14px',
+                        color: 'var(--text-secondary)',
+                        borderBottom: '1px solid var(--border-hairline)',
+                        maxWidth: 160,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontSize: 12,
+                      }}
+                    >
+                      {response.metadata?.[col] || '—'}
+                    </td>
+                  ))}
+                </>
+              )}
             </tr>
           ))}
         </tbody>
@@ -583,6 +629,8 @@ export default function RespostasPage() {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [navDirection, setNavDirection] = useState<'forward' | 'back'>('forward');
   const [isExporting, setIsExporting] = useState(false);
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | '7d' | '30d'>('all');
+  const [showUTMColumns, setShowUTMColumns] = useState(false);
 
   const { data: application, isLoading: appLoading } = useQuery({
     queryKey: applicationKeys.detail(id!),
@@ -602,7 +650,22 @@ export default function RespostasPage() {
     (f) => f.type !== 'welcome' && f.type !== 'thank_you' && f.type !== 'message',
   );
 
-  const selectedResponse = responses[selectedIndex] ?? null;
+  const filteredResponses = useMemo(() => {
+    if (!responses) return [];
+    if (dateFilter === 'all') return responses;
+    const now = new Date();
+    const since = new Date();
+    if (dateFilter === 'today') {
+      since.setHours(0, 0, 0, 0);
+    } else if (dateFilter === '7d') {
+      since.setDate(now.getDate() - 7);
+    } else if (dateFilter === '30d') {
+      since.setDate(now.getDate() - 30);
+    }
+    return responses.filter((r) => new Date(r.created_at) >= since);
+  }, [responses, dateFilter]);
+
+  const selectedResponse = filteredResponses[selectedIndex] ?? null;
 
   const handleSelectResponse = useCallback((idx: number) => {
     setNavDirection(idx > selectedIndex ? 'forward' : 'back');
@@ -616,10 +679,10 @@ export default function RespostasPage() {
   }, [selectedIndex]);
 
   const handleNext = useCallback(() => {
-    if (selectedIndex >= responses.length - 1) return;
+    if (selectedIndex >= filteredResponses.length - 1) return;
     setNavDirection('forward');
     setSelectedIndex((prev) => prev + 1);
-  }, [selectedIndex, responses.length]);
+  }, [selectedIndex, filteredResponses.length]);
 
   const handleExport = useCallback(async () => {
     if (!id || !application) return;
@@ -688,7 +751,7 @@ export default function RespostasPage() {
             letterSpacing: '0.06em',
           }}
         >
-          {isLoading ? '...' : `${responses.length} resposta${responses.length !== 1 ? 's' : ''}`}
+          {isLoading ? '...' : `${filteredResponses.length} resposta${filteredResponses.length !== 1 ? 's' : ''}`}
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {/* View toggle */}
@@ -745,6 +808,37 @@ export default function RespostasPage() {
         </div>
       </div>
 
+      {/* ── Filter toolbar ── */}
+      <div className="flex items-center gap-2 px-4 py-2 flex-wrap" style={{ borderBottom: '1px solid var(--border-hairline)', background: 'var(--bg-surface-1)', flexShrink: 0 }}>
+        <span className="text-[12px] text-[var(--text-tertiary)]">Período:</span>
+        {(['all', 'today', '7d', '30d'] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => { setDateFilter(f); setSelectedIndex(0); }}
+            className={cn(
+              'px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer',
+              dateFilter === f
+                ? 'bg-[var(--accent)] text-white'
+                : 'bg-[var(--bg-base)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-hairline)]',
+            )}
+          >
+            {f === 'all' ? 'Todas' : f === 'today' ? 'Hoje' : f === '7d' ? '7 dias' : '30 dias'}
+          </button>
+        ))}
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={() => setShowUTMColumns((v) => !v)}
+          className={cn(
+            'px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer border',
+            showUTMColumns
+              ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+              : 'bg-[var(--bg-base)] text-[var(--text-secondary)] border-[var(--border-hairline)] hover:text-[var(--text-primary)]',
+          )}
+        >
+          UTM
+        </button>
+      </div>
+
       {/* ── Body ── */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* ── Sidebar ── */}
@@ -788,7 +882,7 @@ export default function RespostasPage() {
             <div style={{ flex: 1, overflowY: 'auto', padding: '6px 0' }}>
               {isLoading ? (
                 <SidebarSkeleton />
-              ) : responses.length === 0 ? (
+              ) : filteredResponses.length === 0 ? (
                 <div
                   style={{
                     padding: '24px 16px',
@@ -800,7 +894,7 @@ export default function RespostasPage() {
                   Nenhuma resposta
                 </div>
               ) : (
-                responses.map((response, idx) => (
+                filteredResponses.map((response, idx) => (
                   <ResponseSidebarItem
                     key={response.id}
                     response={response}
@@ -827,13 +921,13 @@ export default function RespostasPage() {
             <IndividualView
               response={selectedResponse}
               index={selectedIndex}
-              total={responses.length}
+              total={filteredResponses.length}
               onPrev={handlePrev}
               onNext={handleNext}
               direction={navDirection}
             />
           ) : viewMode === 'tabela' ? (
-            <TableView responses={responses} fields={fields} />
+            <TableView responses={filteredResponses} fields={fields} showUTMColumns={showUTMColumns} />
           ) : null}
         </div>
       </div>

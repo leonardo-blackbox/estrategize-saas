@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 import {
   fetchPublicForm,
   submitFormResponse,
@@ -11,6 +12,8 @@ import {
   type FormSettings,
   type FieldOption,
 } from '../../api/applications.ts';
+import { useTrackingPixels } from '../../hooks/useTrackingPixels.ts';
+import { useVisualViewport } from '../../hooks/useVisualViewport.ts';
 
 // ─────────────────────────────────────────────
 // Helpers
@@ -41,6 +44,29 @@ function getOptionFromOptions(
 
 const LETTER_KEYS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
 
+// UTM capture helper
+function captureUTM(slug: string): Record<string, string> {
+  const params = new URLSearchParams(window.location.search);
+  const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  const utm: Record<string, string> = {};
+  utmKeys.forEach((key) => {
+    const val = params.get(key);
+    if (val) utm[key] = val;
+  });
+
+  if (Object.keys(utm).length > 0) {
+    try {
+      sessionStorage.setItem(`iris_utm_${slug}`, JSON.stringify(utm));
+    } catch { /* ignore */ }
+  } else {
+    try {
+      const stored = sessionStorage.getItem(`iris_utm_${slug}`);
+      if (stored) return JSON.parse(stored) as Record<string, string>;
+    } catch { /* ignore */ }
+  }
+  return utm;
+}
+
 // ─────────────────────────────────────────────
 // Progress Bar
 // ─────────────────────────────────────────────
@@ -49,35 +75,56 @@ function ProgressBar({
   progress,
   buttonColor,
   visible,
+  currentQuestion,
+  totalQuestions,
 }: {
   progress: number;
   buttonColor: string;
   visible: boolean;
+  currentQuestion?: number;
+  totalQuestions?: number;
 }) {
   if (!visible) return null;
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 3,
-        zIndex: 100,
-        background: 'rgba(255,255,255,0.1)',
-      }}
-    >
-      <motion.div
+    <>
+      <div
         style={{
-          height: '100%',
-          background: buttonColor,
-          boxShadow: `0 0 8px ${buttonColor}`,
-          originX: 0,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 3,
+          zIndex: 100,
+          background: 'rgba(255,255,255,0.1)',
         }}
-        animate={{ width: `${progress * 100}%` }}
-        transition={{ duration: 0.4, ease: "easeInOut" as const }}
-      />
-    </div>
+      >
+        <motion.div
+          style={{
+            height: '100%',
+            background: buttonColor,
+            boxShadow: `0 0 8px ${buttonColor}`,
+            originX: 0,
+          }}
+          animate={{ width: `${progress * 100}%` }}
+          transition={{ duration: 0.4, ease: "easeInOut" as const }}
+        />
+      </div>
+      {currentQuestion !== undefined && totalQuestions !== undefined && totalQuestions > 0 && (
+        <div style={{
+          position: 'fixed',
+          top: 8,
+          right: 16,
+          fontSize: 11,
+          color: buttonColor,
+          opacity: 0.6,
+          fontFamily: 'monospace',
+          fontWeight: 600,
+          zIndex: 101,
+        }}>
+          {currentQuestion} / {totalQuestions}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -231,10 +278,12 @@ function ThankYouScreen({
   settings,
   theme,
   onReset,
+  redirectCountdown,
 }: {
   settings: FormSettings;
   theme: ThemeConfig;
   onReset: () => void;
+  redirectCountdown?: number | null;
 }) {
   const containerVariants = {
     initial: {},
@@ -332,6 +381,32 @@ function ThankYouScreen({
           {settings.thankYouMessage}
         </motion.p>
 
+        {settings.redirectUrl && redirectCountdown !== null && redirectCountdown !== undefined && (
+          <motion.div
+            variants={itemVariants}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}
+          >
+            <p style={{ fontSize: 13, color: theme.answerColor, opacity: 0.5, margin: 0 }}>
+              Redirecionando em {redirectCountdown}s...
+            </p>
+            <button
+              onClick={() => { window.location.href = settings.redirectUrl!; }}
+              style={{
+                background: theme.buttonColor,
+                color: theme.buttonTextColor,
+                border: 'none',
+                padding: '10px 24px',
+                borderRadius: 10,
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Ir agora →
+            </button>
+          </motion.div>
+        )}
+
         <motion.button
           variants={itemVariants}
           onClick={onReset}
@@ -420,10 +495,13 @@ function TextInput({
       max={type === 'number' ? max : type === 'date' ? maxDate : undefined}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
+      aria-label={field.title}
+      aria-required={field.required}
       style={{
         ...inputBaseStyle(theme.buttonColor, theme.answerColor),
         borderColor: focused ? theme.buttonColor : 'rgba(255,255,255,0.12)',
         boxShadow: focused ? `0 0 0 4px ${theme.buttonColor}33` : 'none',
+        fontSize: 18,
       }}
     />
   );
@@ -455,12 +533,15 @@ function TextareaInput({
       rows={4}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
+      aria-label={field.title}
+      aria-required={field.required}
       style={{
         ...inputBaseStyle(theme.buttonColor, theme.answerColor),
         borderColor: focused ? theme.buttonColor : 'rgba(255,255,255,0.12)',
         boxShadow: focused ? `0 0 0 4px ${theme.buttonColor}33` : 'none',
         resize: 'vertical',
         minHeight: 120,
+        fontSize: 18,
       }}
     />
   );
@@ -661,6 +742,9 @@ function QuestionScreen({
   isLast,
   isMutating,
   direction,
+  validationError,
+  onClearError,
+  isTouchDevice,
 }: {
   field: ApplicationField;
   questionNumber: number;
@@ -674,6 +758,9 @@ function QuestionScreen({
   isLast: boolean;
   isMutating: boolean;
   direction: 'forward' | 'back';
+  validationError?: string | null;
+  onClearError?: () => void;
+  isTouchDevice?: boolean;
 }) {
   const xOffset = direction === 'forward' ? 40 : -40;
   const isMessage = field.type === 'message';
@@ -785,9 +872,48 @@ function QuestionScreen({
             <FieldInput
               field={field}
               value={value}
-              onChange={onChange}
+              onChange={(v) => {
+                onChange(v);
+                onClearError?.();
+              }}
               theme={theme}
             />
+            {/* Validation error */}
+            {validationError && (
+              <motion.p
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{
+                  color: '#ff453a',
+                  fontSize: 13,
+                  margin: 0,
+                  marginTop: 8,
+                }}
+                role="alert"
+                aria-live="polite"
+              >
+                {validationError}
+              </motion.p>
+            )}
+            {/* Character counter for text fields with maxLength */}
+            {(() => {
+              const maxLength = getOptionFromOptions(field, 'maxLength') as number | undefined;
+              if (!maxLength) return null;
+              const charCount = typeof value === 'string' ? value.length : 0;
+              return (
+                <p style={{
+                  fontSize: 12,
+                  color: charCount >= maxLength * 0.9 ? '#ff453a' : theme.answerColor,
+                  opacity: charCount >= maxLength * 0.9 ? 1 : 0.4,
+                  margin: 0,
+                  marginTop: 4,
+                  textAlign: 'right',
+                  maxWidth: 560,
+                }}>
+                  {charCount}/{maxLength}
+                </p>
+              );
+            })()}
           </motion.div>
         )}
 
@@ -835,7 +961,7 @@ function QuestionScreen({
             )}
           </motion.button>
 
-          {!isMessage && canProceed && !isLast && (
+          {!isMessage && canProceed && !isLast && !isTouchDevice && (
             <span
               style={{
                 fontSize: 12,
@@ -902,7 +1028,7 @@ function SpinnerIcon({ size = 24, color = '#fff' }: { size?: number; color?: str
   );
 }
 
-function LoadingScreen() {
+function LoadingScreen({ backgroundColor: _backgroundColor = '#000000' }: { backgroundColor?: string }) {
   return (
     <motion.div
       key="loading"
@@ -911,12 +1037,32 @@ function LoadingScreen() {
       exit={{ opacity: 0 }}
       style={{
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
+        padding: '48px 24px',
+        gap: 20,
       }}
     >
-      <SpinnerIcon size={32} color="rgba(255,255,255,0.5)" />
+      <style>{`
+        @keyframes skeleton-pulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.6; }
+        }
+      `}</style>
+      {[{ w: '60%', h: 40 }, { w: '40%', h: 20 }, { w: '50%', h: 20 }, { w: '180px', h: 48, br: 12 }].map((s, i) => (
+        <div
+          key={i}
+          style={{
+            width: s.w,
+            height: s.h,
+            borderRadius: s.br ?? 8,
+            background: 'rgba(255,255,255,0.08)',
+            animation: `skeleton-pulse 1.5s ease-in-out ${i * 0.1}s infinite`,
+          }}
+        />
+      ))}
     </motion.div>
   );
 }
@@ -971,11 +1117,19 @@ function ErrorScreen({ message }: { message: string }) {
 export default function FormPublicoPage() {
   const { slug } = useParams<{ slug: string }>();
 
+  const isEmbedMode = new URLSearchParams(window.location.search).get('embed') === '1';
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
+  const viewportHeight = useVisualViewport();
+  const isTouchDevice = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0;
+
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [submitted, setSubmitted] = useState(false);
   const [direction, setDirection] = useState<'forward' | 'back'>('forward');
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const sessionToken = useRef<string>(crypto.randomUUID());
 
   const {
     data,
@@ -986,17 +1140,6 @@ export default function FormPublicoPage() {
     queryFn: () => fetchPublicForm(slug!),
     enabled: Boolean(slug),
     retry: 1,
-  });
-
-  const submitMutation = useMutation({
-    mutationFn: ({
-      answersArr,
-    }: {
-      answersArr: Array<{ field_id: string; value: unknown }>;
-    }) => submitFormResponse(slug!, answersArr),
-    onSuccess: () => {
-      setSubmitted(true);
-    },
   });
 
   const fields = data?.fields ?? [];
@@ -1018,6 +1161,33 @@ export default function FormPublicoPage() {
     thankYouTitle: 'Obrigado!',
     thankYouMessage: 'Suas respostas foram recebidas.',
   };
+
+  const tracking = (application?.settings as Record<string, unknown> | undefined)?.tracking as import('../../hooks/useTrackingPixels.ts').TrackingConfig | undefined;
+  const { trackFormView, trackFormStart, trackFormSubmit } = useTrackingPixels(tracking);
+
+  const submitMutation = useMutation({
+    mutationFn: ({
+      answersArr,
+      metadata,
+    }: {
+      answersArr: Array<{ field_id: string; value: unknown }>;
+      metadata?: Record<string, string>;
+    }) => submitFormResponse(slug!, answersArr, metadata),
+    onSuccess: () => {
+      trackFormSubmit();
+      setSubmitted(true);
+      if (settings.redirectUrl) {
+        setRedirectCountdown(3);
+      }
+      if (slug) {
+        fetch(`/api/forms/${slug}/events`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event: 'submit', session_token: sessionToken.current }),
+        }).catch(() => { /* ignore */ });
+      }
+    },
+  });
 
   // Collectible fields (not welcome / message / thank_you)
   const collectibleFields = fields.filter(
@@ -1061,6 +1231,14 @@ export default function FormPublicoPage() {
     if (!currentField) {
       // Welcome screen: find first non-welcome field
       const firstIdx = fields.findIndex((f) => f.type !== 'welcome');
+      trackFormStart();
+      if (slug) {
+        fetch(`/api/forms/${slug}/events`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event: 'start', session_token: sessionToken.current }),
+        }).catch(() => { /* ignore */ });
+      }
       setDirection('forward');
       setCurrentIndex(firstIdx >= 0 ? firstIdx : 0);
       return;
@@ -1074,21 +1252,31 @@ export default function FormPublicoPage() {
     ) {
       const v = answers[currentField.id];
       const hasValue = Array.isArray(v) ? v.length > 0 : Boolean(v);
-      if (!hasValue) return;
+      if (!hasValue) {
+        setValidationError('Este campo é obrigatório');
+        return;
+      }
     }
+
+    setValidationError(null);
 
     if (isLastQuestion) {
       // Submit
       const answersArr = collectibleFields
         .filter((f) => answers[f.id] !== undefined)
         .map((f) => ({ field_id: f.id, value: answers[f.id] }));
-      submitMutation.mutate({ answersArr });
+      const utm = captureUTM(slug!);
+      const metadata: Record<string, string> = {};
+      if (Object.keys(utm).length > 0) {
+        Object.entries(utm).forEach(([k, v]) => { metadata[k] = v; });
+      }
+      submitMutation.mutate({ answersArr, metadata: Object.keys(metadata).length > 0 ? metadata : undefined });
       return;
     }
 
     setDirection('forward');
     setCurrentIndex((prev) => Math.min(prev + 1, fields.length - 1));
-  }, [currentField, fields, answers, isLastQuestion, collectibleFields, submitMutation]);
+  }, [currentField, fields, answers, isLastQuestion, collectibleFields, submitMutation, slug, trackFormStart]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleBack = useCallback(() => {
     if (currentIndex <= 0) return;
@@ -1151,6 +1339,29 @@ export default function FormPublicoPage() {
     return () => window.removeEventListener('keydown', handler);
   }, [submitted, currentField, handleNext]);
 
+  // Track form view when data loads
+  useEffect(() => {
+    if (data && slug) {
+      trackFormView();
+      fetch(`/api/forms/${slug}/events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'view', session_token: sessionToken.current }),
+      }).catch(() => { /* ignore */ });
+    }
+  }, [data, slug]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Redirect countdown
+  useEffect(() => {
+    if (redirectCountdown === null) return;
+    if (redirectCountdown <= 0) {
+      window.location.href = settings.redirectUrl!;
+      return;
+    }
+    const timer = setTimeout(() => setRedirectCountdown((c) => (c !== null ? c - 1 : null)), 1000);
+    return () => clearTimeout(timer);
+  }, [redirectCountdown, settings.redirectUrl]);
+
   // Welcome field (first field with type 'welcome')
   const welcomeField = fields.find((f) => f.type === 'welcome');
   const welcomeIndex = welcomeField ? fields.indexOf(welcomeField) : -1;
@@ -1165,6 +1376,7 @@ export default function FormPublicoPage() {
           settings={settings}
           theme={theme}
           onReset={handleReset}
+          redirectCountdown={redirectCountdown}
         />
       );
     }
@@ -1201,7 +1413,7 @@ export default function FormPublicoPage() {
       );
     }
     if (currentField.type === 'thank_you') {
-      return <ThankYouScreen settings={settings} theme={theme} onReset={handleReset} />;
+      return <ThankYouScreen settings={settings} theme={theme} onReset={handleReset} redirectCountdown={redirectCountdown} />;
     }
     return (
       <QuestionScreen
@@ -1217,6 +1429,9 @@ export default function FormPublicoPage() {
         isLast={isLastQuestion}
         isMutating={submitMutation.isPending}
         direction={direction}
+        validationError={validationError}
+        onClearError={() => setValidationError(null)}
+        isTouchDevice={isTouchDevice}
       />
     );
   };
@@ -1237,6 +1452,9 @@ export default function FormPublicoPage() {
     background: theme.backgroundColor,
     fontFamily: theme.fontFamily || 'Inter, sans-serif',
     overflow: 'hidden auto',
+    height: isEmbedMode ? '100%' : `${viewportHeight}px`,
+    paddingBottom: isEmbedMode ? 0 : 'env(safe-area-inset-bottom)',
+    paddingTop: isEmbedMode ? 0 : 'env(safe-area-inset-top)',
   };
 
   if (theme.backgroundImageUrl) {
@@ -1248,15 +1466,34 @@ export default function FormPublicoPage() {
   }
 
   return (
-    <div ref={containerRef} style={bgStyle}>
-      <ProgressBar
-        progress={progress}
-        buttonColor={theme.buttonColor}
-        visible={settings.showProgressBar && !submitted && currentIndex >= 0}
-      />
-      <AnimatePresence mode="wait">
-        {renderContent()}
-      </AnimatePresence>
-    </div>
+    <HelmetProvider>
+      <Helmet>
+        <html lang="pt-BR" />
+        {application && (
+          <>
+            <title>{application.title} — Iris</title>
+            <meta name="description" content={`Responda o formulário: ${application.title}`} />
+            <meta property="og:title" content={application.title} />
+            <meta property="og:description" content="Formulário criado com Iris" />
+            {theme.logoUrl && <meta property="og:image" content={theme.logoUrl} />}
+            <meta property="og:type" content="website" />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+          </>
+        )}
+      </Helmet>
+      <div ref={containerRef} style={bgStyle}>
+        <ProgressBar
+          progress={progress}
+          buttonColor={theme.buttonColor}
+          visible={settings.showProgressBar && !submitted && currentIndex >= 0}
+          currentQuestion={questionNumber > 0 ? questionNumber : undefined}
+          totalQuestions={collectibleFields.length}
+        />
+        <AnimatePresence mode="wait">
+          {renderContent()}
+        </AnimatePresence>
+      </div>
+    </HelmetProvider>
   );
 }

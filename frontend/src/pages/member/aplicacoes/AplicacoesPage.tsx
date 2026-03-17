@@ -13,7 +13,10 @@ import {
   deleteApplication,
   duplicateApplication,
   applicationKeys,
+  fetchTemplates,
+  createFromTemplate,
   type Application,
+  type ApplicationTemplate,
 } from '../../../api/applications.ts';
 
 // ─────────────────────────────────────────────
@@ -276,17 +279,23 @@ interface KebabMenuProps {
   onShare: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onOpenChange?: (open: boolean) => void;
 }
 
-function KebabMenu({ onEdit, onResponses, onShare, onDuplicate, onDelete }: KebabMenuProps) {
+function KebabMenu({ onEdit, onResponses, onShare, onDuplicate, onDelete, onOpenChange }: KebabMenuProps) {
   const [open, setOpen] = useState(false);
+
+  const toggleOpen = (value: boolean) => {
+    setOpen(value);
+    onOpenChange?.(value);
+  };
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
+        toggleOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -392,7 +401,7 @@ function KebabMenu({ onEdit, onResponses, onShare, onDuplicate, onDelete }: Keba
     <div ref={menuRef} className="relative" onClick={(e) => e.stopPropagation()}>
       <motion.button
         whileTap={{ scale: 0.92 }}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => toggleOpen(!open)}
         className={cn(
           'w-8 h-8 rounded-lg flex items-center justify-center',
           'text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
@@ -429,7 +438,7 @@ function KebabMenu({ onEdit, onResponses, onShare, onDuplicate, onDelete }: Keba
                 key={item.label}
                 onClick={() => {
                   item.onClick();
-                  setOpen(false);
+                  toggleOpen(false);
                 }}
                 className={cn(
                   'w-full flex items-center gap-2.5 px-3.5 py-2',
@@ -466,6 +475,7 @@ interface ApplicationCardProps {
 function ApplicationCard({ app, onDuplicate, onDelete }: ApplicationCardProps) {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const formattedDate = new Date(app.updated_at).toLocaleDateString('pt-BR', {
     day: '2-digit',
@@ -488,7 +498,7 @@ function ApplicationCard({ app, onDuplicate, onDelete }: ApplicationCardProps) {
       onHoverEnd={() => setIsHovered(false)}
       onClick={() => navigate(`/aplicacoes/${app.id}/respostas`)}
       className={cn(
-        'group rounded-[var(--radius-md)] overflow-hidden cursor-pointer',
+        'group rounded-[var(--radius-md)] cursor-pointer',
         'bg-[var(--bg-surface-1)]',
         'ring-1 transition-all duration-200',
         isHovered
@@ -497,32 +507,30 @@ function ApplicationCard({ app, onDuplicate, onDelete }: ApplicationCardProps) {
       )}
     >
       {/* Thumbnail */}
-      <FormThumbnail form={app} />
+      <div className="rounded-t-[var(--radius-md)] overflow-hidden">
+        <FormThumbnail form={app} />
+      </div>
 
       {/* Content */}
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-2">
           <StatusBadge status={app.status} />
 
-          {/* Kebab menu — shown when card hovered */}
-          <AnimatePresence>
-            {isHovered && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.1 }}
-              >
-                <KebabMenu
-                  onEdit={() => navigate(`/aplicacoes/${app.id}/editor`)}
-                  onResponses={() => navigate(`/aplicacoes/${app.id}/respostas`)}
-                  onShare={handleCopyLink}
-                  onDuplicate={() => onDuplicate(app.id)}
-                  onDelete={() => onDelete(app.id)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Kebab menu — visible on hover or when menu is open */}
+          <motion.div
+            animate={{ opacity: isHovered || menuOpen ? 1 : 0 }}
+            transition={{ duration: 0.1 }}
+            style={{ pointerEvents: isHovered || menuOpen ? 'auto' : 'none' }}
+          >
+            <KebabMenu
+              onEdit={() => navigate(`/aplicacoes/${app.id}/editor`)}
+              onResponses={() => navigate(`/aplicacoes/${app.id}/respostas`)}
+              onShare={handleCopyLink}
+              onDuplicate={() => onDuplicate(app.id)}
+              onDelete={() => onDelete(app.id)}
+              onOpenChange={setMenuOpen}
+            />
+          </motion.div>
         </div>
 
         <h3 className="text-[14px] font-semibold text-[var(--text-primary)] leading-snug line-clamp-2 mt-2 mb-1">
@@ -689,11 +697,13 @@ const FILTER_TABS: Array<{ id: FilterTab; label: string }> = [
 ];
 
 export default function AplicacoesPage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [search, setSearch] = useState('');
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
 
   // ── Queries ──────────────────────────────────
 
@@ -719,6 +729,22 @@ export default function AplicacoesPage() {
     mutationFn: (id: string) => duplicateApplication(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: applicationKeys.lists() });
+    },
+  });
+
+  const { data: templates } = useQuery({
+    queryKey: ['templates'],
+    queryFn: fetchTemplates,
+    enabled: showTemplateModal,
+    staleTime: 300_000,
+  });
+
+  const createFromTemplateMutation = useMutation({
+    mutationFn: (templateId: string) => createFromTemplate(templateId),
+    onSuccess: (app) => {
+      setShowTemplateModal(false);
+      queryClient.invalidateQueries({ queryKey: applicationKeys.lists() });
+      navigate(`/aplicacoes/${app.id}/editor`);
     },
   });
 
@@ -766,20 +792,38 @@ export default function AplicacoesPage() {
             </p>
           </div>
 
-          <Button
-            onClick={() => setCreateOpen(true)}
-            className="flex-shrink-0 gap-2"
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-              <path
-                d="M7 1v12M1 7h12"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-            </svg>
-            Nova Aplicação
-          </Button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setShowTemplateModal(true)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium',
+                'border border-[var(--border-hairline)] text-[var(--text-secondary)]',
+                'hover:text-[var(--text-primary)] hover:border-[var(--accent)] transition-colors cursor-pointer',
+              )}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+                <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+                <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+                <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+              </svg>
+              Templates
+            </button>
+            <Button
+              onClick={() => setCreateOpen(true)}
+              className="gap-2"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path
+                  d="M7 1v12M1 7h12"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </svg>
+              Nova Aplicação
+            </Button>
+          </div>
         </div>
 
         {/* Toolbar: Filter tabs + Search */}
@@ -918,6 +962,67 @@ export default function AplicacoesPage() {
         }}
         isLoading={deleteMutation.isPending}
       />
+
+      {/* Template Modal */}
+      {showTemplateModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+          onClick={(e) => e.target === e.currentTarget && setShowTemplateModal(false)}
+        >
+          <div
+            className="w-full max-w-2xl rounded-2xl overflow-hidden"
+            style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}
+          >
+            <div className="flex items-center justify-between p-5" style={{ borderBottom: '1px solid var(--border-hairline)' }}>
+              <div>
+                <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">Escolha um template</h2>
+                <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">Comece com um formulário pré-configurado</p>
+              </div>
+              <button
+                onClick={() => setShowTemplateModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="overflow-y-auto p-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {templates ? templates.map((template: ApplicationTemplate) => (
+                <button
+                  key={template.id}
+                  onClick={() => createFromTemplateMutation.mutate(template.id)}
+                  disabled={createFromTemplateMutation.isPending}
+                  className={cn(
+                    'text-left p-4 rounded-xl cursor-pointer transition-all',
+                    'border border-[var(--border-hairline)] hover:border-[var(--accent)]',
+                    'hover:bg-[var(--bg-hover)] group',
+                  )}
+                  style={{ background: 'var(--bg-base)' }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-white text-[18px] font-bold"
+                    style={{ background: template.thumbnail_color }}
+                  >
+                    ◉
+                  </div>
+                  <p className="text-[13px] font-semibold text-[var(--text-primary)] mb-1 group-hover:text-[var(--accent)] transition-colors">
+                    {template.name}
+                  </p>
+                  {template.description && (
+                    <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed">
+                      {template.description}
+                    </p>
+                  )}
+                </button>
+              )) : (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-24 rounded-xl animate-pulse" style={{ background: 'var(--border-hairline)' }} />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
