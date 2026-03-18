@@ -224,6 +224,7 @@ function WelcomeScreen({
               opacity: 0.75,
               margin: 0,
               lineHeight: 1.6,
+              whiteSpace: 'pre-wrap',
             }}
           >
             {field.description}
@@ -859,6 +860,7 @@ function QuestionScreen({
               opacity: 0.7,
               margin: 0,
               lineHeight: 1.6,
+              whiteSpace: 'pre-wrap',
             }}
           >
             {field.description}

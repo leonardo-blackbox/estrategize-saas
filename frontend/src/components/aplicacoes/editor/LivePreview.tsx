@@ -30,7 +30,7 @@ function WelcomePreview({ field, theme }: FieldPreviewProps) {
         {description && (
           <p
             className="text-[15px] opacity-70 leading-relaxed"
-            style={{ color: theme.questionColor, fontFamily: theme.fontFamily }}
+            style={{ color: theme.questionColor, fontFamily: theme.fontFamily, whiteSpace: 'pre-wrap' }}
           >
             {description}
           </p>
@@ -63,7 +63,7 @@ function MessagePreview({ field, theme }: FieldPreviewProps) {
       {field.description && (
         <p
           className="text-[14px] opacity-70 leading-relaxed"
-          style={{ color: theme.questionColor, fontFamily: theme.fontFamily }}
+          style={{ color: theme.questionColor, fontFamily: theme.fontFamily, whiteSpace: 'pre-wrap' }}
         >
           {field.description}
         </p>
@@ -99,7 +99,7 @@ function InputFieldPreview({ field, theme, inputPlaceholder, type = 'text' }: Fi
         {field.description && (
           <p
             className="text-[13px] opacity-60"
-            style={{ color: theme.questionColor, fontFamily: theme.fontFamily }}
+            style={{ color: theme.questionColor, fontFamily: theme.fontFamily, whiteSpace: 'pre-wrap' }}
           >
             {field.description}
           </p>
@@ -147,7 +147,7 @@ function LongTextPreview({ field, theme }: FieldPreviewProps) {
           {field.required && <span className="ml-1 text-[#ff453a] text-[14px]">*</span>}
         </label>
         {field.description && (
-          <p className="text-[13px] opacity-60" style={{ color: theme.questionColor, fontFamily: theme.fontFamily }}>
+          <p className="text-[13px] opacity-60" style={{ color: theme.questionColor, fontFamily: theme.fontFamily, whiteSpace: 'pre-wrap' }}>
             {field.description}
           </p>
         )}
@@ -184,7 +184,7 @@ function MultipleChoicePreview({ field, theme }: FieldPreviewProps) {
           {field.required && <span className="ml-1 text-[#ff453a] text-[14px]">*</span>}
         </label>
         {field.description && (
-          <p className="text-[13px] opacity-60" style={{ color: theme.questionColor, fontFamily: theme.fontFamily }}>
+          <p className="text-[13px] opacity-60" style={{ color: theme.questionColor, fontFamily: theme.fontFamily, whiteSpace: 'pre-wrap' }}>
             {field.description}
           </p>
         )}
