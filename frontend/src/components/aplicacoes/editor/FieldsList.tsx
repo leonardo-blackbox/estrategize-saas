@@ -26,16 +26,16 @@ import { FieldTypeSelector } from './FieldTypeSelector.tsx';
 // ─────────────────────────────────────────────
 
 const FIELD_TYPE_META: Record<FieldType, { label: string; icon: string }> = {
-  welcome: { label: 'Boas-vindas', icon: '👋' },
-  message: { label: 'Mensagem', icon: '💬' },
+  welcome: { label: 'Boas-vindas', icon: 'Hi' },
+  message: { label: 'Mensagem', icon: '¶' },
   short_text: { label: 'Texto Curto', icon: 'Aa' },
   long_text: { label: 'Texto Longo', icon: '☰' },
-  name: { label: 'Nome', icon: '👤' },
+  name: { label: 'Nome', icon: 'Ab' },
   email: { label: 'E-mail', icon: '@' },
-  phone: { label: 'Telefone', icon: '📞' },
+  phone: { label: 'Telefone', icon: 'Tel' },
   multiple_choice: { label: 'Múltipla', icon: '◉' },
   number: { label: 'Número', icon: '#' },
-  date: { label: 'Data', icon: '📅' },
+  date: { label: 'Data', icon: 'Dt' },
   thank_you: { label: 'Agradecimento', icon: '✓' },
 };
 

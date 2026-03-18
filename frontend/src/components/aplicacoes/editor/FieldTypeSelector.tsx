@@ -8,17 +8,17 @@ import { cn } from '../../../lib/cn.ts';
 // ─────────────────────────────────────────────
 
 const FIELD_TYPE_META: Record<FieldType, { label: string; icon: string; category: 'basic' | 'choice' | 'structure' }> = {
-  welcome:         { label: 'Boas-vindas',   icon: '👋', category: 'structure' },
-  message:         { label: 'Mensagem',       icon: '💬', category: 'structure' },
-  short_text:      { label: 'Texto Curto',    icon: 'Aa', category: 'basic' },
-  long_text:       { label: 'Texto Longo',    icon: '☰',  category: 'basic' },
-  name:            { label: 'Nome',           icon: '👤', category: 'basic' },
-  email:           { label: 'E-mail',         icon: '@',  category: 'basic' },
-  phone:           { label: 'Telefone',       icon: '📞', category: 'basic' },
-  multiple_choice: { label: 'Múltipla',       icon: '◉',  category: 'choice' },
-  number:          { label: 'Número',         icon: '#',  category: 'basic' },
-  date:            { label: 'Data',           icon: '📅', category: 'basic' },
-  thank_you:       { label: 'Agradecimento',  icon: '✓',  category: 'structure' },
+  welcome:         { label: 'Boas-vindas',   icon: 'Hi',  category: 'structure' },
+  message:         { label: 'Mensagem',       icon: '¶',   category: 'structure' },
+  short_text:      { label: 'Texto Curto',    icon: 'Aa',  category: 'basic' },
+  long_text:       { label: 'Texto Longo',    icon: '☰',   category: 'basic' },
+  name:            { label: 'Nome',           icon: 'Ab',  category: 'basic' },
+  email:           { label: 'E-mail',         icon: '@',   category: 'basic' },
+  phone:           { label: 'Telefone',       icon: 'Tel', category: 'basic' },
+  multiple_choice: { label: 'Múltipla',       icon: '◉',   category: 'choice' },
+  number:          { label: 'Número',         icon: '#',   category: 'basic' },
+  date:            { label: 'Data',           icon: 'Dt',  category: 'basic' },
+  thank_you:       { label: 'Agradecimento',  icon: '✓',   category: 'structure' },
 };
 
 const SECTIONS: { title: string; types: FieldType[] }[] = [

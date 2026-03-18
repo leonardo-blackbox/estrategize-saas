@@ -564,6 +564,14 @@ function MultipleChoiceSettings({ field, index }: FieldSettingsProps) {
         />
       </OptionRow>
 
+      <OptionRow label="Descrição (opcional)">
+        <AutoTextarea
+          value={field.description ?? ''}
+          onValueChange={(v) => updateField(index, { description: v || undefined })}
+          placeholder="Instrução ou detalhe adicional..."
+        />
+      </OptionRow>
+
       <OptionRow label="Opções">
         <div className="flex flex-col gap-1.5">
           {options.map((opt) => (
@@ -792,6 +800,16 @@ function GenericFieldSettings({ field, index }: FieldSettingsProps) {
           />
         </>
       )}
+
+      <OptionRow label="Texto do botão">
+        <TextInput
+          value={(opts.buttonLabel as string) ?? ''}
+          onChange={(v) =>
+            updateField(index, { options: { ...opts, buttonLabel: v || undefined } })
+          }
+          placeholder="OK"
+        />
+      </OptionRow>
 
       <div
         className="flex items-center justify-between px-3 py-2.5 rounded-lg"

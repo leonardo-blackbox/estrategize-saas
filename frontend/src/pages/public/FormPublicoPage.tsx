@@ -746,6 +746,7 @@ function QuestionScreen({
   validationError,
   onClearError,
   isTouchDevice,
+  buttonLabel,
 }: {
   field: ApplicationField;
   questionNumber: number;
@@ -762,6 +763,7 @@ function QuestionScreen({
   validationError?: string | null;
   onClearError?: () => void;
   isTouchDevice?: boolean;
+  buttonLabel?: string;
 }) {
   const xOffset = direction === 'forward' ? 40 : -40;
   const isMessage = field.type === 'message';
@@ -957,7 +959,7 @@ function QuestionScreen({
               'Enviar'
             ) : (
               <>
-                OK <span style={{ fontFamily: 'monospace', opacity: 0.8 }}>↵</span>
+                {buttonLabel || 'OK'} <span style={{ fontFamily: 'monospace', opacity: 0.8 }}>↵</span>
               </>
             )}
           </motion.button>
@@ -1445,6 +1447,7 @@ export default function FormPublicoPage() {
         validationError={validationError}
         onClearError={() => setValidationError(null)}
         isTouchDevice={isTouchDevice}
+        buttonLabel={(currentField.options as Record<string, unknown>)?.buttonLabel as string | undefined}
       />
     );
   };
