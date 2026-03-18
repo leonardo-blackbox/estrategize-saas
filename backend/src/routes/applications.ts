@@ -59,7 +59,8 @@ const updateSchema = z.object({
 });
 
 const fieldItemSchema = z.object({
-  id: z.string().uuid().optional().nullable(),
+  // null id = new field, will get a new UUID
+  id: z.preprocess((v) => (v == null ? undefined : v), z.string().uuid().optional()),
   type: z.enum([
     'welcome',
     'message',
@@ -73,12 +74,12 @@ const fieldItemSchema = z.object({
     'date',
     'thank_you',
   ] as [FieldType, ...FieldType[]]),
-  // Accept null (Supabase returns null for unset columns) — coerce to empty string/undefined
-  title: z.string().nullish().transform((v) => v ?? ''),
-  description: z.string().nullish().transform((v) => v ?? undefined),
-  required: z.boolean().default(false),
-  options: z.unknown().optional().nullable(),
-  conditional_logic: z.unknown().optional().nullable(),
+  // Supabase returns null for unset columns — preprocess to safe defaults
+  title: z.preprocess((v) => (v == null ? '' : v), z.string()),
+  description: z.preprocess((v) => (v == null ? undefined : v), z.string().optional()),
+  required: z.preprocess((v) => (v == null ? false : v), z.boolean()),
+  options: z.unknown().optional(),
+  conditional_logic: z.unknown().optional(),
 });
 
 const bulkFieldsSchema = z.object({
@@ -432,7 +433,9 @@ router.post('/:id/duplicate', async (req: AuthenticatedRequest, res) => {
 router.put('/:id/fields', async (req: AuthenticatedRequest, res) => {
   const parsed = bulkFieldsSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.issues[0].message });
+    const issue = parsed.error.issues[0];
+    const path = issue.path.length ? ` [${issue.path.join('.')}]` : '';
+    res.status(400).json({ error: `${issue.message}${path}` });
     return;
   }
 
