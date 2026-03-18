@@ -59,7 +59,7 @@ const updateSchema = z.object({
 });
 
 const fieldItemSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().uuid().optional().nullable(),
   type: z.enum([
     'welcome',
     'message',
@@ -73,11 +73,12 @@ const fieldItemSchema = z.object({
     'date',
     'thank_you',
   ] as [FieldType, ...FieldType[]]),
-  title: z.string().default(''),
-  description: z.string().optional(),
+  // Accept null (Supabase returns null for unset columns) — coerce to empty string/undefined
+  title: z.string().nullish().transform((v) => v ?? ''),
+  description: z.string().nullish().transform((v) => v ?? undefined),
   required: z.boolean().default(false),
-  options: z.unknown().optional(),
-  conditional_logic: z.record(z.string(), z.unknown()).optional(),
+  options: z.unknown().optional().nullable(),
+  conditional_logic: z.unknown().optional().nullable(),
 });
 
 const bulkFieldsSchema = z.object({
