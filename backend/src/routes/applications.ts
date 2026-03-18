@@ -431,6 +431,16 @@ router.post('/:id/duplicate', async (req: AuthenticatedRequest, res) => {
 
 // PUT /api/applications/:id/fields  — bulk replace all fields
 router.put('/:id/fields', async (req: AuthenticatedRequest, res) => {
+  // Normalize nulls from Supabase/frontend before Zod sees them
+  if (Array.isArray(req.body?.fields)) {
+    req.body.fields = (req.body.fields as Record<string, unknown>[]).map((f) => ({
+      ...f,
+      title: f.title ?? '',
+      description: f.description ?? undefined,
+      required: f.required ?? false,
+    }));
+  }
+
   const parsed = bulkFieldsSchema.safeParse(req.body);
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
