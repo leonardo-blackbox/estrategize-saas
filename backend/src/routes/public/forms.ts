@@ -67,7 +67,7 @@ router.post('/:slug/events', async (req, res) => {
   if (!supabaseAdmin) return;
 
   const { event, session_token } = req.body as { event: string; session_token?: string };
-  if (!['view', 'start'].includes(event)) return;
+  if (!['view', 'start', 'submit'].includes(event)) return;
 
   try {
     const { data: app } = await supabaseAdmin
@@ -89,8 +89,13 @@ router.post('/:slug/events', async (req, res) => {
     const settings = app.settings as Record<string, unknown> | null;
     const tracking = settings?.tracking as Record<string, unknown> | undefined;
     if (tracking?.metaPixelActive && tracking?.metaPixelId) {
-      const metaEvent = event === 'view' ? 'PageView' : 'Lead';
-      fireServerMetaPixel(tracking.metaPixelId as string, metaEvent);
+      const metaEventMap: Record<string, string> = {
+        view: 'PageView',
+        start: 'Lead',
+        submit: 'CompleteRegistration',
+      };
+      const metaEvent = metaEventMap[event];
+      if (metaEvent) fireServerMetaPixel(tracking.metaPixelId as string, metaEvent);
     }
   } catch (err) {
     console.warn('[forms/events] error:', err);

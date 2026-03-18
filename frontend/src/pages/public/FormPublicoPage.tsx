@@ -1405,6 +1405,7 @@ export default function FormPublicoPage() {
           settings={settings}
           onStart={() => {
             setDirection('forward');
+            trackFormStart();
             const firstNonWelcome = fields.findIndex(
               (f, i) => i > welcomeIndex && f.type !== 'welcome',
             );
