@@ -1410,6 +1410,14 @@ export default function FormPublicoPage() {
           onStart={() => {
             setDirection('forward');
             trackFormStart();
+            // Fire backend start event (was missing — only pixel was firing before)
+            if (slug) {
+              fetch(`${API_BASE}/api/forms/${slug}/events`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ event: 'start', session_token: sessionToken.current }),
+              }).catch(() => { /* ignore */ });
+            }
             const firstNonWelcome = fields.findIndex(
               (f, i) => i > welcomeIndex && f.type !== 'welcome',
             );
@@ -1454,17 +1462,25 @@ export default function FormPublicoPage() {
     );
   };
 
-  // Auto-start if no welcome field
+  // Auto-start if no welcome field — fire start event immediately
   useEffect(() => {
     if (!isLoading && data && !welcomeField && currentIndex === -1) {
       const first = fields.findIndex(
         (f) => f.type !== 'welcome' && f.type !== 'thank_you',
       );
-      // Only auto-start when there's a renderable field; otherwise stay at -1
-      // so renderContent can show an empty-state message
-      if (first >= 0) setCurrentIndex(first);
+      if (first >= 0) {
+        trackFormStart();
+        if (slug) {
+          fetch(`${API_BASE}/api/forms/${slug}/events`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event: 'start', session_token: sessionToken.current }),
+          }).catch(() => { /* ignore */ });
+        }
+        setCurrentIndex(first);
+      }
     }
-  }, [isLoading, data, welcomeField, currentIndex, fields]);
+  }, [isLoading, data, welcomeField, currentIndex, fields]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const bgStyle: React.CSSProperties = {
     position: 'fixed',

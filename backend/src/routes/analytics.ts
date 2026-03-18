@@ -69,35 +69,4 @@ router.get('/:id/analytics', requireAuth, async (req: AuthenticatedRequest, res)
   });
 });
 
-// POST /api/forms/:slug/events (public, fire-and-forget)
-router.post('/forms-events/:slug', async (req, res) => {
-  // Respond immediately, process async
-  res.json({ ok: true });
-
-  if (!supabaseAdmin) return;
-
-  const { event, session_token } = req.body as { event: string; session_token?: string };
-  const validEvents = ['view', 'start', 'submit'];
-  if (!validEvents.includes(event)) return;
-
-  try {
-    const { data: app } = await supabaseAdmin
-      .from('applications')
-      .select('id')
-      .eq('slug', req.params.slug)
-      .eq('status', 'published')
-      .single();
-
-    if (!app) return;
-
-    await supabaseAdmin.from('application_events').insert({
-      application_id: app.id,
-      event_type: event,
-      session_token: session_token || null,
-    });
-  } catch (err) {
-    console.error('[analytics] Event insert failed:', err);
-  }
-});
-
 export default router;
