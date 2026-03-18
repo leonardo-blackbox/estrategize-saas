@@ -74,6 +74,7 @@ function InlineTitle({ value, onSave }: InlineTitleProps) {
 // ─── SaveStatusIndicator ─────────────────────────────────────────────────────
 function SaveStatusIndicator() {
   const saveStatus = useEditorStore((s) => s.saveStatus);
+  const saveError = useEditorStore((s) => s.saveError);
   const forceSave = useEditorStore((s) => s.forceSave);
 
   return (
@@ -107,11 +108,17 @@ function SaveStatusIndicator() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="text-[12px] text-[#ff453a] flex items-center gap-1"
+          className="text-[12px] text-[#ff453a] flex items-center gap-1.5"
+          title={saveError ?? undefined}
         >
           <button onClick={() => void forceSave()} className="underline hover:no-underline">
             Erro — tentar novamente ↺
           </button>
+          {saveError && (
+            <span className="opacity-70 max-w-[200px] truncate" title={saveError}>
+              ({saveError})
+            </span>
+          )}
         </motion.span>
       )}
     </AnimatePresence>

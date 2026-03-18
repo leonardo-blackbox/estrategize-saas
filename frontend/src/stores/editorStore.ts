@@ -76,6 +76,7 @@ export interface EditorState {
   previewDevice: 'desktop' | 'mobile';
   isDirty: boolean;
   saveStatus: 'idle' | 'saving' | 'saved' | 'error';
+  saveError: string | null;
   saveTimer: ReturnType<typeof setTimeout> | null;
 
   // Load
@@ -118,6 +119,7 @@ const INITIAL_STATE = {
   previewDevice: 'desktop' as const,
   isDirty: false,
   saveStatus: 'idle' as const,
+  saveError: null,
   saveTimer: null,
 };
 
@@ -324,8 +326,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       setTimeout(() => {
         set((state) => (state.saveStatus === 'saved' ? { saveStatus: 'idle' } : {}));
       }, 3000);
-    } catch {
-      set({ saveStatus: 'error' });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[EditorStore] _performSave failed:', msg);
+      set({ saveStatus: 'error', saveError: msg });
     }
   },
 
