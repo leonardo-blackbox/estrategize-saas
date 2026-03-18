@@ -35,3 +35,4 @@ Thumbs.db
 
 # Legacy installer subfolder (AIOS installer artifact — não faz parte do projeto)
 estrategize-saas/
+.vercel

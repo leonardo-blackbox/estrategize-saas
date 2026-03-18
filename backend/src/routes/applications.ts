@@ -605,4 +605,61 @@ router.get('/:id/responses/export', async (req: AuthenticatedRequest, res) => {
   }
 });
 
+// DELETE /api/applications/:id/responses/:responseId
+router.delete('/:id/responses/:responseId', async (req: AuthenticatedRequest, res) => {
+  try {
+    if (!supabaseAdmin) {
+      res.status(503).json({ error: 'Database unavailable' });
+      return;
+    }
+
+    const id = paramId(req);
+    const existing = await getOwnedApplication(req.userId!, id);
+    if (!existing) {
+      res.status(404).json({ error: 'Aplicação não encontrada' });
+      return;
+    }
+
+    const responseId = Array.isArray(req.params.responseId)
+      ? req.params.responseId[0]
+      : req.params.responseId;
+
+    // Verify response belongs to this application
+    const { data: responseRow, error: fetchError } = await supabaseAdmin
+      .from('application_responses')
+      .select('id')
+      .eq('id', responseId)
+      .eq('application_id', id)
+      .single();
+
+    if (fetchError || !responseRow) {
+      res.status(404).json({ error: 'Resposta não encontrada' });
+      return;
+    }
+
+    // Delete answers first (in case no cascade)
+    await supabaseAdmin
+      .from('application_response_answers')
+      .delete()
+      .eq('response_id', responseId);
+
+    // Delete response
+    const { error } = await supabaseAdmin
+      .from('application_responses')
+      .delete()
+      .eq('id', responseId)
+      .eq('application_id', id);
+
+    if (error) {
+      res.status(500).json({ error: error.message });
+      return;
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    res.status(500).json({ error: message });
+  }
+});
+
 export default router;

@@ -425,3 +425,7 @@ export async function deleteApplicationAsset(
 ): Promise<void> {
   await client.delete(`/api/applications/${applicationId}/assets/${assetType}`);
 }
+
+export async function deleteResponse(appId: string, responseId: string): Promise<void> {
+  await client.delete(`/api/applications/${appId}/responses/${responseId}`).json<void>();
+}
