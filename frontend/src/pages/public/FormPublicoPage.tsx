@@ -1527,6 +1527,28 @@ export default function FormPublicoPage() {
             MODO PRÉVIA — Rascunho não publicado. As respostas não serão salvas.
           </div>
         )}
+        {/* Logo overlay — visible on question screens (welcome already has it inline) */}
+        {theme.logoUrl &&
+          !submitted &&
+          currentIndex >= 0 &&
+          currentField?.type !== 'welcome' &&
+          currentField?.type !== 'thank_you' && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 20,
+                left: 24,
+                zIndex: 50,
+                pointerEvents: 'none',
+              }}
+            >
+              <img
+                src={theme.logoUrl}
+                alt="Logo"
+                style={{ height: 32, objectFit: 'contain', maxWidth: 140 }}
+              />
+            </div>
+          )}
         <ProgressBar
           progress={progress}
           buttonColor={theme.buttonColor}

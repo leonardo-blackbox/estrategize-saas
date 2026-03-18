@@ -20,6 +20,13 @@ function WelcomePreview({ field, theme }: FieldPreviewProps) {
 
   return (
     <div className="flex flex-col items-center justify-center h-full gap-6 px-8 text-center">
+      {theme.logoUrl && (
+        <img
+          src={theme.logoUrl}
+          alt="Logo"
+          style={{ height: 40, objectFit: 'contain', maxWidth: 160 }}
+        />
+      )}
       <div className="flex flex-col gap-3">
         <h1
           className="text-[28px] font-bold leading-tight"
@@ -409,6 +416,27 @@ export function LivePreviewPanel() {
                   }}
                 />
               )}
+
+              {/* Logo overlay — visible on non-welcome screens */}
+              {themeConfig.logoUrl &&
+                currentField?.type !== 'welcome' &&
+                currentField?.type !== 'thank_you' && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 16,
+                      left: 20,
+                      zIndex: 5,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <img
+                      src={themeConfig.logoUrl}
+                      alt="Logo"
+                      style={{ height: 24, objectFit: 'contain', maxWidth: 100 }}
+                    />
+                  </div>
+                )}
 
               {/* Field content */}
               <div style={{ height: '100%', pointerEvents: 'none', overflow: 'hidden' }}>
