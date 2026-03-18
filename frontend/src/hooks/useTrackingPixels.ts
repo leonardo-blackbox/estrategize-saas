@@ -19,15 +19,45 @@ interface PixelEvents {
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
+    _fbq?: unknown;
     gtag?: (...args: unknown[]) => void;
     ttq?: { load: (id: string) => void; page: () => void; track: (event: string, data?: object) => void };
     dataLayer?: unknown[];
   }
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const DEBUG = true; // set to false to mute pixel logs in production
+
+function log(...args: unknown[]) {
+  if (DEBUG) console.debug('[pixel]', ...args);
+}
+
+/** Fire a Meta noscript image pixel (works even when fbevents.js is blocked). */
+function fireMetaImgPixel(pixelId: string, event: string) {
+  try {
+    const url =
+      `https://www.facebook.com/tr?id=${pixelId}&ev=${event}&noscript=1`;
+    const img = new Image(1, 1);
+    img.src = url;
+    log(`img pixel → ${event} (id: ${pixelId})`);
+  } catch (err) {
+    console.warn('[pixel] img pixel failed:', err);
+  }
+}
+
+// ─── Meta Pixel ───────────────────────────────────────────────────────────────
+
 function injectMetaPixel(pixelId: string) {
   try {
-    if (window.fbq) return;
+    log('injecting meta pixel', pixelId);
+    if (window.fbq) {
+      log('fbq already present, re-initializing pixel id');
+      // Re-init in case a different pixel was loaded
+      window.fbq('init', pixelId);
+      return;
+    }
     const script = document.createElement('script');
     script.innerHTML = `
       !function(f,b,e,v,n,t,s){
@@ -39,10 +69,26 @@ function injectMetaPixel(pixelId: string) {
       fbq('init', '${pixelId}');
     `;
     document.head.appendChild(script);
+    log('meta pixel script injected');
   } catch (err) {
-    console.warn('[tracking] Meta Pixel init failed:', err);
+    console.warn('[pixel] Meta Pixel init failed:', err);
   }
 }
+
+function fireMetaEvent(event: string, data?: Record<string, unknown>) {
+  try {
+    if (window.fbq) {
+      window.fbq('track', event, data);
+      log(`fbq → ${event}`, data ?? '');
+    } else {
+      log(`fbq not ready for ${event}, fbq =`, window.fbq);
+    }
+  } catch (err) {
+    console.warn('[pixel] Meta event failed:', event, err);
+  }
+}
+
+// ─── GA4 ──────────────────────────────────────────────────────────────────────
 
 function injectGA4(measurementId: string) {
   try {
@@ -60,9 +106,11 @@ function injectGA4(measurementId: string) {
     `;
     document.head.appendChild(s2);
   } catch (err) {
-    console.warn('[tracking] GA4 init failed:', err);
+    console.warn('[pixel] GA4 init failed:', err);
   }
 }
+
+// ─── TikTok Pixel ─────────────────────────────────────────────────────────────
 
 function injectTikTokPixel(pixelId: string) {
   try {
@@ -84,23 +132,43 @@ function injectTikTokPixel(pixelId: string) {
     `;
     document.head.appendChild(script);
   } catch (err) {
-    console.warn('[tracking] TikTok Pixel init failed:', err);
+    console.warn('[pixel] TikTok Pixel init failed:', err);
   }
 }
 
+// ─── Hook ─────────────────────────────────────────────────────────────────────
+
 export function useTrackingPixels(tracking: TrackingConfig | undefined): PixelEvents {
   const initialized = useRef(false);
+  const pixelIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (!tracking || initialized.current) return;
+    if (!tracking) {
+      log('no tracking config yet');
+      return;
+    }
+    log('tracking config received:', tracking);
+
+    if (initialized.current) {
+      log('already initialized, skipping');
+      return;
+    }
     initialized.current = true;
 
     if (tracking.metaPixelActive && tracking.metaPixelId) {
+      pixelIdRef.current = tracking.metaPixelId;
       injectMetaPixel(tracking.metaPixelId);
+    } else {
+      log('meta pixel inactive or no id:', {
+        active: tracking.metaPixelActive,
+        id: tracking.metaPixelId,
+      });
     }
+
     if (tracking.ga4Active && tracking.ga4MeasurementId) {
       injectGA4(tracking.ga4MeasurementId);
     }
+
     if (tracking.tiktokPixelActive && tracking.tiktokPixelId) {
       injectTikTokPixel(tracking.tiktokPixelId);
     }
@@ -108,17 +176,34 @@ export function useTrackingPixels(tracking: TrackingConfig | undefined): PixelEv
 
   return {
     trackFormView: () => {
-      try { window.fbq?.('track', 'PageView'); } catch { /* ignore */ }
+      log('trackFormView called, fbq =', !!window.fbq);
+      const metaId = pixelIdRef.current;
+
+      // Primary: fbq SDK
+      fireMetaEvent('PageView');
+      // Fallback: img pixel (bypasses SDK load issues)
+      if (metaId) fireMetaImgPixel(metaId, 'PageView');
+
       try { window.gtag?.('event', 'page_view'); } catch { /* ignore */ }
       try { window.ttq?.track('ViewContent'); } catch { /* ignore */ }
     },
     trackFormStart: () => {
-      try { window.fbq?.('track', 'Lead', { content_name: 'form_start' }); } catch { /* ignore */ }
+      log('trackFormStart called, fbq =', !!window.fbq);
+      const metaId = pixelIdRef.current;
+
+      fireMetaEvent('Lead', { content_name: 'form_start' });
+      if (metaId) fireMetaImgPixel(metaId, 'Lead');
+
       try { window.gtag?.('event', 'generate_lead', { form_event: 'start' }); } catch { /* ignore */ }
       try { window.ttq?.track('ClickButton', { content_name: 'form_start' }); } catch { /* ignore */ }
     },
     trackFormSubmit: () => {
-      try { window.fbq?.('track', 'CompleteRegistration', { status: true }); } catch { /* ignore */ }
+      log('trackFormSubmit called, fbq =', !!window.fbq);
+      const metaId = pixelIdRef.current;
+
+      fireMetaEvent('CompleteRegistration', { status: true });
+      if (metaId) fireMetaImgPixel(metaId, 'CompleteRegistration');
+
       try { window.gtag?.('event', 'sign_up', { method: 'form' }); } catch { /* ignore */ }
       try { window.ttq?.track('CompleteRegistration'); } catch { /* ignore */ }
     },

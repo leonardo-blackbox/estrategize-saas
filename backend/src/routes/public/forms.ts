@@ -1,9 +1,34 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import https from 'https';
 import rateLimit from 'express-rate-limit';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { notifyNewResponse } from '../../services/emailNotificationService.js';
 import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
+
+// ─── Server-side Meta Pixel ───────────────────────────────────────────────────
+
+/**
+ * Fires a Meta noscript pixel from the server.
+ * This is not blockable by browser ad blockers.
+ * Uses the basic pixel endpoint (no access token required).
+ * Events appear in Events Manager with limited attribution data.
+ */
+function fireServerMetaPixel(pixelId: string, event: string): void {
+  const path = `/tr?id=${encodeURIComponent(pixelId)}&ev=${encodeURIComponent(event)}&noscript=1`;
+  const options = {
+    hostname: 'www.facebook.com',
+    path,
+    method: 'GET',
+    timeout: 3000,
+  };
+  const req = https.request(options);
+  req.on('error', (err) => {
+    console.warn('[pixel:server] Meta pixel fire failed:', err.message);
+  });
+  req.end();
+  console.debug(`[pixel:server] fired → ${event} (pixel: ${pixelId})`);
+}
 
 const router = Router();
 
@@ -47,7 +72,7 @@ router.post('/:slug/events', async (req, res) => {
   try {
     const { data: app } = await supabaseAdmin
       .from('applications')
-      .select('id')
+      .select('id, settings')
       .eq('slug', req.params.slug)
       .eq('status', 'published')
       .single();
@@ -59,7 +84,17 @@ router.post('/:slug/events', async (req, res) => {
       event_type: event,
       session_token: session_token || null,
     });
-  } catch { /* ignore */ }
+
+    // Server-side Meta Pixel (not blockable by ad blockers)
+    const settings = app.settings as Record<string, unknown> | null;
+    const tracking = settings?.tracking as Record<string, unknown> | undefined;
+    if (tracking?.metaPixelActive && tracking?.metaPixelId) {
+      const metaEvent = event === 'view' ? 'PageView' : 'Lead';
+      fireServerMetaPixel(tracking.metaPixelId as string, metaEvent);
+    }
+  } catch (err) {
+    console.warn('[forms/events] error:', err);
+  }
 });
 
 // GET /api/forms/:slug/preview — fetch draft form (owner only, for preview)
@@ -217,6 +252,17 @@ router.post('/:slug/responses', async (req, res) => {
     }
 
     res.status(201).json({ data: { response_id: response.id } });
+
+    // Server-side Meta Pixel — CompleteRegistration (not blockable by ad blockers)
+    ;(async () => {
+      try {
+        const settings = application.settings as Record<string, unknown> | null;
+        const tracking = settings?.tracking as Record<string, unknown> | undefined;
+        if (tracking?.metaPixelActive && tracking?.metaPixelId) {
+          fireServerMetaPixel(tracking.metaPixelId as string, 'CompleteRegistration');
+        }
+      } catch { /* non-critical */ }
+    })();
 
     // Trigger email notification (async, non-blocking)
     const answersToInsert = answers.map((a) => ({
