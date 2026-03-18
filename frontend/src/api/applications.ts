@@ -261,7 +261,7 @@ export async function fetchPublicFormPreview(
 
 export async function submitFormResponse(
   slug: string,
-  answers: Array<{ field_id: string; value: unknown }>,
+  answers: Array<{ field_id: string; field_type?: string; field_title?: string; value: unknown }>,
   metadata?: Record<string, string>,
 ): Promise<{ response_id: string }> {
   const res = await client

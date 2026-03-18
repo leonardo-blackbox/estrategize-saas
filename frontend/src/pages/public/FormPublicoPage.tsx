@@ -1274,7 +1274,7 @@ export default function FormPublicoPage() {
       // Submit
       const answersArr = collectibleFields
         .filter((f) => answers[f.id] !== undefined)
-        .map((f) => ({ field_id: f.id, value: answers[f.id] }));
+        .map((f) => ({ field_id: f.id, field_type: f.type, field_title: f.title, value: answers[f.id] }));
       const utm = captureUTM(slug!);
       const metadata: Record<string, string> = {};
       if (Object.keys(utm).length > 0) {
