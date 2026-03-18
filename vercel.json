@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm --prefix frontend ci && npm --prefix frontend run build",
+  "installCommand": "echo skip",
+  "outputDirectory": "frontend/dist",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
