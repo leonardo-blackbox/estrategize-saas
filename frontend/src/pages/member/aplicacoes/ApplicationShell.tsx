@@ -338,27 +338,25 @@ export function ApplicationShell() {
             </div>
           )}
 
-          {/* Ver (preview) */}
+          {/* Ver (preview / published) */}
           {application && (
             <a
-              href={publicUrl}
+              href={status === 'published' ? publicUrl : `${publicUrl}?preview=1`}
               target="_blank"
               rel="noopener noreferrer"
-              title={status !== 'published' ? 'Publique o formulário para ver a versão pública' : 'Ver formulário público'}
+              title={status === 'published' ? 'Ver formulário público' : 'Prévia do rascunho'}
               className={cn(
                 'inline-flex items-center gap-1.5 px-2.5 h-[30px] rounded-md text-[12.5px] font-medium cursor-pointer',
                 'border transition-all duration-150 active:scale-95',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
-                status === 'published'
-                  ? 'border-[var(--border-hairline)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] hover:border-[var(--text-tertiary)]'
-                  : 'border-[var(--border-hairline)] text-[var(--text-tertiary)] opacity-60 pointer-events-none',
+                'border-[var(--border-hairline)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] hover:border-[var(--text-tertiary)]',
               )}
             >
               <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                 <path d="M1 7s2-4.5 6-4.5S13 7 13 7s-2 4.5-6 4.5S1 7 1 7z" stroke="currentColor" strokeWidth="1.4" fill="none" />
                 <circle cx="7" cy="7" r="1.8" stroke="currentColor" strokeWidth="1.4" fill="none" />
               </svg>
-              Ver
+              {status === 'published' ? 'Ver' : 'Prévia'}
             </a>
           )}
 

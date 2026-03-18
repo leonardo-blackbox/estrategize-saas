@@ -167,6 +167,10 @@ interface PublicFormResponse {
   fields: ApplicationField[];
 }
 
+interface PublicFormResponseWrapper {
+  data: PublicFormResponse;
+}
+
 interface SubmitResponseResult {
   response_id: string;
 }
@@ -243,9 +247,16 @@ export async function exportResponses(id: string): Promise<ResponseWithAnswers[]
 
 export async function fetchPublicForm(
   slug: string,
-): Promise<{ application: Application; fields: ApplicationField[] }> {
-  const res = await client.get(`/api/forms/${slug}`).json<PublicFormResponse>();
-  return res;
+): Promise<{ application: Application; fields: ApplicationField[]; isPreview?: boolean }> {
+  const res = await client.get(`/api/forms/${slug}`).json<PublicFormResponseWrapper>();
+  return res.data;
+}
+
+export async function fetchPublicFormPreview(
+  slug: string,
+): Promise<{ application: Application; fields: ApplicationField[]; isPreview: boolean }> {
+  const res = await client.get(`/api/forms/${slug}/preview`).json<PublicFormResponseWrapper>();
+  return { ...res.data, isPreview: true };
 }
 
 export async function submitFormResponse(

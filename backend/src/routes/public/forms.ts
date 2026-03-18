@@ -3,6 +3,7 @@ import { z } from 'zod';
 import rateLimit from 'express-rate-limit';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { notifyNewResponse } from '../../services/emailNotificationService.js';
+import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 
 const router = Router();
 
@@ -61,7 +62,52 @@ router.post('/:slug/events', async (req, res) => {
   } catch { /* ignore */ }
 });
 
-// GET /public/forms/:slug  — fetch published form + fields
+// GET /api/forms/:slug/preview — fetch draft form (owner only, for preview)
+router.get('/:slug/preview', requireAuth, async (req: AuthenticatedRequest, res) => {
+  try {
+    if (!supabaseAdmin) {
+      res.status(503).json({ error: 'Database unavailable' });
+      return;
+    }
+
+    const { slug } = req.params;
+
+    const { data: application, error } = await supabaseAdmin
+      .from('applications')
+      .select('id, title, slug, status, theme_config, settings, response_count, created_at, user_id')
+      .eq('slug', slug)
+      .single();
+
+    if (error || !application) {
+      res.status(404).json({ error: 'Formulário não encontrado' });
+      return;
+    }
+
+    // Only the owner can preview a draft
+    if (application.user_id !== req.userId) {
+      res.status(403).json({ error: 'Acesso negado' });
+      return;
+    }
+
+    const { data: fields, error: fieldsError } = await supabaseAdmin
+      .from('application_fields')
+      .select('id, position, type, title, description, required, options, conditional_logic')
+      .eq('application_id', application.id)
+      .order('position', { ascending: true });
+
+    if (fieldsError) {
+      res.status(500).json({ error: fieldsError.message });
+      return;
+    }
+
+    res.json({ data: { application, fields: fields ?? [], isPreview: true } });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    res.status(500).json({ error: message });
+  }
+});
+
+// GET /api/forms/:slug  — fetch published form + fields
 router.get('/:slug', async (req, res) => {
   try {
     if (!supabaseAdmin) {

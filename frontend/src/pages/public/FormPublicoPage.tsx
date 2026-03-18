@@ -5,6 +5,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 import {
   fetchPublicForm,
+  fetchPublicFormPreview,
   submitFormResponse,
   applicationKeys,
   type ApplicationField,
@@ -1114,10 +1115,14 @@ function ErrorScreen({ message }: { message: string }) {
 // Main Page
 // ─────────────────────────────────────────────
 
+const API_BASE = import.meta.env.VITE_API_URL ?? '';
+
 export default function FormPublicoPage() {
   const { slug } = useParams<{ slug: string }>();
 
-  const isEmbedMode = new URLSearchParams(window.location.search).get('embed') === '1';
+  const searchParams = new URLSearchParams(window.location.search);
+  const isEmbedMode = searchParams.get('embed') === '1';
+  const isPreviewMode = searchParams.get('preview') === '1';
   const [validationError, setValidationError] = useState<string | null>(null);
   const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
   const viewportHeight = useVisualViewport();
@@ -1136,8 +1141,9 @@ export default function FormPublicoPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: applicationKeys.public(slug ?? ''),
-    queryFn: () => fetchPublicForm(slug!),
+    queryKey: [...applicationKeys.public(slug ?? ''), isPreviewMode ? 'preview' : 'public'],
+    queryFn: () =>
+      isPreviewMode ? fetchPublicFormPreview(slug!) : fetchPublicForm(slug!),
     enabled: Boolean(slug),
     retry: 1,
   });
@@ -1180,7 +1186,7 @@ export default function FormPublicoPage() {
         setRedirectCountdown(3);
       }
       if (slug) {
-        fetch(`/api/forms/${slug}/events`, {
+        fetch(`${API_BASE}/api/forms/${slug}/events`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ event: 'submit', session_token: sessionToken.current }),
@@ -1233,7 +1239,7 @@ export default function FormPublicoPage() {
       const firstIdx = fields.findIndex((f) => f.type !== 'welcome');
       trackFormStart();
       if (slug) {
-        fetch(`/api/forms/${slug}/events`, {
+        fetch(`${API_BASE}/api/forms/${slug}/events`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ event: 'start', session_token: sessionToken.current }),
@@ -1343,7 +1349,7 @@ export default function FormPublicoPage() {
   useEffect(() => {
     if (data && slug) {
       trackFormView();
-      fetch(`/api/forms/${slug}/events`, {
+      fetch(`${API_BASE}/api/forms/${slug}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event: 'view', session_token: sessionToken.current }),
@@ -1383,7 +1389,13 @@ export default function FormPublicoPage() {
     if (currentIndex === -1) {
       // Before start: show welcome or loading
       if (!welcomeField) {
-        // No welcome field, auto-start
+        // No welcome field — check if there are renderable fields before showing loader
+        const hasRenderableFields = fields.some(
+          (f) => f.type !== 'welcome' && f.type !== 'thank_you',
+        );
+        if (!hasRenderableFields) {
+          return <ErrorScreen message="Este formulário ainda não tem perguntas configuradas." />;
+        }
         return <LoadingScreen />;
       }
       return (
@@ -1401,7 +1413,7 @@ export default function FormPublicoPage() {
         />
       );
     }
-    if (!currentField) return null;
+    if (!currentField) return <ErrorScreen message="Pergunta não encontrada." />;
     if (currentField.type === 'welcome') {
       return (
         <WelcomeScreen
@@ -1442,7 +1454,9 @@ export default function FormPublicoPage() {
       const first = fields.findIndex(
         (f) => f.type !== 'welcome' && f.type !== 'thank_you',
       );
-      setCurrentIndex(first >= 0 ? first : 0);
+      // Only auto-start when there's a renderable field; otherwise stay at -1
+      // so renderContent can show an empty-state message
+      if (first >= 0) setCurrentIndex(first);
     }
   }, [isLoading, data, welcomeField, currentIndex, fields]);
 
@@ -1483,10 +1497,34 @@ export default function FormPublicoPage() {
         )}
       </Helmet>
       <div ref={containerRef} style={bgStyle}>
+        {/* Preview mode banner */}
+        {isPreviewMode && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 200,
+            background: 'rgba(124,92,252,0.92)',
+            backdropFilter: 'blur(8px)',
+            padding: '8px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            fontSize: 12,
+            fontWeight: 600,
+            color: '#fff',
+            letterSpacing: '0.02em',
+          }}>
+            <span style={{ opacity: 0.8 }}>👁</span>
+            MODO PRÉVIA — Rascunho não publicado. As respostas não serão salvas.
+          </div>
+        )}
         <ProgressBar
           progress={progress}
           buttonColor={theme.buttonColor}
-          visible={settings.showProgressBar && !submitted && currentIndex >= 0}
+          visible={settings.showProgressBar && !submitted && currentIndex >= 0 && !isPreviewMode}
           currentQuestion={questionNumber > 0 ? questionNumber : undefined}
           totalQuestions={collectibleFields.length}
         />
