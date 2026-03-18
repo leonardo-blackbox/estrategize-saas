@@ -535,7 +535,7 @@ router.get('/:id/responses', async (req: AuthenticatedRequest, res) => {
       .select(
         `
         *,
-        application_response_answers (*)
+        answers:application_response_answers (field_id, field_type, field_title, value)
         `,
         { count: 'exact' },
       )
@@ -586,7 +586,7 @@ router.get('/:id/responses/export', async (req: AuthenticatedRequest, res) => {
       .select(
         `
         *,
-        application_response_answers (*)
+        answers:application_response_answers (field_id, field_type, field_title, value)
         `,
       )
       .eq('application_id', id)
