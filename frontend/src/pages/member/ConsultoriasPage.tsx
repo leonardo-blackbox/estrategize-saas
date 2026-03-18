@@ -47,9 +47,9 @@ type SortOption = 'recent' | 'priority' | 'progress' | 'alpha';
 type PhaseFilter = ConsultancyPhase | 'all';
 
 const PRIORITY_WEIGHT: Record<string, number> = {
-  critical: 0,
+  at_risk: 0,
   high: 1,
-  medium: 2,
+  normal: 2,
   low: 3,
 };
 
@@ -202,16 +202,16 @@ function ConsultancyCard({ consultancy: c, selected, onSelect, onArchive }: Card
             </div>
             <div className="flex flex-col items-end gap-1 shrink-0">
               <PhaseBadge phase={c.phase} />
-              {(c.priority === 'critical' || c.priority === 'high') && (
+              {(c.priority === 'at_risk' || c.priority === 'high') && (
                 <span
                   className={cn(
                     'inline-flex items-center rounded-[var(--radius-pill)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider',
-                    c.priority === 'critical'
+                    c.priority === 'at_risk'
                       ? 'bg-[rgba(255,59,48,0.12)] text-[var(--color-error)]'
                       : 'bg-[rgba(255,159,10,0.12)] text-[var(--color-warning)]',
                   )}
                 >
-                  {c.priority === 'critical' ? 'Crítico' : 'Alto'}
+                  {c.priority === 'at_risk' ? 'Em risco' : 'Alto'}
                 </span>
               )}
             </div>

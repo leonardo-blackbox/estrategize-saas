@@ -16,7 +16,11 @@ export type ConsultancyTemplate =
   | 'scaling'
   | 'restructuring';
 
-export type ConsultancyPriority = 'critical' | 'high' | 'medium' | 'low';
+/** Prioridade da consultoria (tabela consultancies) */
+export type ConsultancyPriority = 'low' | 'normal' | 'high' | 'at_risk';
+
+/** Prioridade de tarefas/action items (tabela consultancy_action_items) */
+export type ActionPriority = 'low' | 'medium' | 'high' | 'critical';
 
 // ─── Core Types ──────────────────────────────────────────────────────────────
 
@@ -123,7 +127,7 @@ export interface ActionItem {
   title: string;
   description: string | null;
   status: 'pending' | 'in_progress' | 'done' | 'cancelled';
-  priority: ConsultancyPriority;
+  priority: ActionPriority;
   responsible: string | null;
   due_date: string | null;
   created_at: string;
