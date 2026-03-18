@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -10,6 +11,320 @@ import {
 } from '../../../api/applications.ts';
 import { cn } from '../../../lib/cn.ts';
 import type { ApplicationShellContext } from './ApplicationShell.tsx';
+
+// ─── Color math ──────────────────────────────────────────────────────────────
+
+function hsvToHex(h: number, s: number, v: number): string {
+  const f = (n: number) => {
+    const k = (n + h / 60) % 6;
+    return v - v * s * Math.max(0, Math.min(k, 4 - k, 1));
+  };
+  return (
+    '#' +
+    [f(5), f(3), f(1)]
+      .map((x) => Math.round(x * 255).toString(16).padStart(2, '0'))
+      .join('')
+  );
+}
+
+function hexToHsv(hex: string): [number, number, number] {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!m) return [0, 0, 1];
+  const r = parseInt(m[1], 16) / 255;
+  const g = parseInt(m[2], 16) / 255;
+  const b = parseInt(m[3], 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+    else if (max === g) h = ((b - r) / d + 2) * 60;
+    else h = ((r - g) / d + 4) * 60;
+  }
+  return [h, max === 0 ? 0 : d / max, max];
+}
+
+const PICKER_PRESETS = [
+  '#7c5cfc', '#3b82f6', '#06b6d4', '#10b981',
+  '#f59e0b', '#ef4444', '#ec4899', '#f97316',
+  '#ffffff', '#d1d5db', '#6b7280', '#000000',
+];
+
+// ─── Color Picker Popover ─────────────────────────────────────────────────────
+
+function ColorPickerPopover({
+  value,
+  onChange,
+  onClose,
+  anchorRect,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onClose: () => void;
+  anchorRect: DOMRect;
+}) {
+  const [hsv, setHsv] = useState<[number, number, number]>(() => hexToHsv(value));
+  const [hexInput, setHexInput] = useState(() => value.replace('#', '').toUpperCase());
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  const PICKER_W = 244;
+  const PICKER_H = 380;
+
+  // Position: prefer left of anchor, fallback to right
+  const left =
+    anchorRect.left - PICKER_W - 10 > 0
+      ? anchorRect.left - PICKER_W - 10
+      : anchorRect.right + 10;
+  const top = Math.min(
+    anchorRect.top,
+    window.innerHeight - PICKER_H - 12,
+  );
+
+  // Click outside → close
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    }
+    document.addEventListener('mousedown', onDown, true);
+    return () => document.removeEventListener('mousedown', onDown, true);
+  }, [onClose]);
+
+  const emit = useCallback(
+    (nh: number, ns: number, nv: number) => {
+      setHsv([nh, ns, nv]);
+      const hex = hsvToHex(nh, ns, nv);
+      setHexInput(hex.replace('#', '').toUpperCase());
+      onChange(hex);
+    },
+    [onChange],
+  );
+
+  // Gradient drag
+  function readGradientPos(e: React.PointerEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ns = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const nv = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
+    emit(hsv[0], ns, nv);
+  }
+
+  // Hue drag
+  function readHuePos(e: React.PointerEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const nh = Math.max(0, Math.min(360, ((e.clientX - rect.left) / rect.width) * 360));
+    emit(nh, hsv[1], hsv[2]);
+  }
+
+  const hueColor = hsvToHex(hsv[0], 1, 1);
+  const currentHex = hsvToHex(hsv[0], hsv[1], hsv[2]);
+
+  return createPortal(
+    <div
+      ref={popoverRef}
+      style={{
+        position: 'fixed',
+        top,
+        left,
+        zIndex: 9999,
+        width: PICKER_W,
+        background: 'var(--bg-surface-1)',
+        border: '1px solid var(--border-hairline)',
+        borderRadius: 14,
+        boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+        padding: 12,
+        userSelect: 'none',
+      }}
+    >
+      {/* ── Gradient SV ── */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: 160,
+          borderRadius: 8,
+          overflow: 'hidden',
+          cursor: 'crosshair',
+          touchAction: 'none',
+          marginBottom: 10,
+        }}
+        onPointerDown={(e) => {
+          e.currentTarget.setPointerCapture(e.pointerId);
+          readGradientPos(e);
+        }}
+        onPointerMove={(e) => {
+          if (e.buttons) readGradientPos(e);
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: `linear-gradient(to right, #fff, ${hueColor})`,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to top, #000, transparent)',
+          }}
+        />
+        {/* cursor */}
+        <div
+          style={{
+            position: 'absolute',
+            left: `${hsv[1] * 100}%`,
+            top: `${(1 - hsv[2]) * 100}%`,
+            transform: 'translate(-50%, -50%)',
+            width: 16,
+            height: 16,
+            borderRadius: '50%',
+            border: '2.5px solid white',
+            boxShadow: '0 0 0 1.5px rgba(0,0,0,0.35)',
+            background: currentHex,
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
+
+      {/* ── Hue strip ── */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: 14,
+          borderRadius: 7,
+          cursor: 'ew-resize',
+          touchAction: 'none',
+          background:
+            'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)',
+          marginBottom: 14,
+        }}
+        onPointerDown={(e) => {
+          e.currentTarget.setPointerCapture(e.pointerId);
+          readHuePos(e);
+        }}
+        onPointerMove={(e) => {
+          if (e.buttons) readHuePos(e);
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            left: `${(hsv[0] / 360) * 100}%`,
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 20,
+            height: 20,
+            borderRadius: '50%',
+            border: '2.5px solid white',
+            boxShadow: '0 0 0 1.5px rgba(0,0,0,0.35)',
+            background: hueColor,
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
+
+      {/* ── Current color + Hex input ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 7,
+            background: currentHex,
+            border: '1px solid rgba(255,255,255,0.14)',
+            flexShrink: 0,
+          }}
+        />
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            background: 'var(--bg-base)',
+            border: '1px solid var(--border-hairline)',
+            borderRadius: 7,
+            padding: '5px 10px',
+          }}
+        >
+          <span style={{ fontSize: 12, color: 'var(--text-tertiary)', marginRight: 2 }}>#</span>
+          <input
+            type="text"
+            value={hexInput}
+            onChange={(e) => {
+              const v = e.target.value.toUpperCase().replace(/[^0-9A-F]/g, '').slice(0, 6);
+              setHexInput(v);
+              if (v.length === 6) {
+                const hex = '#' + v;
+                const newHsv = hexToHsv(hex);
+                setHsv(newHsv);
+                onChange(hex);
+              }
+            }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              fontSize: 12,
+              fontFamily: 'monospace',
+              color: 'var(--text-primary)',
+              width: '100%',
+              letterSpacing: '0.06em',
+            }}
+            placeholder="7C5CFC"
+          />
+        </div>
+      </div>
+
+      {/* ── Preset swatches ── */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gap: 5,
+        }}
+      >
+        {PICKER_PRESETS.map((preset) => {
+          const isActive = currentHex.toLowerCase() === preset.toLowerCase();
+          return (
+            <button
+              key={preset}
+              title={preset}
+              onClick={() => {
+                const newHsv = hexToHsv(preset);
+                setHsv(newHsv);
+                setHexInput(preset.replace('#', '').toUpperCase());
+                onChange(preset);
+              }}
+              style={{
+                width: '100%',
+                aspectRatio: '1',
+                borderRadius: 6,
+                background: preset,
+                border: isActive
+                  ? '2.5px solid white'
+                  : '1px solid rgba(255,255,255,0.12)',
+                cursor: 'pointer',
+                transition: 'transform 0.1s, box-shadow 0.1s',
+                boxShadow: isActive ? '0 0 0 1.5px rgba(0,0,0,0.4)' : 'none',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1.18)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>,
+    document.body,
+  );
+}
 
 // ─── Section wrapper ─────────────────────────────────────────────────────────
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
@@ -28,32 +343,49 @@ function Section({ title, description, children }: { title: string; description?
 
 // ─── ColorField ──────────────────────────────────────────────────────────────
 function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
+  const swatchRef = useRef<HTMLButtonElement>(null);
+
+  function togglePicker() {
+    if (swatchRef.current) {
+      setAnchorRect(swatchRef.current.getBoundingClientRect());
+    }
+    setOpen((v) => !v);
+  }
+
   return (
     <div className="flex items-center justify-between py-2">
       <span className="text-[13px] text-[var(--text-secondary)]">{label}</span>
       <div className="flex items-center gap-2">
-        <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-[var(--border-hairline)] cursor-pointer hover:border-[var(--text-tertiary)] transition-colors">
-          <input
-            type="color"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="absolute inset-0 w-[140%] h-[140%] -translate-x-[14%] -translate-y-[14%] cursor-pointer border-0 bg-transparent p-0 opacity-0"
-            aria-label={`Cor: ${label}`}
-          />
-          <span
-            className="absolute inset-0 rounded-lg"
-            style={{ backgroundColor: value }}
-            aria-hidden="true"
-          />
-        </div>
+        {/* Swatch button */}
+        <button
+          ref={swatchRef}
+          onClick={togglePicker}
+          title="Escolher cor"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            background: value,
+            border: open
+              ? '2px solid var(--accent)'
+              : '1px solid var(--border-hairline)',
+            cursor: 'pointer',
+            transition: 'border-color 0.12s',
+            flexShrink: 0,
+          }}
+        />
+        {/* Hex text input */}
         <input
           type="text"
-          value={value.toUpperCase()}
+          value={value.replace('#', '').toUpperCase()}
           onChange={(e) => {
-            const v = e.target.value;
-            if (/^#[0-9A-Fa-f]{0,6}$/.test(v)) onChange(v);
+            const v = e.target.value.replace(/[^0-9A-Fa-f]/g, '').slice(0, 6);
+            if (v.length === 6) onChange('#' + v);
           }}
-          maxLength={7}
+          maxLength={6}
+          placeholder="7C5CFC"
           className={cn(
             'w-24 px-2 py-1.5 rounded-lg text-[12px] font-mono uppercase',
             'bg-[var(--bg-base)] border border-[var(--border-hairline)]',
@@ -61,6 +393,15 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
             'focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]',
           )}
         />
+        {/* Picker popover */}
+        {open && anchorRect && (
+          <ColorPickerPopover
+            value={value}
+            onChange={onChange}
+            onClose={() => setOpen(false)}
+            anchorRect={anchorRect}
+          />
+        )}
       </div>
     </div>
   );
@@ -100,13 +441,11 @@ export default function OpcoesPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  // Local state for form
   const [title, setTitle] = useState('');
   const [theme, setTheme] = useState<Partial<ThemeConfig>>({});
   const [settings, setSettings] = useState<Partial<FormSettings>>({});
   const [isDirty, setIsDirty] = useState(false);
 
-  // Seed from application data
   useEffect(() => {
     if (application) {
       setTitle(application.title);
@@ -198,7 +537,6 @@ export default function OpcoesPage() {
           </div>
         )}
 
-        {/* Divider */}
         <div style={{ height: 1, background: 'var(--border-hairline)', marginBottom: 24 }} />
 
         {/* ── Geral ── */}
