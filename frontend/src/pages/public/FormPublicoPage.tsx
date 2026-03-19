@@ -1319,7 +1319,15 @@ export default function FormPublicoPage() {
       // Submit
       const answersArr = collectibleFields
         .filter((f) => answers[f.id] !== undefined)
-        .map((f) => ({ field_id: f.id, field_type: f.type, field_title: f.title, value: answers[f.id] }));
+        .map((f) => {
+          let value = answers[f.id];
+          // Resolve multiple_choice option IDs → human-readable labels before submitting
+          if (f.type === 'multiple_choice' && Array.isArray(value)) {
+            const opts = getFieldOptions(f);
+            value = (value as string[]).map((id) => opts.find((o) => o.id === id)?.label ?? id);
+          }
+          return { field_id: f.id, field_type: f.type, field_title: f.title, value };
+        });
       const utm = captureUTM(slug!);
       const { fbc, fbp, fbclid } = captureMetaClickData(slug!);
       const metadata: Record<string, string> = {};

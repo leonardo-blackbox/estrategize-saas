@@ -27,6 +27,7 @@ import {
   applicationKeys,
   type ResponseWithAnswers,
   type ApplicationField,
+  type FieldOption,
 } from '../../../api/applications.ts';
 import type { ApplicationShellContext } from './ApplicationShell.tsx';
 
@@ -49,6 +50,24 @@ function formatValue(value: unknown): string {
   if (typeof value === 'boolean') return value ? 'Sim' : 'Não';
   if (Array.isArray(value)) return value.join(', ');
   return String(value);
+}
+
+/** Resolves multiple_choice UUIDs → human-readable labels using field definitions. */
+function resolveValue(
+  answer: { field_id: string; field_type: string; value: unknown },
+  fields: ApplicationField[],
+): string {
+  if (answer.field_type === 'multiple_choice' && Array.isArray(answer.value)) {
+    const field = fields.find((f) => f.id === answer.field_id);
+    if (field && Array.isArray(field.options)) {
+      const opts = field.options as FieldOption[];
+      const labels = (answer.value as string[]).map(
+        (id) => opts.find((o) => o.id === id)?.label ?? id,
+      );
+      return labels.join(', ');
+    }
+  }
+  return formatValue(answer.value);
 }
 
 function getFirstAnswerPreview(response: ResponseWithAnswers): string {
@@ -182,6 +201,7 @@ function IndividualView({
   onDelete,
   direction,
   showUTM,
+  fields,
 }: {
   response: ResponseWithAnswers;
   index: number;
@@ -191,6 +211,7 @@ function IndividualView({
   onDelete: (id: string) => void;
   direction: 'forward' | 'back';
   showUTM: boolean;
+  fields: ApplicationField[];
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const xOffset = direction === 'forward' ? 32 : -32;
@@ -389,7 +410,7 @@ function IndividualView({
                       wordBreak: 'break-word',
                     }}
                   >
-                    {formatValue(answer.value) || (
+                    {resolveValue(answer, fields) || (
                       <span style={{ color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
                         Sem resposta
                       </span>
@@ -533,7 +554,7 @@ function TableView({
                       key={f.id}
                       style={{ padding: '10px 12px', color: 'var(--text-primary)', borderBottom: '1px solid var(--border-hairline)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                     >
-                      {answer ? formatValue(answer.value) : '—'}
+                      {answer ? resolveValue(answer, fields) : '—'}
                     </td>
                   );
                 })}
@@ -722,7 +743,7 @@ export default function RespostasPage() {
         };
         collectibleFields.forEach((f) => {
           const answer = r.answers.find((a) => a.field_id === f.id);
-          row[f.title] = answer ? formatValue(answer.value) : '';
+          row[f.title] = answer ? resolveValue(answer, fields) : '';
         });
         return row;
       });
@@ -929,6 +950,7 @@ export default function RespostasPage() {
               onDelete={deleteResponseMutation}
               direction={navDirection}
               showUTM={showUTMColumns}
+              fields={fields}
             />
           ) : viewMode === 'tabela' ? (
             <TableView
