@@ -686,7 +686,7 @@ export default function IntegracaoPage() {
                       </button>
                     </div>
                     <p className="text-[10px] text-[var(--text-tertiary)] mt-1">
-                      Gere um System User Token no Business Manager → Usuários do sistema.
+                      Gerenciador de Eventos → Conjuntos de dados → Configurações → API de Conversões → Gerar token.
                     </p>
                   </div>
                   <div>
