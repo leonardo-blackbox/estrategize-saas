@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react';
 export interface TrackingConfig {
   metaPixelId?: string;
   metaPixelActive?: boolean;
+  /** When to fire the Meta Lead event. Defaults to 'submit' (end of form). */
+  metaLeadEvent?: 'start' | 'submit';
   ga4MeasurementId?: string;
   ga4Active?: boolean;
   tiktokPixelId?: string;
@@ -190,9 +192,16 @@ export function useTrackingPixels(tracking: TrackingConfig | undefined): PixelEv
     trackFormStart: () => {
       log('trackFormStart called, fbq =', !!window.fbq);
       const metaId = pixelIdRef.current;
+      const leadEvent = tracking?.metaLeadEvent ?? 'submit';
 
-      fireMetaEvent('Lead', { content_name: 'form_start' });
-      if (metaId) fireMetaImgPixel(metaId, 'Lead');
+      // Fire Lead only if configured to fire at form start
+      if (leadEvent === 'start') {
+        fireMetaEvent('Lead', { content_name: 'form_start' });
+        if (metaId) fireMetaImgPixel(metaId, 'Lead');
+        log('Lead fired at form start (configured)');
+      } else {
+        log('Lead skipped at form start (configured to fire at submit)');
+      }
 
       try { window.gtag?.('event', 'generate_lead', { form_event: 'start' }); } catch { /* ignore */ }
       try { window.ttq?.track('ClickButton', { content_name: 'form_start' }); } catch { /* ignore */ }
@@ -200,6 +209,14 @@ export function useTrackingPixels(tracking: TrackingConfig | undefined): PixelEv
     trackFormSubmit: () => {
       log('trackFormSubmit called, fbq =', !!window.fbq);
       const metaId = pixelIdRef.current;
+      const leadEvent = tracking?.metaLeadEvent ?? 'submit';
+
+      // Fire Lead at form end if configured (default behavior)
+      if (leadEvent === 'submit') {
+        fireMetaEvent('Lead', { content_name: 'form_submit' });
+        if (metaId) fireMetaImgPixel(metaId, 'Lead');
+        log('Lead fired at form submit (configured)');
+      }
 
       fireMetaEvent('CompleteRegistration', { status: true });
       if (metaId) fireMetaImgPixel(metaId, 'CompleteRegistration');

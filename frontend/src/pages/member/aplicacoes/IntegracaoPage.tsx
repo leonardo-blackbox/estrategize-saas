@@ -405,6 +405,7 @@ export default function IntegracaoPage() {
   // Tracking state
   const [metaPixelId, setMetaPixelId] = useState(existingTracking?.metaPixelId || '');
   const [metaPixelActive, setMetaPixelActive] = useState(existingTracking?.metaPixelActive ?? false);
+  const [metaLeadEvent, setMetaLeadEvent] = useState<'start' | 'submit'>(existingTracking?.metaLeadEvent ?? 'submit');
   const [ga4Id, setGa4Id] = useState(existingTracking?.ga4MeasurementId || '');
   const [ga4Active, setGa4Active] = useState(existingTracking?.ga4Active ?? false);
   const [tiktokId, setTiktokId] = useState(existingTracking?.tiktokPixelId || '');
@@ -422,6 +423,7 @@ export default function IntegracaoPage() {
     if (existingTracking) {
       setMetaPixelId(existingTracking.metaPixelId || '');
       setMetaPixelActive(existingTracking.metaPixelActive ?? false);
+      setMetaLeadEvent(existingTracking.metaLeadEvent ?? 'submit');
       setGa4Id(existingTracking.ga4MeasurementId || '');
       setGa4Active(existingTracking.ga4Active ?? false);
       setTiktokId(existingTracking.tiktokPixelId || '');
@@ -457,6 +459,7 @@ export default function IntegracaoPage() {
     trackingMutation.mutate({
       metaPixelId: metaPixelId.trim() || undefined,
       metaPixelActive,
+      metaLeadEvent,
       ga4MeasurementId: ga4Id.trim() || undefined,
       ga4Active,
       tiktokPixelId: tiktokId.trim() || undefined,
@@ -532,6 +535,38 @@ export default function IntegracaoPage() {
             tooltip="Encontre o ID no TikTok Ads Manager → Ativos → Eventos → Web Events → selecione seu pixel → Configurações. O ID é alfanumérico."
           />
 
+          {/* Disparar Lead: início ou fim */}
+          <div
+            className="p-3 rounded-xl mb-3"
+            style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)' }}
+          >
+            <p className="text-[12px] font-semibold text-[var(--text-primary)] mb-2">
+              Quando disparar o evento <span className="font-mono text-[var(--accent)]">Lead</span>?
+            </p>
+            <div className="flex gap-2">
+              {(['start', 'submit'] as const).map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setMetaLeadEvent(opt)}
+                  className={cn(
+                    'flex-1 py-1.5 px-3 rounded-lg text-[12px] font-medium transition-all border',
+                    metaLeadEvent === opt
+                      ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+                      : 'text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--accent)]',
+                  )}
+                >
+                  {opt === 'start' ? 'Início do formulário' : 'Fim do formulário'}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-[var(--text-tertiary)] mt-2">
+              {metaLeadEvent === 'start'
+                ? 'Lead dispara quando o usuário clica em "Começar". Útil para medir intenção.'
+                : 'Lead dispara após o envio completo. Recomendado para qualidade de lead.'}
+            </p>
+          </div>
+
           {/* Eventos rastreados */}
           <div
             className="p-3 rounded-xl mb-3 text-[12px] text-[var(--text-secondary)]"
@@ -539,8 +574,10 @@ export default function IntegracaoPage() {
           >
             <p className="font-semibold text-[var(--text-primary)] mb-1">Eventos rastreados automaticamente:</p>
             <p>• Visualização do formulário → <span className="font-mono text-[var(--accent)]">PageView</span></p>
-            <p>• Início do formulário → <span className="font-mono text-[var(--accent)]">Lead</span></p>
-            <p>• Envio completo → <span className="font-mono text-[var(--accent)]">CompleteRegistration</span></p>
+            {metaLeadEvent === 'start' && (
+              <p>• Início do formulário → <span className="font-mono text-[var(--accent)]">Lead</span></p>
+            )}
+            <p>• Envio completo → <span className="font-mono text-[var(--accent)]">CompleteRegistration</span>{metaLeadEvent === 'submit' && <span> + <span className="font-mono text-[var(--accent)]">Lead</span></span>}</p>
           </div>
 
           {/* Painel de teste do Meta Pixel */}

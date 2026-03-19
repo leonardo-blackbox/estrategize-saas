@@ -277,6 +277,8 @@ export async function submitFormResponse(
 export interface TrackingConfig {
   metaPixelId?: string;
   metaPixelActive: boolean;
+  /** When to fire the Meta Lead event. Defaults to 'submit' (end of form). */
+  metaLeadEvent?: 'start' | 'submit';
   ga4MeasurementId?: string;
   ga4Active: boolean;
   tiktokPixelId?: string;
