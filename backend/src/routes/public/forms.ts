@@ -497,4 +497,80 @@ router.post('/:slug/responses', async (req, res) => {
   }
 });
 
+// GET /api/forms/:slug/capi-test — validate CAPI token and fire a test PageView
+// Returns raw Facebook response. Remove test_event_code from form settings to go live.
+router.get('/:slug/capi-test', requireAuth, async (req: AuthenticatedRequest, res) => {
+  if (!supabaseAdmin) { res.status(503).json({ error: 'DB unavailable' }); return; }
+
+  const { data: app } = await supabaseAdmin
+    .from('applications')
+    .select('id, title, settings, user_id')
+    .eq('slug', req.params.slug)
+    .single();
+
+  if (!app || app.user_id !== req.userId) {
+    res.status(403).json({ error: 'Acesso negado' });
+    return;
+  }
+
+  const tracking = (app.settings as Record<string, unknown>)?.tracking as Record<string, unknown> | undefined;
+
+  if (!tracking?.metaPixelActive || !tracking?.metaPixelId) {
+    res.json({ ok: false, reason: 'Meta Pixel não está ativo ou sem Pixel ID' });
+    return;
+  }
+
+  const pixelId = tracking.metaPixelId as string;
+  const accessToken = tracking.metaAccessToken as string | undefined;
+  const testEventCode = tracking.metaTestEventCode as string | undefined;
+
+  if (!accessToken) {
+    res.json({ ok: false, reason: 'Access Token não configurado — modo Pixel Normal (sem CAPI)' });
+    return;
+  }
+
+  // Fire a test PageView and return raw Facebook response
+  const payload = JSON.stringify({
+    data: [{
+      event_name: 'PageView',
+      event_time: Math.floor(Date.now() / 1000),
+      action_source: 'website',
+      event_source_url: `https://app.estrategize.co/f/${req.params.slug}`,
+      user_data: { client_user_agent: req.headers['user-agent'] ?? 'test' },
+    }],
+    ...(testEventCode && { test_event_code: testEventCode }),
+  });
+
+  const path = `/v19.0/${encodeURIComponent(pixelId)}/events?access_token=${encodeURIComponent(accessToken)}`;
+
+  const result = await new Promise<{ statusCode: number; body: string }>((resolve) => {
+    const r = https.request({
+      hostname: 'graph.facebook.com',
+      path,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+      timeout: 8000,
+    }, (fbRes) => {
+      let data = '';
+      fbRes.on('data', (c: Buffer) => { data += c; });
+      fbRes.on('end', () => resolve({ statusCode: fbRes.statusCode ?? 0, body: data }));
+    });
+    r.on('error', (err) => resolve({ statusCode: 0, body: err.message }));
+    r.on('timeout', () => { r.destroy(); resolve({ statusCode: 0, body: 'timeout' }); });
+    r.write(payload);
+    r.end();
+  });
+
+  let parsed: unknown;
+  try { parsed = JSON.parse(result.body); } catch { parsed = result.body; }
+
+  res.json({
+    pixel_id: pixelId,
+    has_token: true,
+    test_event_code: testEventCode ?? null,
+    http_status: result.statusCode,
+    facebook_response: parsed,
+  });
+});
+
 export default router;
