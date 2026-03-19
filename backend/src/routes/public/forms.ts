@@ -177,15 +177,15 @@ router.post('/:slug/events', async (req, res) => {
       // metaLeadEvent: 'start' | 'submit' — defaults to 'submit' (fire Lead at end of form)
       const metaLeadEvent = (tracking.metaLeadEvent as string) || 'submit';
 
+      // submit: Lead + CompleteRegistration are fired by the /responses endpoint
+      // (which also has email/phone data). Only view and start are handled here.
       const eventsToFire: string[] = [];
       if (event === 'view') {
         eventsToFire.push('PageView');
       } else if (event === 'start' && metaLeadEvent === 'start') {
         eventsToFire.push('Lead');
-      } else if (event === 'submit') {
-        if (metaLeadEvent === 'submit') eventsToFire.push('Lead');
-        eventsToFire.push('CompleteRegistration');
       }
+      // event === 'submit' → skipped here, handled in POST /:slug/responses with full PII
 
       const accessToken = tracking.metaAccessToken as string | undefined;
       const testEventCode = tracking.metaTestEventCode as string | undefined;

@@ -29,6 +29,19 @@ export interface CapiEventParams {
   testEventCode?: string;
 }
 
+/**
+ * Normalize phone to E.164 digits only.
+ * Brazilian numbers (10–11 digits) get country code 55 prepended.
+ */
+function normalizePhone(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  // Already has country code (13 digits with 55 prefix, or starts with +55)
+  if (digits.length >= 12) return digits;
+  // Brazilian 10-11 digit number — add country code 55
+  if (digits.length >= 10 && digits.length <= 11) return `55${digits}`;
+  return digits;
+}
+
 export function buildUserData(params: {
   email?: string;
   phone?: string;
@@ -42,7 +55,7 @@ export function buildUserData(params: {
   const ud: CapiUserData = {};
 
   if (params.email) ud.em = hashSHA256(params.email);
-  if (params.phone) ud.ph = hashSHA256(params.phone.replace(/\D/g, ''));
+  if (params.phone) ud.ph = hashSHA256(normalizePhone(params.phone));
   if (params.firstName) ud.fn = hashSHA256(params.firstName.trim().toLowerCase());
   if (params.lastName) ud.ln = hashSHA256(params.lastName.trim().toLowerCase());
   if (params.fbc) ud.fbc = params.fbc;
@@ -88,11 +101,19 @@ export function sendCapiEvent(params: CapiEventParams): void {
     res.on('data', (chunk: Buffer) => { data += chunk; });
     res.on('end', () => {
       try {
-        const parsed = JSON.parse(data) as { events_received?: number; error?: { message: string } };
+        const parsed = JSON.parse(data) as {
+          events_received?: number;
+          error?: { message: string; code?: number; type?: string };
+        };
         if (parsed.events_received) {
           console.info(`[capi] ✓ ${eventName} → pixel ${pixelId} (received: ${parsed.events_received})`);
         } else if (parsed.error) {
-          console.warn(`[capi] ✗ ${eventName} API error:`, parsed.error.message);
+          const isTokenError = parsed.error.code === 190 || /token|oauth|access/i.test(parsed.error.message);
+          if (isTokenError) {
+            console.error(`[capi] ✗ TOKEN INVÁLIDO/EXPIRADO — pixel ${pixelId} — regenere o System User Token no Business Manager. Erro: ${parsed.error.message}`);
+          } else {
+            console.warn(`[capi] ✗ ${eventName} API error (code ${parsed.error.code}):`, parsed.error.message);
+          }
         }
       } catch { /* ignore parse error */ }
     });
