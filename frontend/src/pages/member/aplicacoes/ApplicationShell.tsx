@@ -64,7 +64,7 @@ function InlineTitle({ value, onSave }: InlineTitleProps) {
     <button
       onClick={() => setEditing(true)}
       title="Clique para editar o nome"
-      className="text-[var(--text-primary)] text-[14px] font-semibold hover:text-[var(--text-secondary)] transition-colors truncate max-w-[260px] text-left cursor-text"
+      className="text-[var(--text-primary)] text-[14px] font-semibold hover:text-[var(--text-secondary)] transition-colors truncate max-w-[90px] sm:max-w-[180px] lg:max-w-[260px] text-left cursor-text"
     >
       {value || 'Sem título'}
     </button>
@@ -251,7 +251,7 @@ export function ApplicationShell() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
+        height: '100dvh',
         background: 'var(--bg-base)',
         color: 'var(--text-primary)',
         overflow: 'hidden',
@@ -299,7 +299,7 @@ export function ApplicationShell() {
         </div>
 
         {/* Center ── tabs */}
-        <nav className="flex items-end h-full gap-0.5 px-4 flex-1 justify-center">
+        <nav className="flex items-end h-full gap-0.5 px-2 flex-1 justify-center overflow-x-auto scrollbar-none">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             return (

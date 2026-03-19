@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { cn } from '../../../lib/cn.ts';
 import {
   fetchApplication,
   applicationKeys,
@@ -11,10 +12,19 @@ import { LivePreviewPanel } from '../../../components/aplicacoes/editor/LivePrev
 import { FieldOptionsPanel } from '../../../components/aplicacoes/editor/FieldOptions.tsx';
 import type { ApplicationShellContext } from './ApplicationShell.tsx';
 
+type MobilePanel = 'fields' | 'preview' | 'options';
+
+const MOBILE_TABS: { id: MobilePanel; label: string }[] = [
+  { id: 'fields', label: 'Campos' },
+  { id: 'preview', label: 'Prévia' },
+  { id: 'options', label: 'Opções' },
+];
+
 export function EditorPage() {
   const { id } = useParams<{ id: string }>();
   const { isLoading: shellLoading } = useOutletContext<ApplicationShellContext>();
   const { loadApplication, reset } = useEditorStore();
+  const [mobilePanel, setMobilePanel] = useState<MobilePanel>('preview');
 
   const { data, isLoading, error } = useQuery({
     queryKey: applicationKeys.detail(id ?? ''),
@@ -53,22 +63,40 @@ export function EditorPage() {
   }
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '260px 1fr 320px',
-        height: '100%',
-        overflow: 'hidden',
-      }}
-    >
-      <div style={{ gridColumn: '1', overflow: 'hidden' }}>
-        <FieldsListPanel />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {/* Mobile tab switcher */}
+      <div className="md:hidden flex shrink-0 border-b border-[var(--border-hairline)] bg-[var(--bg-surface-1)]">
+        {MOBILE_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setMobilePanel(tab.id)}
+            className={cn(
+              'flex-1 py-2.5 text-[12px] font-medium transition-colors',
+              mobilePanel === tab.id
+                ? 'text-[var(--text-primary)] border-b-2 border-[var(--accent)] -mb-px'
+                : 'text-[var(--text-tertiary)]',
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
-      <div style={{ gridColumn: '2', overflow: 'hidden' }}>
-        <LivePreviewPanel />
+
+      {/* Desktop: 3-column grid */}
+      <div
+        className="hidden md:grid"
+        style={{ gridTemplateColumns: '260px 1fr 320px', flex: 1, overflow: 'hidden' }}
+      >
+        <div style={{ overflow: 'hidden' }}><FieldsListPanel /></div>
+        <div style={{ overflow: 'hidden' }}><LivePreviewPanel /></div>
+        <div style={{ overflow: 'hidden' }}><FieldOptionsPanel /></div>
       </div>
-      <div style={{ gridColumn: '3', overflow: 'hidden' }}>
-        <FieldOptionsPanel />
+
+      {/* Mobile: single active panel */}
+      <div className="md:hidden" style={{ flex: 1, overflow: 'hidden' }}>
+        {mobilePanel === 'fields' && <FieldsListPanel />}
+        {mobilePanel === 'preview' && <LivePreviewPanel />}
+        {mobilePanel === 'options' && <FieldOptionsPanel />}
       </div>
     </div>
   );
