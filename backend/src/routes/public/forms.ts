@@ -7,6 +7,74 @@ import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { notifyNewResponse } from '../../services/emailNotificationService.js';
 import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 
+// ─── Bot detection ────────────────────────────────────────────────────────────
+
+const BOT_UA_PATTERNS = [
+  // Meta / Facebook crawlers
+  /facebookexternalhit/i,
+  /facebookbot/i,
+  /meta-externalagent/i,
+  /facebot/i,
+  // Google
+  /googlebot/i,
+  /adsbot-google/i,
+  /apis-google/i,
+  /google-inspectiontool/i,
+  // Common crawlers
+  /bingbot/i,
+  /yandexbot/i,
+  /twitterbot/i,
+  /linkedinbot/i,
+  /whatsapp/i,
+  /slackbot/i,
+  /discordbot/i,
+  /telegrambot/i,
+  /applebot/i,
+  /ahrefsbot/i,
+  /semrushbot/i,
+  /mj12bot/i,
+  /dotbot/i,
+  /petalbot/i,
+  // Generic patterns
+  /\bbot\b/i,
+  /\bspider\b/i,
+  /\bcrawler\b/i,
+  /\bscraper\b/i,
+  // Headless browsers (Meta ad review uses headless Chrome)
+  /headlesschrome/i,
+  /phantomjs/i,
+  /prerender/i,
+  /puppeteer/i,
+  /selenium/i,
+  /webdriver/i,
+];
+
+/**
+ * Returns true if the request appears to be from a bot or headless browser.
+ * Silent drop: we still return 200 to the client so bots don't retry.
+ */
+function isBotRequest(req: import('express').Request): boolean {
+  const ua = req.headers['user-agent'] || '';
+
+  // 1. Known bot user agents
+  if (BOT_UA_PATTERNS.some((re) => re.test(ua))) return true;
+
+  // 2. Missing sec-fetch-site — real browsers always send this on cross-origin fetch
+  //    (Chrome 63+, Firefox 90+, Safari 16.4+). Headless crawlers typically omit it.
+  const secFetchSite = req.headers['sec-fetch-site'];
+  if (!secFetchSite) {
+    // Only flag if UA also lacks a recognizable browser token
+    // (avoids false positives on older mobile browsers)
+    const looksLikeBrowser = /mozilla|chrome|safari|firefox|edge/i.test(ua);
+    if (!looksLikeBrowser) return true;
+  }
+
+  // 3. Empty User-Agent
+  if (!ua.trim()) return true;
+
+  return false;
+}
+
 // ─── Server-side Meta Pixel ───────────────────────────────────────────────────
 
 /**
@@ -63,9 +131,10 @@ const submitSchema = z.object({
 
 // POST /api/forms/:slug/events — fire-and-forget event tracking
 router.post('/:slug/events', async (req, res) => {
-  res.json({ ok: true }); // respond immediately
+  res.json({ ok: true }); // respond immediately — always, even for bots
 
   if (!supabaseAdmin) return;
+  if (isBotRequest(req)) return; // silent drop: don't record bot events
 
   const {
     event,
@@ -246,6 +315,11 @@ router.get('/:slug', async (req, res) => {
 
 // POST /api/forms/:slug/responses  — submit a completed response
 router.post('/:slug/responses', async (req, res) => {
+  if (isBotRequest(req)) {
+    res.status(200).json({ data: { response_id: null } }); // silent drop
+    return;
+  }
+
   const parsed = submitSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0].message });
