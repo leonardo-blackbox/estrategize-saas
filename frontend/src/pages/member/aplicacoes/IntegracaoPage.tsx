@@ -492,8 +492,6 @@ export default function IntegracaoPage() {
   }
 
   const isMetaConfigured = !!(metaPixelId && metaPixelActive);
-  const isTrackingConfigured = !!(isMetaConfigured || (ga4Id && ga4Active) || (tiktokId && tiktokActive));
-
   const publicFormUrl = application?.slug
     ? `${window.location.origin}/f/${application.slug}`
     : undefined;
