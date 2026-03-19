@@ -770,7 +770,7 @@ export default function AplicacoesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {/* Header */}
-        <div className="flex items-start justify-between mb-8 gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
           <div>
             {/* Breadcrumb */}
             <nav className="flex items-center gap-1.5 text-[13px] text-[var(--text-tertiary)] mb-3">
@@ -784,7 +784,7 @@ export default function AplicacoesPage() {
               <span className="text-[var(--text-secondary)]">Aplicações</span>
             </nav>
 
-            <h1 className="text-[28px] font-bold text-[var(--text-primary)] leading-tight">
+            <h1 className="text-[24px] sm:text-[28px] font-bold text-[var(--text-primary)] leading-tight">
               Aplicações
             </h1>
             <p className="text-[14px] text-[var(--text-secondary)] mt-1">
@@ -792,7 +792,7 @@ export default function AplicacoesPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 self-start">
             <button
               onClick={() => setShowTemplateModal(true)}
               className={cn(
@@ -827,7 +827,7 @@ export default function AplicacoesPage() {
         </div>
 
         {/* Toolbar: Filter tabs + Search */}
-        <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
           {/* Filter tabs */}
           <div
             className={cn(
@@ -862,7 +862,7 @@ export default function AplicacoesPage() {
           </div>
 
           {/* Search */}
-          <div className="relative w-64">
+          <div className="relative w-full sm:w-64">
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]"
               width="14"

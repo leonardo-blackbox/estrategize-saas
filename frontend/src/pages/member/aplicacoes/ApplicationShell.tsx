@@ -307,7 +307,7 @@ export function ApplicationShell() {
                 key={tab.id}
                 to={`/aplicacoes/${id}/${tab.id}`}
                 className={cn(
-                  'relative px-3.5 h-full flex items-center gap-1.5 text-[13.5px] font-medium select-none',
+                  'relative px-2 sm:px-3 h-full flex items-center gap-1.5 text-[11px] sm:text-[13px] font-medium select-none whitespace-nowrap shrink-0',
                   'transition-colors duration-150 cursor-pointer',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm',
                   // Underline indicator
@@ -363,7 +363,7 @@ export function ApplicationShell() {
                 <path d="M1 7s2-4.5 6-4.5S13 7 13 7s-2 4.5-6 4.5S1 7 1 7z" stroke="currentColor" strokeWidth="1.4" fill="none" />
                 <circle cx="7" cy="7" r="1.8" stroke="currentColor" strokeWidth="1.4" fill="none" />
               </svg>
-              {status === 'published' ? 'Ver' : 'Prévia'}
+              <span className="hidden sm:inline">{status === 'published' ? 'Ver' : 'Prévia'}</span>
             </a>
           )}
 
@@ -410,7 +410,8 @@ export function ApplicationShell() {
                   <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               ) : null}
-              {status === 'published' ? 'Publicado' : 'Publicar'}
+              <span className="hidden sm:inline">{status === 'published' ? 'Publicado' : 'Publicar'}</span>
+              <span className="sm:hidden">{status === 'published' ? '✓' : '↑'}</span>
             </button>
           )}
         </div>
