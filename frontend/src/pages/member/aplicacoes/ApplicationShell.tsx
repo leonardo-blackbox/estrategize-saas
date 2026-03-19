@@ -375,7 +375,7 @@ export function ApplicationShell() {
 
         {/* ── Row 2: navigation tabs ─────────────────────────────────────── */}
         <nav
-          className="flex items-end h-10 px-1 overflow-x-auto scrollbar-none"
+          className="flex items-end justify-center h-10 px-1 overflow-x-auto scrollbar-none"
           style={{ borderTop: '1px solid var(--border-hairline)' }}
         >
           {TABS.map((tab) => {
