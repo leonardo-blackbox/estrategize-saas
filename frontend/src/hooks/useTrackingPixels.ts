@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react';
 export interface TrackingConfig {
   metaPixelId?: string;
   metaPixelActive?: boolean;
+  /** 'pixel' = browser-only (fbevents.js). 'capi' = server-side only (no browser pixel). */
+  metaMode?: 'pixel' | 'capi';
   /** When to fire the Meta Lead event. Defaults to 'submit' (end of form). */
   metaLeadEvent?: 'start' | 'submit';
   ga4MeasurementId?: string;
@@ -157,9 +159,16 @@ export function useTrackingPixels(tracking: TrackingConfig | undefined): PixelEv
     }
     initialized.current = true;
 
+    const isCapi = tracking.metaMode === 'capi';
+
     if (tracking.metaPixelActive && tracking.metaPixelId) {
       pixelIdRef.current = tracking.metaPixelId;
-      injectMetaPixel(tracking.metaPixelId);
+      if (!isCapi) {
+        // Pixel Normal: inject browser SDK
+        injectMetaPixel(tracking.metaPixelId);
+      } else {
+        log('CAPI mode: skipping browser pixel injection (server-side only)');
+      }
     } else {
       log('meta pixel inactive or no id:', {
         active: tracking.metaPixelActive,
@@ -176,51 +185,40 @@ export function useTrackingPixels(tracking: TrackingConfig | undefined): PixelEv
     }
   }, [tracking]);
 
+  const isCapi = tracking?.metaMode === 'capi';
+
   return {
     trackFormView: (eventId?: string) => {
-      log('trackFormView called, fbq =', !!window.fbq);
-      const metaId = pixelIdRef.current;
-
-      // Primary: fbq SDK (with eventID for CAPI deduplication)
-      fireMetaEvent('PageView', undefined, eventId);
-      // Fallback: img pixel (bypasses SDK load issues)
-      if (metaId) fireMetaImgPixel(metaId, 'PageView');
-
+      if (isCapi) { log('CAPI mode: skipping browser PageView (server handles it)'); }
+      else {
+        log('trackFormView called, fbq =', !!window.fbq);
+        fireMetaEvent('PageView', undefined, eventId);
+      }
       try { window.gtag?.('event', 'page_view'); } catch { /* ignore */ }
       try { window.ttq?.track('ViewContent'); } catch { /* ignore */ }
     },
     trackFormStart: (eventId?: string) => {
-      log('trackFormStart called, fbq =', !!window.fbq);
-      const metaId = pixelIdRef.current;
       const leadEvent = tracking?.metaLeadEvent ?? 'submit';
-
-      // Fire Lead only if configured to fire at form start
-      if (leadEvent === 'start') {
+      if (!isCapi && leadEvent === 'start') {
         fireMetaEvent('Lead', { content_name: 'form_start' }, eventId);
-        if (metaId) fireMetaImgPixel(metaId, 'Lead');
-        log('Lead fired at form start (configured)');
+        log('Lead fired at form start (browser pixel)');
       } else {
-        log('Lead skipped at form start (configured to fire at submit)');
+        log('Lead skipped at form start — mode:', isCapi ? 'capi' : 'pixel', 'leadEvent:', leadEvent);
       }
-
       try { window.gtag?.('event', 'generate_lead', { form_event: 'start' }); } catch { /* ignore */ }
       try { window.ttq?.track('ClickButton', { content_name: 'form_start' }); } catch { /* ignore */ }
     },
     trackFormSubmit: (eventId?: string) => {
-      log('trackFormSubmit called, fbq =', !!window.fbq);
-      const metaId = pixelIdRef.current;
-      const leadEvent = tracking?.metaLeadEvent ?? 'submit';
-
-      // Fire Lead at form end if configured (default behavior)
-      if (leadEvent === 'submit') {
-        fireMetaEvent('Lead', { content_name: 'form_submit' }, eventId ? `${eventId}-lead` : undefined);
-        if (metaId) fireMetaImgPixel(metaId, 'Lead');
-        log('Lead fired at form submit (configured)');
+      if (isCapi) {
+        log('CAPI mode: skipping browser Lead/CompleteRegistration (server handles it)');
+      } else {
+        log('trackFormSubmit called, fbq =', !!window.fbq);
+        const leadEvent = tracking?.metaLeadEvent ?? 'submit';
+        if (leadEvent === 'submit') {
+          fireMetaEvent('Lead', { content_name: 'form_submit' }, eventId ? `${eventId}-lead` : undefined);
+        }
+        fireMetaEvent('CompleteRegistration', { status: true }, eventId ? `${eventId}-completeregistration` : undefined);
       }
-
-      fireMetaEvent('CompleteRegistration', { status: true }, eventId ? `${eventId}-completeregistration` : undefined);
-      if (metaId) fireMetaImgPixel(metaId, 'CompleteRegistration');
-
       try { window.gtag?.('event', 'sign_up', { method: 'form' }); } catch { /* ignore */ }
       try { window.ttq?.track('CompleteRegistration'); } catch { /* ignore */ }
     },

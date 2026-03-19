@@ -471,6 +471,7 @@ export default function IntegracaoPage() {
     trackingMutation.mutate({
       metaPixelId: metaPixelId.trim() || undefined,
       metaPixelActive,
+      metaMode,
       metaLeadEvent,
       metaAccessToken: metaMode === 'capi' ? (metaAccessToken.trim() || undefined) : undefined,
       metaTestEventCode: metaMode === 'capi' ? (metaTestEventCode.trim() || undefined) : undefined,

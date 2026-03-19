@@ -277,6 +277,8 @@ export async function submitFormResponse(
 export interface TrackingConfig {
   metaPixelId?: string;
   metaPixelActive: boolean;
+  /** 'pixel' = browser-only (fbevents.js). 'capi' = server-side only (no browser pixel). */
+  metaMode?: 'pixel' | 'capi';
   /** When to fire the Meta Lead event. Defaults to 'submit' (end of form). */
   metaLeadEvent?: 'start' | 'submit';
   /** Meta Conversions API access token (System User Token). Stored server-side only. */
