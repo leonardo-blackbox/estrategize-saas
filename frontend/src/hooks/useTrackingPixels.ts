@@ -38,19 +38,6 @@ function log(...args: unknown[]) {
   if (DEBUG) console.debug('[pixel]', ...args);
 }
 
-/** Fire a Meta noscript image pixel (works even when fbevents.js is blocked). */
-function fireMetaImgPixel(pixelId: string, event: string) {
-  try {
-    const url =
-      `https://www.facebook.com/tr?id=${pixelId}&ev=${event}&noscript=1`;
-    const img = new Image(1, 1);
-    img.src = url;
-    log(`img pixel → ${event} (id: ${pixelId})`);
-  } catch (err) {
-    console.warn('[pixel] img pixel failed:', err);
-  }
-}
-
 // ─── Meta Pixel ───────────────────────────────────────────────────────────────
 
 function injectMetaPixel(pixelId: string) {
