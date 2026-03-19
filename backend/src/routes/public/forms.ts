@@ -101,6 +101,31 @@ function fireServerMetaPixel(pixelId: string, event: string): void {
 
 const router = Router();
 
+// ─── IP helpers ───────────────────────────────────────────────────────────────
+
+/**
+ * Extract the real public client IP from request headers.
+ * Returns undefined if only private/loopback addresses are found.
+ * Railway forwards x-forwarded-for; the first entry is the real client IP.
+ */
+function getPublicClientIp(req: import('express').Request): string | undefined {
+  const PRIVATE_IP = /^(::1|::ffff:127\.|127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|fd[0-9a-f]{2}:|fc)/i;
+
+  // x-forwarded-for can be comma-separated: "realClientIp, proxy1, proxy2"
+  const xff = (req.headers['x-forwarded-for'] as string | undefined)?.split(',');
+  if (xff) {
+    for (const raw of xff) {
+      const ip = raw.trim();
+      if (ip && !PRIVATE_IP.test(ip)) return ip;
+    }
+  }
+
+  const remoteAddr = req.socket.remoteAddress ?? '';
+  if (remoteAddr && !PRIVATE_IP.test(remoteAddr)) return remoteAddr;
+
+  return undefined; // only private/internal IPs found — omit rather than send garbage
+}
+
 // ─── Rate limiting ────────────────────────────────────────────────────────────
 
 const publicFormLimit = rateLimit({
@@ -189,7 +214,7 @@ router.post('/:slug/events', async (req, res) => {
 
       const accessToken = tracking.metaAccessToken as string | undefined;
       const testEventCode = tracking.metaTestEventCode as string | undefined;
-      const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress;
+      const clientIp = getPublicClientIp(req);
       const userAgent = req.headers['user-agent'];
 
       for (const metaEvent of eventsToFire) {
@@ -412,7 +437,7 @@ router.post('/:slug/responses', async (req, res) => {
         }
 
         const meta = (metadata ?? {}) as Record<string, string | undefined>;
-        const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress;
+        const clientIp = getPublicClientIp(req);
         const userAgent = req.headers['user-agent'];
 
         const userData = buildUserData({
