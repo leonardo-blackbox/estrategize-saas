@@ -2,6 +2,20 @@ import { Router } from 'express';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
 
+/** Generate a random opaque slug unique in the DB. */
+async function generateSlug(): Promise<string> {
+  if (!supabaseAdmin) throw new Error('Database unavailable');
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const randomCode = () =>
+    Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  for (let i = 0; i < 20; i++) {
+    const candidate = randomCode();
+    const { data } = await supabaseAdmin.from('applications').select('id').eq('slug', candidate).maybeSingle();
+    if (!data) return candidate;
+  }
+  throw new Error('Failed to generate unique slug');
+}
+
 const router = Router();
 
 // GET /api/templates
@@ -43,9 +57,7 @@ router.post('/:tid/create', requireAuth, async (req: AuthenticatedRequest, res) 
   }
 
   // Generate slug
-  const { data: slugData } = await supabaseAdmin.rpc('generate_application_slug', {
-    p_title: template.name,
-  });
+  const slugData = await generateSlug();
 
   const { data: app, error: appErr } = await supabaseAdmin
     .from('applications')

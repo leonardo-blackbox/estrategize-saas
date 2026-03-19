@@ -108,17 +108,25 @@ async function getOwnedApplication(userId: string, applicationId: string) {
   return data;
 }
 
-/** Call the generate_application_slug DB function. */
-async function generateSlug(title: string, excludeId?: string): Promise<string> {
+/** Generate a random opaque slug (8 alphanumeric chars) guaranteed unique in the DB. */
+async function generateSlug(_title?: string, _excludeId?: string): Promise<string> {
   if (!supabaseAdmin) throw new Error('Database unavailable');
 
-  const { data, error } = await supabaseAdmin.rpc('generate_application_slug', {
-    title,
-    exclude_id: excludeId ?? null,
-  });
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const randomCode = () =>
+    Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 
-  if (error) throw new Error(error.message);
-  return data as string;
+  for (let i = 0; i < 20; i++) {
+    const candidate = randomCode();
+    const { data } = await supabaseAdmin
+      .from('applications')
+      .select('id')
+      .eq('slug', candidate)
+      .maybeSingle();
+    if (!data) return candidate;
+  }
+
+  throw new Error('Failed to generate unique slug after 20 attempts');
 }
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
@@ -293,10 +301,7 @@ router.put('/:id', async (req: AuthenticatedRequest, res) => {
 
     const updates: Record<string, unknown> = { ...parsed.data };
 
-    // If title changed, regenerate slug
-    if (parsed.data.title && parsed.data.title !== existing.title) {
-      updates.slug = await generateSlug(parsed.data.title, id);
-    }
+    // Slug is a permanent opaque code — never regenerate on title change
 
     const { data: updated, error } = await supabaseAdmin
       .from('applications')
@@ -654,6 +659,17 @@ router.delete('/:id/responses/:responseId', async (req: AuthenticatedRequest, re
       res.status(500).json({ error: error.message });
       return;
     }
+
+    // Decrement response_count (floor at 0) — recalculate from actual rows
+    const { count } = await supabaseAdmin
+      .from('application_responses')
+      .select('id', { count: 'exact', head: true })
+      .eq('application_id', id)
+      .eq('status', 'completed');
+    await supabaseAdmin
+      .from('applications')
+      .update({ response_count: count ?? 0 })
+      .eq('id', id);
 
     res.json({ ok: true });
   } catch (err) {
