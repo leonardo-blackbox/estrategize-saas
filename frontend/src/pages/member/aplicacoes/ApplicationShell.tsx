@@ -260,19 +260,15 @@ export function ApplicationShell() {
       {/* ── Topbar ────────────────────────────────────────────────────────── */}
       <div
         style={{
-          height: 56,
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 16px',
-          borderBottom: '1px solid var(--border-hairline)',
           background: 'var(--bg-surface-1)',
+          borderBottom: '1px solid var(--border-hairline)',
           flexShrink: 0,
           zIndex: 40,
-          gap: 0,
         }}
       >
-        {/* Left ── back + title */}
-        <div className="flex items-center gap-3 min-w-0 flex-shrink-0" style={{ minWidth: 0, maxWidth: '30%' }}>
+        {/* ── Row 1: back + title + actions ─────────────────────────────── */}
+        <div className="flex items-center gap-2 px-3 h-12">
+          {/* Back */}
           <button
             onClick={() => navigate('/aplicacoes')}
             className={cn(
@@ -288,18 +284,100 @@ export function ApplicationShell() {
             </svg>
           </button>
           <span className="text-[var(--border-default)] shrink-0 text-[16px] opacity-40">/</span>
-          {isLoading ? (
-            <div className="h-4 w-32 rounded animate-pulse bg-[var(--bg-hover)]" />
-          ) : (
-            <InlineTitle
-              value={application?.title ?? ''}
-              onSave={(v) => titleMutation.mutate(v)}
-            />
-          )}
+
+          {/* Title */}
+          <div className="flex-1 min-w-0">
+            {isLoading ? (
+              <div className="h-4 w-32 rounded animate-pulse bg-[var(--bg-hover)]" />
+            ) : (
+              <InlineTitle
+                value={application?.title ?? ''}
+                onSave={(v) => titleMutation.mutate(v)}
+              />
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Save indicator */}
+            {isEditorTab && <SaveStatusIndicator />}
+
+            {/* Ver */}
+            {application && (
+              <a
+                href={status === 'published' ? publicUrl : `${publicUrl}?preview=1`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={status === 'published' ? 'Ver formulário público' : 'Prévia do rascunho'}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-2 h-[30px] rounded-md text-[12px] font-medium cursor-pointer',
+                  'border transition-all duration-150 active:scale-95',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
+                  'border-[var(--border-hairline)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]',
+                )}
+              >
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M1 7s2-4.5 6-4.5S13 7 13 7s-2 4.5-6 4.5S1 7 1 7z" stroke="currentColor" strokeWidth="1.4" fill="none" />
+                  <circle cx="7" cy="7" r="1.8" stroke="currentColor" strokeWidth="1.4" fill="none" />
+                </svg>
+                <span className="hidden sm:inline">{status === 'published' ? 'Ver' : 'Prévia'}</span>
+              </a>
+            )}
+
+            {/* Share */}
+            {application && (
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(publicUrl).catch(() => null);
+                  setToast({ message: 'Link copiado!' });
+                }}
+                className={cn(
+                  'w-[30px] h-[30px] flex items-center justify-center rounded-md cursor-pointer',
+                  'border border-[var(--border-hairline)] text-[var(--text-secondary)]',
+                  'hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]',
+                  'transition-all duration-150 active:scale-95',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
+                )}
+                aria-label="Copiar link do formulário"
+              >
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M9 1l4 3-4 3M13 4H5a3 3 0 000 6h1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+
+            {/* Publish */}
+            {application && (
+              <button
+                onClick={handlePublishToggle}
+                disabled={publishMutation.isPending}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-2.5 h-[30px] rounded-md text-[12px] font-semibold cursor-pointer',
+                  'transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none active:scale-95',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
+                  status === 'published'
+                    ? 'bg-[rgba(48,209,88,0.1)] text-[#30d158] border border-[rgba(48,209,88,0.25)] hover:bg-[rgba(48,209,88,0.18)]'
+                    : 'bg-[var(--accent)] text-white hover:opacity-90 shadow-[0_1px_3px_rgba(0,0,0,0.3)]',
+                )}
+              >
+                {publishMutation.isPending ? (
+                  <span className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+                ) : status === 'published' ? (
+                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : null}
+                <span>{status === 'published' ? 'Publicado' : 'Publicar'}</span>
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Center ── tabs */}
-        <nav className="flex items-end h-full gap-0.5 px-2 flex-1 justify-center overflow-x-auto scrollbar-none">
+        {/* ── Row 2: navigation tabs ─────────────────────────────────────── */}
+        <nav
+          className="flex items-end h-10 px-1 overflow-x-auto scrollbar-none"
+          style={{ borderTop: '1px solid var(--border-hairline)' }}
+        >
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -307,10 +385,9 @@ export function ApplicationShell() {
                 key={tab.id}
                 to={`/aplicacoes/${id}/${tab.id}`}
                 className={cn(
-                  'relative px-2 sm:px-3 h-full flex items-center gap-1.5 text-[11px] sm:text-[13px] font-medium select-none whitespace-nowrap shrink-0',
+                  'relative px-3 h-full flex items-center gap-1.5 text-[12px] font-medium select-none whitespace-nowrap shrink-0',
                   'transition-colors duration-150 cursor-pointer',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] rounded-sm',
-                  // Underline indicator
                   'after:absolute after:bottom-0 after:left-1 after:right-1 after:h-[2px]',
                   'after:rounded-full after:transition-all after:duration-200',
                   isActive
@@ -322,7 +399,7 @@ export function ApplicationShell() {
                 {tab.id === 'respostas' && application && application.response_count > 0 && (
                   <span
                     className={cn(
-                      'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-semibold tabular-nums',
+                      'inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 rounded-full text-[10px] font-semibold tabular-nums',
                       isActive
                         ? 'bg-[var(--bg-hover)] text-[var(--text-secondary)]'
                         : 'bg-[var(--bg-hover)] text-[var(--text-tertiary)]',
@@ -335,86 +412,6 @@ export function ApplicationShell() {
             );
           })}
         </nav>
-
-        {/* Right ── actions */}
-        <div className="flex items-center gap-2 flex-shrink-0" style={{ minWidth: 0, maxWidth: '30%', justifyContent: 'flex-end' }}>
-          {/* Save indicator — only on editor tab */}
-          {isEditorTab && (
-            <div className="mr-2">
-              <SaveStatusIndicator />
-            </div>
-          )}
-
-          {/* Ver (preview / published) */}
-          {application && (
-            <a
-              href={status === 'published' ? publicUrl : `${publicUrl}?preview=1`}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={status === 'published' ? 'Ver formulário público' : 'Prévia do rascunho'}
-              className={cn(
-                'inline-flex items-center gap-1.5 px-2.5 h-[30px] rounded-md text-[12.5px] font-medium cursor-pointer',
-                'border transition-all duration-150 active:scale-95',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
-                'border-[var(--border-hairline)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] hover:border-[var(--text-tertiary)]',
-              )}
-            >
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M1 7s2-4.5 6-4.5S13 7 13 7s-2 4.5-6 4.5S1 7 1 7z" stroke="currentColor" strokeWidth="1.4" fill="none" />
-                <circle cx="7" cy="7" r="1.8" stroke="currentColor" strokeWidth="1.4" fill="none" />
-              </svg>
-              <span className="hidden sm:inline">{status === 'published' ? 'Ver' : 'Prévia'}</span>
-            </a>
-          )}
-
-          {/* Share icon */}
-          {application && (
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(publicUrl).catch(() => null);
-                setToast({ message: 'Link copiado!' });
-              }}
-              className={cn(
-                'w-[30px] h-[30px] flex items-center justify-center rounded-md cursor-pointer',
-                'border border-[var(--border-hairline)] text-[var(--text-secondary)]',
-                'hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] hover:border-[var(--text-tertiary)]',
-                'transition-all duration-150 active:scale-95',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
-              )}
-              aria-label="Copiar link do formulário"
-            >
-              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M9 1l4 3-4 3M13 4H5a3 3 0 000 6h1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          )}
-
-          {/* Publish/Status button */}
-          {application && (
-            <button
-              onClick={handlePublishToggle}
-              disabled={publishMutation.isPending}
-              className={cn(
-                'inline-flex items-center gap-1.5 px-3 h-[30px] rounded-md text-[12.5px] font-semibold cursor-pointer',
-                'transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none active:scale-95',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
-                status === 'published'
-                  ? 'bg-[rgba(48,209,88,0.1)] text-[#30d158] border border-[rgba(48,209,88,0.25)] hover:bg-[rgba(48,209,88,0.18)]'
-                  : 'bg-[var(--accent)] text-white hover:opacity-90 shadow-[0_1px_3px_rgba(0,0,0,0.3)]',
-              )}
-            >
-              {publishMutation.isPending ? (
-                <span className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" aria-hidden="true" />
-              ) : status === 'published' ? (
-                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              ) : null}
-              <span className="hidden sm:inline">{status === 'published' ? 'Publicado' : 'Publicar'}</span>
-              <span className="sm:hidden">{status === 'published' ? '✓' : '↑'}</span>
-            </button>
-          )}
-        </div>
       </div>
 
       {/* ── Content area ─────────────────────────────────────────────────── */}
