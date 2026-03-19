@@ -84,14 +84,11 @@ export default function CompartilharPage() {
   }
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex flex-col md:flex-row h-full overflow-y-auto md:overflow-hidden">
       {/* ── Left panel ── */}
       <div
-        className="w-[340px] flex-shrink-0 overflow-y-auto"
-        style={{
-          borderRight: '1px solid var(--border-hairline)',
-          background: 'var(--bg-surface-1)',
-        }}
+        className="w-full md:w-[340px] md:flex-shrink-0 overflow-y-auto border-b md:border-b-0 md:border-r border-[var(--border-hairline)]"
+        style={{ background: 'var(--bg-surface-1)' }}
       >
         <div className="p-6 space-y-8">
           {/* Link section */}
@@ -345,9 +342,9 @@ export default function CompartilharPage() {
         </div>
       </div>
 
-      {/* ── Right panel ── preview ── */}
+      {/* ── Right panel ── preview (desktop only) ── */}
       <div
-        className="flex-1 flex flex-col items-center justify-center gap-4 overflow-hidden"
+        className="hidden md:flex flex-1 flex-col items-center justify-center gap-4 overflow-hidden"
         style={{ background: 'var(--bg-base)' }}
       >
         <p className="text-[13px] text-[var(--text-tertiary)]">

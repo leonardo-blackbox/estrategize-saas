@@ -323,6 +323,12 @@ export function AdminShell() {
     setDrawerOpen(false);
   }, [location.pathname]);
 
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [drawerOpen]);
+
   return (
     <div data-admin="true" className="min-h-[100dvh] flex bg-[var(--bg-base)] transition-colors duration-[var(--duration-normal)]">
 
@@ -387,6 +393,9 @@ export function AdminShell() {
             {/* Drawer panel */}
             <motion.aside
               key="drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu de navegação"
               initial={{ x: -220 }}
               animate={{ x: 0 }}
               exit={{ x: -220 }}

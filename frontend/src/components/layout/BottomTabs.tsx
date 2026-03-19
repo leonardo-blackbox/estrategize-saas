@@ -65,7 +65,7 @@ export function BottomTabs() {
             to={tab.to}
             className={({ isActive }) =>
               cn(
-                'flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1',
+                'flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-2 min-h-[44px]',
                 'text-[10px] font-medium transition-all duration-200 tracking-tight',
                 'active:scale-[0.92]',
                 isActive

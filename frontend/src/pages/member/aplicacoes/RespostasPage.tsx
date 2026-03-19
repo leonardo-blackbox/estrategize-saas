@@ -1,4 +1,19 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+
+// ─────────────────────────────────────────────
+// useIsMobile
+// ─────────────────────────────────────────────
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < breakpoint);
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, [breakpoint]);
+  return isMobile;
+}
 import { useParams, useOutletContext } from 'react-router-dom';
 import { cn } from '../../../lib/cn.ts';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,6 +27,7 @@ import {
   applicationKeys,
   type ResponseWithAnswers,
   type ApplicationField,
+  type FieldOption,
 } from '../../../api/applications.ts';
 import type { ApplicationShellContext } from './ApplicationShell.tsx';
 
@@ -34,6 +50,24 @@ function formatValue(value: unknown): string {
   if (typeof value === 'boolean') return value ? 'Sim' : 'Não';
   if (Array.isArray(value)) return value.join(', ');
   return String(value);
+}
+
+/** Resolves multiple_choice UUIDs → human-readable labels using field definitions. */
+function resolveValue(
+  answer: { field_id: string; field_type: string; value: unknown },
+  fields: ApplicationField[],
+): string {
+  if (answer.field_type === 'multiple_choice' && Array.isArray(answer.value)) {
+    const field = fields.find((f) => f.id === answer.field_id);
+    if (field && Array.isArray(field.options)) {
+      const opts = field.options as FieldOption[];
+      const labels = (answer.value as string[]).map(
+        (id) => opts.find((o) => o.id === id)?.label ?? id,
+      );
+      return labels.join(', ');
+    }
+  }
+  return formatValue(answer.value);
 }
 
 function getFirstAnswerPreview(response: ResponseWithAnswers): string {
@@ -167,6 +201,7 @@ function IndividualView({
   onDelete,
   direction,
   showUTM,
+  fields,
 }: {
   response: ResponseWithAnswers;
   index: number;
@@ -176,6 +211,7 @@ function IndividualView({
   onDelete: (id: string) => void;
   direction: 'forward' | 'back';
   showUTM: boolean;
+  fields: ApplicationField[];
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const xOffset = direction === 'forward' ? 32 : -32;
@@ -374,7 +410,7 @@ function IndividualView({
                       wordBreak: 'break-word',
                     }}
                   >
-                    {formatValue(answer.value) || (
+                    {resolveValue(answer, fields) || (
                       <span style={{ color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
                         Sem resposta
                       </span>
@@ -518,7 +554,7 @@ function TableView({
                       key={f.id}
                       style={{ padding: '10px 12px', color: 'var(--text-primary)', borderBottom: '1px solid var(--border-hairline)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                     >
-                      {answer ? formatValue(answer.value) : '—'}
+                      {answer ? resolveValue(answer, fields) : '—'}
                     </td>
                   );
                 })}
@@ -630,6 +666,8 @@ export default function RespostasPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | '7d' | '30d'>('all');
   const [showUTMColumns, setShowUTMColumns] = useState(false);
+  const [mobileShowDetail, setMobileShowDetail] = useState(false);
+  const isMobile = useIsMobile();
 
   const { data: application, isLoading: appLoading } = useQuery({
     queryKey: applicationKeys.detail(id!),
@@ -705,7 +743,7 @@ export default function RespostasPage() {
         };
         collectibleFields.forEach((f) => {
           const answer = r.answers.find((a) => a.field_id === f.id);
-          row[f.title] = answer ? formatValue(answer.value) : '';
+          row[f.title] = answer ? resolveValue(answer, fields) : '';
         });
         return row;
       });
@@ -734,12 +772,12 @@ export default function RespostasPage() {
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: 'var(--bg-base)', color: 'var(--text-primary)', overflow: 'hidden' }}>
 
       {/* ── Toolbar ── */}
-      <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--border-hairline)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-surface-1)', flexShrink: 0, gap: 12 }}>
+      <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border-hairline)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-surface-1)', flexShrink: 0, gap: 8, flexWrap: 'wrap' }}>
         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
           {isLoading ? '...' : `${filteredResponses.length} resposta${filteredResponses.length !== 1 ? 's' : ''}`}
         </span>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
           {/* Period filters */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginRight: 4 }}>
             {(['all', 'today', '7d', '30d'] as const).map((f) => (
@@ -824,15 +862,28 @@ export default function RespostasPage() {
       </div>
 
       {/* ── Body ── */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
 
-        {/* ── Sidebar ── */}
+        {/* ── Sidebar ── Mobile: absolute overlay, slides in/out */}
         <motion.div
-          animate={{ width: sidebarCollapsed ? 0 : 220 }}
+          animate={{
+            x: isMobile ? (mobileShowDetail || sidebarCollapsed ? '-100%' : '0%') : '0%',
+            width: isMobile ? '100%' : (sidebarCollapsed ? 0 : 220),
+          }}
           transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-          style={{ flexShrink: 0, borderRight: '1px solid var(--border-hairline)', overflow: 'hidden', display: 'flex', flexDirection: 'column', background: 'var(--bg-surface-1)' }}
+          style={{
+            position: isMobile ? 'absolute' : 'relative',
+            top: 0, left: 0, bottom: 0,
+            zIndex: isMobile ? 10 : 'auto' as never,
+            flexShrink: 0,
+            borderRight: '1px solid var(--border-hairline)',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'var(--bg-surface-1)',
+          }}
         >
-          <div style={{ width: 220, flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+          <div style={{ width: isMobile ? '100%' : 220, flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
             {/* Sidebar header */}
             <div style={{ padding: '12px 14px 8px', borderBottom: '1px solid var(--border-hairline)' }}>
               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -852,7 +903,7 @@ export default function RespostasPage() {
                   response={response}
                   index={idx}
                   isSelected={selectedIndex === idx && viewMode === 'individual'}
-                  onClick={() => { setViewMode('individual'); handleSelectResponse(idx); }}
+                  onClick={() => { setViewMode('individual'); handleSelectResponse(idx); setMobileShowDetail(true); }}
                 />
               ))
             )}
@@ -861,6 +912,30 @@ export default function RespostasPage() {
 
         {/* ── Main Area ── */}
         <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+          {/* Mobile back button — shows when detail is visible */}
+          {isMobile && viewMode === 'individual' && (
+            <button
+              onClick={() => setMobileShowDetail(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '10px 16px',
+                fontSize: 13,
+                fontWeight: 500,
+                color: 'var(--accent)',
+                background: 'var(--bg-surface-1)',
+                borderBottom: '1px solid var(--border-hairline)',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Respostas
+            </button>
+          )}
           {isLoading ? (
             <MainSkeleton />
           ) : responses.length === 0 ? (
@@ -875,6 +950,7 @@ export default function RespostasPage() {
               onDelete={deleteResponseMutation}
               direction={navDirection}
               showUTM={showUTMColumns}
+              fields={fields}
             />
           ) : viewMode === 'tabela' ? (
             <TableView
