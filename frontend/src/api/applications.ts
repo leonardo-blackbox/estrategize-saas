@@ -279,6 +279,10 @@ export interface TrackingConfig {
   metaPixelActive: boolean;
   /** When to fire the Meta Lead event. Defaults to 'submit' (end of form). */
   metaLeadEvent?: 'start' | 'submit';
+  /** Meta Conversions API access token (System User Token). Stored server-side only. */
+  metaAccessToken?: string;
+  /** Optional test event code for debugging CAPI events in Meta Events Manager. */
+  metaTestEventCode?: string;
   ga4MeasurementId?: string;
   ga4Active: boolean;
   tiktokPixelId?: string;

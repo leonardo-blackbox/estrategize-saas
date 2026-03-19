@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import https from 'https';
 import rateLimit from 'express-rate-limit';
+import { buildUserData, sendCapiEvent } from '../../services/metaCapiService.js';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { notifyNewResponse } from '../../services/emailNotificationService.js';
 import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
@@ -66,7 +67,21 @@ router.post('/:slug/events', async (req, res) => {
 
   if (!supabaseAdmin) return;
 
-  const { event, session_token } = req.body as { event: string; session_token?: string };
+  const {
+    event,
+    session_token,
+    event_id,
+    page_url,
+    fbc,
+    fbp,
+  } = req.body as {
+    event: string;
+    session_token?: string;
+    event_id?: string;
+    page_url?: string;
+    fbc?: string;
+    fbp?: string;
+  };
   if (!['view', 'start', 'submit'].includes(event)) return;
 
   try {
@@ -103,8 +118,25 @@ router.post('/:slug/events', async (req, res) => {
         eventsToFire.push('CompleteRegistration');
       }
 
+      const accessToken = tracking.metaAccessToken as string | undefined;
+      const testEventCode = tracking.metaTestEventCode as string | undefined;
+      const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress;
+      const userAgent = req.headers['user-agent'];
+
       for (const metaEvent of eventsToFire) {
-        fireServerMetaPixel(pixelId, metaEvent);
+        if (accessToken) {
+          sendCapiEvent({
+            pixelId,
+            accessToken,
+            eventName: metaEvent,
+            eventId: event_id,
+            eventSourceUrl: page_url,
+            userData: buildUserData({ fbc, fbp, ip: clientIp, userAgent }),
+            testEventCode,
+          });
+        } else {
+          fireServerMetaPixel(pixelId, metaEvent);
+        }
       }
     }
   } catch (err) {
@@ -192,7 +224,20 @@ router.get('/:slug', async (req, res) => {
       return;
     }
 
-    res.json({ data: { application, fields: fields ?? [] } });
+    // Strip sensitive CAPI credentials before returning to the public browser
+    const publicApp = {
+      ...application,
+      settings: (() => {
+        const s = (application.settings ?? {}) as Record<string, unknown>;
+        const tracking = s.tracking as Record<string, unknown> | undefined;
+        if (!tracking) return s;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { metaAccessToken: _at, metaTestEventCode: _tc, ...safeTracking } = tracking;
+        return { ...s, tracking: safeTracking };
+      })(),
+    };
+
+    res.json({ data: { application: publicApp, fields: fields ?? [] } });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     res.status(500).json({ error: message });
@@ -268,13 +313,58 @@ router.post('/:slug/responses', async (req, res) => {
 
     res.status(201).json({ data: { response_id: response.id } });
 
-    // Server-side Meta Pixel — CompleteRegistration (not blockable by ad blockers)
+    // Server-side CAPI — CompleteRegistration (+Lead if configured)
     ;(async () => {
       try {
         const settings = application.settings as Record<string, unknown> | null;
         const tracking = settings?.tracking as Record<string, unknown> | undefined;
-        if (tracking?.metaPixelActive && tracking?.metaPixelId) {
-          fireServerMetaPixel(tracking.metaPixelId as string, 'CompleteRegistration');
+        if (!tracking?.metaPixelActive || !tracking?.metaPixelId) return;
+
+        const pixelId = tracking.metaPixelId as string;
+        const accessToken = tracking.metaAccessToken as string | undefined;
+        const testEventCode = tracking.metaTestEventCode as string | undefined;
+        const metaLeadEvent = (tracking.metaLeadEvent as string) || 'submit';
+
+        // Extract PII from answers for hashing
+        const emailAnswer = answers.find((a) => a.field_type === 'email');
+        const phoneAnswer = answers.find((a) => a.field_type === 'phone');
+        const nameAnswer  = answers.find((a) => a.field_type === 'name');
+        let firstName: string | undefined;
+        let lastName: string | undefined;
+        if (typeof nameAnswer?.value === 'string') {
+          const parts = nameAnswer.value.trim().split(/\s+/);
+          firstName = parts[0];
+          lastName  = parts.length > 1 ? parts.slice(1).join(' ') : undefined;
+        }
+
+        const meta = (metadata ?? {}) as Record<string, string | undefined>;
+        const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress;
+        const userAgent = req.headers['user-agent'];
+
+        const userData = buildUserData({
+          email:     typeof emailAnswer?.value === 'string' ? emailAnswer.value : undefined,
+          phone:     typeof phoneAnswer?.value === 'string' ? phoneAnswer.value : undefined,
+          firstName,
+          lastName,
+          fbc:       meta.fbc,
+          fbp:       meta.fbp,
+          ip:        clientIp,
+          userAgent,
+        });
+
+        const eventId = meta.event_id as string | undefined;
+        const pageUrl = meta.page_url as string | undefined;
+
+        const eventsToFire: string[] = ['CompleteRegistration'];
+        if (metaLeadEvent === 'submit') eventsToFire.push('Lead');
+
+        for (const metaEvent of eventsToFire) {
+          const eid = eventId ? `${eventId}-${metaEvent.toLowerCase()}` : undefined;
+          if (accessToken) {
+            sendCapiEvent({ pixelId, accessToken, eventName: metaEvent, eventId: eid, eventSourceUrl: pageUrl, userData, testEventCode });
+          } else {
+            fireServerMetaPixel(pixelId, metaEvent);
+          }
         }
       } catch { /* non-critical */ }
     })();

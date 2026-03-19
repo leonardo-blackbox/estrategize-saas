@@ -402,10 +402,17 @@ export default function IntegracaoPage() {
   const existingTracking = existingSettings?.tracking as TrackingConfig | undefined;
   const existingNotifs = existingSettings?.notifications as NotificationConfig | undefined;
 
-  // Tracking state
+  // Meta Ads state
+  const [metaOpen, setMetaOpen] = useState(!!(existingTracking?.metaPixelId || existingTracking?.metaPixelActive));
   const [metaPixelId, setMetaPixelId] = useState(existingTracking?.metaPixelId || '');
   const [metaPixelActive, setMetaPixelActive] = useState(existingTracking?.metaPixelActive ?? false);
+  const [metaMode, setMetaMode] = useState<'pixel' | 'capi'>(existingTracking?.metaAccessToken ? 'capi' : 'pixel');
   const [metaLeadEvent, setMetaLeadEvent] = useState<'start' | 'submit'>(existingTracking?.metaLeadEvent ?? 'submit');
+  const [metaAccessToken, setMetaAccessToken] = useState(existingTracking?.metaAccessToken || '');
+  const [metaTestEventCode, setMetaTestEventCode] = useState(existingTracking?.metaTestEventCode || '');
+  const [showToken, setShowToken] = useState(false);
+
+  // Other tracking state
   const [ga4Id, setGa4Id] = useState(existingTracking?.ga4MeasurementId || '');
   const [ga4Active, setGa4Active] = useState(existingTracking?.ga4Active ?? false);
   const [tiktokId, setTiktokId] = useState(existingTracking?.tiktokPixelId || '');
@@ -421,9 +428,14 @@ export default function IntegracaoPage() {
 
   useEffect(() => {
     if (existingTracking) {
+      const hasConfig = !!(existingTracking.metaPixelId || existingTracking.metaPixelActive);
+      setMetaOpen(hasConfig);
       setMetaPixelId(existingTracking.metaPixelId || '');
       setMetaPixelActive(existingTracking.metaPixelActive ?? false);
+      setMetaMode(existingTracking.metaAccessToken ? 'capi' : 'pixel');
       setMetaLeadEvent(existingTracking.metaLeadEvent ?? 'submit');
+      setMetaAccessToken(existingTracking.metaAccessToken || '');
+      setMetaTestEventCode(existingTracking.metaTestEventCode || '');
       setGa4Id(existingTracking.ga4MeasurementId || '');
       setGa4Active(existingTracking.ga4Active ?? false);
       setTiktokId(existingTracking.tiktokPixelId || '');
@@ -460,6 +472,8 @@ export default function IntegracaoPage() {
       metaPixelId: metaPixelId.trim() || undefined,
       metaPixelActive,
       metaLeadEvent,
+      metaAccessToken: metaMode === 'capi' ? (metaAccessToken.trim() || undefined) : undefined,
+      metaTestEventCode: metaMode === 'capi' ? (metaTestEventCode.trim() || undefined) : undefined,
       ga4MeasurementId: ga4Id.trim() || undefined,
       ga4Active,
       tiktokPixelId: tiktokId.trim() || undefined,
@@ -477,13 +491,9 @@ export default function IntegracaoPage() {
     });
   }
 
-  const isTrackingConfigured = !!(
-    (metaPixelId && metaPixelActive) ||
-    (ga4Id && ga4Active) ||
-    (tiktokId && tiktokActive)
-  );
+  const isMetaConfigured = !!(metaPixelId && metaPixelActive);
+  const isTrackingConfigured = !!(isMetaConfigured || (ga4Id && ga4Active) || (tiktokId && tiktokActive));
 
-  // URL pública do formulário para links de teste
   const publicFormUrl = application?.slug
     ? `${window.location.origin}/f/${application.slug}`
     : undefined;
@@ -498,111 +508,315 @@ export default function IntegracaoPage() {
 
   return (
     <div className="h-full overflow-y-auto" style={{ background: 'var(--bg-base)' }}>
-      <div className="max-w-xl mx-auto px-6 py-8 space-y-8">
+      <div className="max-w-xl mx-auto px-6 py-8 space-y-3">
 
-        {/* Rastreamento */}
-        <section>
-          <SectionHeader title="Rastreamento" isConfigured={isTrackingConfigured} />
-          <p className="text-[12px] text-[var(--text-secondary)] mb-4">
-            Configure pixels de rastreamento para medir o desempenho das suas campanhas.
-          </p>
-
-          <PixelField
-            label="Meta Pixel (Facebook / Instagram)"
-            placeholder="Ex: 123456789012345"
-            value={metaPixelId}
-            active={metaPixelActive}
-            onValueChange={setMetaPixelId}
-            onActiveChange={setMetaPixelActive}
-            tooltip="Encontre o ID no Gerenciador de Anúncios → Gerenciador de Eventos → selecione seu pixel → aba Configurações. O ID é numérico (ex: 762730812147902)."
-          />
-          <PixelField
-            label="Google Analytics 4"
-            placeholder="Ex: G-XXXXXXXXXX"
-            value={ga4Id}
-            active={ga4Active}
-            onValueChange={setGa4Id}
-            onActiveChange={setGa4Active}
-            tooltip="Encontre o ID no Google Analytics → Administrador → Fluxos de dados → selecione seu site. O ID começa com G- (ex: G-AB12CD34EF)."
-          />
-          <PixelField
-            label="TikTok Pixel"
-            placeholder="Ex: XXXXXXXXXXXXXXXXXXXXXXXX"
-            value={tiktokId}
-            active={tiktokActive}
-            onValueChange={setTiktokId}
-            onActiveChange={setTiktokActive}
-            tooltip="Encontre o ID no TikTok Ads Manager → Ativos → Eventos → Web Events → selecione seu pixel → Configurações. O ID é alfanumérico."
-          />
-
-          {/* Disparar Lead: início ou fim */}
-          <div
-            className="p-3 rounded-xl mb-3"
-            style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)' }}
-          >
-            <p className="text-[12px] font-semibold text-[var(--text-primary)] mb-2">
-              Quando disparar o evento <span className="font-mono text-[var(--accent)]">Lead</span>?
-            </p>
-            <div className="flex gap-2">
-              {(['start', 'submit'] as const).map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setMetaLeadEvent(opt)}
-                  className={cn(
-                    'flex-1 py-1.5 px-3 rounded-lg text-[12px] font-medium transition-all border',
-                    metaLeadEvent === opt
-                      ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
-                      : 'text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--accent)]',
-                  )}
-                >
-                  {opt === 'start' ? 'Início do formulário' : 'Fim do formulário'}
-                </button>
-              ))}
-            </div>
-            <p className="text-[11px] text-[var(--text-tertiary)] mt-2">
-              {metaLeadEvent === 'start'
-                ? 'Lead dispara quando o usuário clica em "Começar". Útil para medir intenção.'
-                : 'Lead dispara após o envio completo. Recomendado para qualidade de lead.'}
-            </p>
-          </div>
-
-          {/* Eventos rastreados */}
-          <div
-            className="p-3 rounded-xl mb-3 text-[12px] text-[var(--text-secondary)]"
-            style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)' }}
-          >
-            <p className="font-semibold text-[var(--text-primary)] mb-1">Eventos rastreados automaticamente:</p>
-            <p>• Visualização do formulário → <span className="font-mono text-[var(--accent)]">PageView</span></p>
-            {metaLeadEvent === 'start' && (
-              <p>• Início do formulário → <span className="font-mono text-[var(--accent)]">Lead</span></p>
-            )}
-            <p>• Envio completo → <span className="font-mono text-[var(--accent)]">CompleteRegistration</span>{metaLeadEvent === 'submit' && <span> + <span className="font-mono text-[var(--accent)]">Lead</span></span>}</p>
-          </div>
-
-          {/* Painel de teste do Meta Pixel */}
-          {(metaPixelActive || metaPixelId) && (
-            <MetaTestPanel pixelId={metaPixelId} publicUrl={publicFormUrl} />
-          )}
-
+        {/* ── Meta Ads accordion ─────────────────────────────────────────── */}
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{ border: '1px solid var(--border-hairline)' }}
+        >
+          {/* Header clicável */}
           <button
-            onClick={handleSaveTracking}
-            disabled={trackingMutation.isPending}
+            type="button"
+            onClick={() => setMetaOpen((v) => !v)}
             className={cn(
-              'w-full py-2.5 rounded-lg text-[13px] font-semibold transition-all cursor-pointer',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
-              trackingSaved
-                ? 'bg-[rgba(48,209,88,0.12)] text-[#30d158] border border-[rgba(48,209,88,0.25)]'
-                : 'bg-[var(--accent)] text-white hover:opacity-90',
+              'w-full flex items-center justify-between px-4 py-3.5 transition-colors text-left',
+              metaOpen ? 'bg-[var(--bg-surface-1)]' : 'bg-[var(--bg-base)] hover:bg-[var(--bg-surface-1)]',
             )}
           >
-            {trackingMutation.isPending ? 'Salvando...' : trackingSaved ? '✓ Salvo' : 'Salvar rastreamento'}
+            <div className="flex items-center gap-2.5">
+              {/* Meta logo */}
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(24,119,242,0.15)' }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"
+                    fill="#1877f2"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[13px] font-semibold text-[var(--text-primary)]">Meta Ads</span>
+                  {isMetaConfigured && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#30d158] flex-shrink-0" />
+                  )}
+                  {metaMode === 'capi' && metaAccessToken && (
+                    <span
+                      className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+                      style={{ background: 'rgba(124,92,252,0.15)', color: 'var(--accent)' }}
+                    >
+                      CAPI
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-[var(--text-tertiary)]">Facebook · Instagram · Audience Network</p>
+              </div>
+            </div>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 16 16"
+              fill="none"
+              className={cn('text-[var(--text-tertiary)] transition-transform flex-shrink-0', metaOpen ? 'rotate-180' : '')}
+            >
+              <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
-        </section>
 
-        <div style={{ height: 1, background: 'var(--border-hairline)' }} />
+          {/* Conteúdo expansível */}
+          {metaOpen && (
+            <div
+              className="px-4 pb-4 pt-3 space-y-3"
+              style={{ borderTop: '1px solid var(--border-hairline)', background: 'var(--bg-base)' }}
+            >
+              {/* Pixel ID + toggle ativo */}
+              <div
+                className="p-3 rounded-xl"
+                style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)' }}
+              >
+                <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[12px] font-semibold text-[var(--text-primary)]">Pixel ID</span>
+                    <Tooltip text="Encontre o ID no Gerenciador de Anúncios → Gerenciador de Eventos → selecione seu pixel → aba Configurações. O ID é numérico (ex: 762730812147902)." />
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={metaPixelActive}
+                    onClick={() => setMetaPixelActive((v) => !v)}
+                    className={cn(
+                      'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
+                      metaPixelActive ? 'bg-[var(--accent)]' : 'bg-[var(--border-hairline)]',
+                    )}
+                  >
+                    <span className={cn('inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform', metaPixelActive ? 'translate-x-[18px]' : 'translate-x-1')} />
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={metaPixelId}
+                  onChange={(e) => setMetaPixelId(e.target.value)}
+                  placeholder="Ex: 123456789012345"
+                  className={cn(
+                    'w-full px-3 py-2 rounded-lg text-[13px] font-mono',
+                    'bg-[var(--bg-base)] border border-[var(--border-hairline)]',
+                    'text-[var(--text-primary)] placeholder-[var(--text-tertiary)]',
+                    'focus:outline-none focus:border-[var(--accent)] transition-colors',
+                  )}
+                />
+              </div>
 
-        {/* Notificações */}
+              {/* Mode toggle: Pixel Normal vs API de Conversões */}
+              <div
+                className="p-3 rounded-xl"
+                style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)' }}
+              >
+                <p className="text-[12px] font-semibold text-[var(--text-primary)] mb-2">Modo de envio</p>
+                <div
+                  className="flex p-0.5 rounded-lg"
+                  style={{ background: 'var(--bg-base)', border: '1px solid var(--border-hairline)' }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setMetaMode('pixel')}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-[12px] font-medium transition-all',
+                      metaMode === 'pixel'
+                        ? 'bg-[var(--bg-surface-1)] text-[var(--text-primary)] shadow-sm'
+                        : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]',
+                    )}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                      <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+                      <path d="M5 6.5h6M5 9.5h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                    </svg>
+                    Pixel Normal
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMetaMode('capi')}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-[12px] font-medium transition-all',
+                      metaMode === 'capi'
+                        ? 'bg-[var(--accent)] text-white shadow-sm'
+                        : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]',
+                    )}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                      <path d="M2 8h3l2-5 2 10 2-5h3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    API de Conversões
+                  </button>
+                </div>
+                <p className="text-[11px] text-[var(--text-tertiary)] mt-2">
+                  {metaMode === 'pixel'
+                    ? 'Disparo via browser (fbevents.js). Pode ser bloqueado por ad blockers e iOS 14+.'
+                    : 'Envio server-side com dados hasheados. Imune a bloqueadores. Requer Access Token.'}
+                </p>
+              </div>
+
+              {/* CAPI fields — só visíveis no modo capi */}
+              {metaMode === 'capi' && (
+                <div
+                  className="p-3 rounded-xl space-y-2.5"
+                  style={{ background: 'var(--bg-surface-1)', border: '1px solid rgba(124,92,252,0.25)' }}
+                >
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                      Access Token
+                    </label>
+                    <div className="flex gap-1">
+                      <input
+                        type={showToken ? 'text' : 'password'}
+                        value={metaAccessToken}
+                        onChange={(e) => setMetaAccessToken(e.target.value)}
+                        placeholder="EAAxxxxx..."
+                        className="flex-1 bg-[var(--bg-base)] text-[12px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] px-2.5 py-1.5 rounded-lg outline-none focus:border-[var(--accent)] transition-colors"
+                        style={{ border: '1px solid var(--border-hairline)' }}
+                        autoComplete="off"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowToken((v) => !v)}
+                        className="px-2.5 py-1.5 rounded-lg text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors bg-[var(--bg-base)]"
+                        style={{ border: '1px solid var(--border-hairline)' }}
+                      >
+                        {showToken ? 'Ocultar' : 'Revelar'}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-[var(--text-tertiary)] mt-1">
+                      Gere um System User Token no Business Manager → Usuários do sistema.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                      Test Event Code <span className="font-normal text-[var(--text-tertiary)]">— opcional</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={metaTestEventCode}
+                      onChange={(e) => setMetaTestEventCode(e.target.value)}
+                      placeholder="TEST12345"
+                      className="w-full bg-[var(--bg-base)] text-[12px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] px-2.5 py-1.5 rounded-lg outline-none focus:border-[var(--accent)] transition-colors"
+                      style={{ border: '1px solid var(--border-hairline)' }}
+                    />
+                    <p className="text-[10px] text-[var(--text-tertiary)] mt-1">
+                      Gerenciador de Eventos → Teste de Eventos. Remova após validar.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Quando disparar Lead */}
+              <div
+                className="p-3 rounded-xl"
+                style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)' }}
+              >
+                <p className="text-[12px] font-semibold text-[var(--text-primary)] mb-2">
+                  Quando disparar o evento <span className="font-mono text-[var(--accent)]">Lead</span>?
+                </p>
+                <div className="flex gap-2">
+                  {(['start', 'submit'] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setMetaLeadEvent(opt)}
+                      className={cn(
+                        'flex-1 py-1.5 px-3 rounded-lg text-[12px] font-medium transition-all border',
+                        metaLeadEvent === opt
+                          ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+                          : 'text-[var(--text-secondary)] border-[var(--border-hairline)] hover:border-[var(--accent)]',
+                      )}
+                    >
+                      {opt === 'start' ? 'Início do formulário' : 'Fim do formulário'}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-[var(--text-tertiary)] mt-2">
+                  {metaLeadEvent === 'start'
+                    ? 'Lead dispara quando o usuário clica em "Começar". Útil para medir intenção.'
+                    : 'Lead dispara após o envio completo. Recomendado para qualidade de lead.'}
+                </p>
+              </div>
+
+              {/* Eventos rastreados */}
+              <div
+                className="px-3 py-2.5 rounded-xl text-[12px] text-[var(--text-secondary)]"
+                style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)' }}
+              >
+                <p className="font-semibold text-[var(--text-primary)] mb-1.5">Eventos rastreados:</p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#30a0ff] flex-shrink-0" />
+                    <span>Visualização → <span className="font-mono text-[var(--accent)]">PageView</span></span>
+                  </div>
+                  {metaLeadEvent === 'start' && (
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#30a0ff] flex-shrink-0" />
+                      <span>Início → <span className="font-mono text-[var(--accent)]">Lead</span></span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#30d158] flex-shrink-0" />
+                    <span>
+                      Envio → <span className="font-mono text-[var(--accent)]">CompleteRegistration</span>
+                      {metaLeadEvent === 'submit' && <span> + <span className="font-mono text-[var(--accent)]">Lead</span></span>}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Painel de teste */}
+              {(metaPixelActive || metaPixelId) && (
+                <MetaTestPanel pixelId={metaPixelId} publicUrl={publicFormUrl} />
+              )}
+
+              {/* Botão salvar rastreamento */}
+              <button
+                onClick={handleSaveTracking}
+                disabled={trackingMutation.isPending}
+                className={cn(
+                  'w-full py-2.5 rounded-lg text-[13px] font-semibold transition-all cursor-pointer',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
+                  trackingSaved
+                    ? 'bg-[rgba(48,209,88,0.12)] text-[#30d158] border border-[rgba(48,209,88,0.25)]'
+                    : 'bg-[var(--accent)] text-white hover:opacity-90',
+                )}
+              >
+                {trackingMutation.isPending ? 'Salvando...' : trackingSaved ? '✓ Salvo' : 'Salvar rastreamento'}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* ── Google Analytics 4 ────────────────────────────────────────── */}
+        <PixelField
+          label="Google Analytics 4"
+          placeholder="Ex: G-XXXXXXXXXX"
+          value={ga4Id}
+          active={ga4Active}
+          onValueChange={setGa4Id}
+          onActiveChange={setGa4Active}
+          tooltip="Encontre o ID no Google Analytics → Administrador → Fluxos de dados → selecione seu site. O ID começa com G- (ex: G-AB12CD34EF)."
+        />
+
+        {/* ── TikTok Pixel ──────────────────────────────────────────────── */}
+        <PixelField
+          label="TikTok Pixel"
+          placeholder="Ex: XXXXXXXXXXXXXXXXXXXXXXXX"
+          value={tiktokId}
+          active={tiktokActive}
+          onValueChange={setTiktokId}
+          onActiveChange={setTiktokActive}
+          tooltip="Encontre o ID no TikTok Ads Manager → Ativos → Eventos → Web Events → selecione seu pixel → Configurações. O ID é alfanumérico."
+        />
+
+        <div style={{ height: 1, background: 'var(--border-hairline)', margin: '20px 0' }} />
+
+        {/* ── Notificações ──────────────────────────────────────────────── */}
         <section>
           <SectionHeader title="Notificações" isConfigured={emailEnabled} />
           <p className="text-[12px] text-[var(--text-secondary)] mb-4">

@@ -68,6 +68,43 @@ function captureUTM(slug: string): Record<string, string> {
   return utm;
 }
 
+function captureMetaClickData(slug: string): { fbclid?: string; fbc?: string; fbp?: string } {
+  const params = new URLSearchParams(window.location.search);
+  const fbclid = params.get('fbclid') ?? undefined;
+
+  // Build _fbc from fbclid if not already set by SDK
+  let fbc: string | undefined;
+  let fbp: string | undefined;
+
+  try {
+    const cookies = Object.fromEntries(
+      document.cookie.split(';').map((c) => {
+        const [k, ...v] = c.trim().split('=');
+        return [k, v.join('=')];
+      }),
+    );
+    fbc = cookies['_fbc'] || (fbclid ? `fb.1.${Date.now()}.${fbclid}` : undefined);
+    fbp = cookies['_fbp'] || undefined;
+  } catch { /* ignore */ }
+
+  // Persist so it survives form navigation
+  try {
+    if (fbc || fbp || fbclid) {
+      const existing = JSON.parse(sessionStorage.getItem(`iris_meta_${slug}`) ?? '{}') as Record<string, string>;
+      const merged = { ...existing, ...(fbc && { fbc }), ...(fbp && { fbp }), ...(fbclid && { fbclid }) };
+      sessionStorage.setItem(`iris_meta_${slug}`, JSON.stringify(merged));
+    } else {
+      const stored = sessionStorage.getItem(`iris_meta_${slug}`);
+      if (stored) {
+        const d = JSON.parse(stored) as { fbc?: string; fbp?: string; fbclid?: string };
+        return d;
+      }
+    }
+  } catch { /* ignore */ }
+
+  return { fbclid, fbc, fbp };
+}
+
 // ─────────────────────────────────────────────
 // Progress Bar
 // ─────────────────────────────────────────────
@@ -1184,16 +1221,24 @@ export default function FormPublicoPage() {
       metadata?: Record<string, string>;
     }) => submitFormResponse(slug!, answersArr, metadata),
     onSuccess: () => {
-      trackFormSubmit();
+      trackFormSubmit(`${sessionToken.current}-submit`);
       setSubmitted(true);
       if (settings.redirectUrl) {
         setRedirectCountdown(3);
       }
       if (slug) {
+        const { fbc, fbp } = captureMetaClickData(slug);
         fetch(`${API_BASE}/api/forms/${slug}/events`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ event: 'submit', session_token: sessionToken.current }),
+          body: JSON.stringify({
+            event: 'submit',
+            session_token: sessionToken.current,
+            event_id: `${sessionToken.current}-submit`,
+            page_url: window.location.href,
+            fbc,
+            fbp,
+          }),
         }).catch(() => { /* ignore */ });
       }
     },
@@ -1241,12 +1286,12 @@ export default function FormPublicoPage() {
     if (!currentField) {
       // Welcome screen: find first non-welcome field
       const firstIdx = fields.findIndex((f) => f.type !== 'welcome');
-      trackFormStart();
+      trackFormStart(`${sessionToken.current}-start`);
       if (slug) {
         fetch(`${API_BASE}/api/forms/${slug}/events`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ event: 'start', session_token: sessionToken.current }),
+          body: JSON.stringify({ event: 'start', session_token: sessionToken.current, event_id: `${sessionToken.current}-start`, page_url: window.location.href, ...captureMetaClickData(slug!) }),
         }).catch(() => { /* ignore */ });
       }
       setDirection('forward');
@@ -1276,11 +1321,15 @@ export default function FormPublicoPage() {
         .filter((f) => answers[f.id] !== undefined)
         .map((f) => ({ field_id: f.id, field_type: f.type, field_title: f.title, value: answers[f.id] }));
       const utm = captureUTM(slug!);
+      const { fbc, fbp, fbclid } = captureMetaClickData(slug!);
       const metadata: Record<string, string> = {};
-      if (Object.keys(utm).length > 0) {
-        Object.entries(utm).forEach(([k, v]) => { metadata[k] = v; });
-      }
-      submitMutation.mutate({ answersArr, metadata: Object.keys(metadata).length > 0 ? metadata : undefined });
+      Object.entries(utm).forEach(([k, v]) => { metadata[k] = v; });
+      if (fbc)    metadata.fbc     = fbc;
+      if (fbp)    metadata.fbp     = fbp;
+      if (fbclid) metadata.fbclid  = fbclid;
+      metadata.event_id = `${sessionToken.current}-submit`;
+      metadata.page_url = window.location.href;
+      submitMutation.mutate({ answersArr, metadata });
       return;
     }
 
@@ -1352,11 +1401,19 @@ export default function FormPublicoPage() {
   // Track form view when data loads
   useEffect(() => {
     if (data && slug) {
-      trackFormView();
+      trackFormView(`${sessionToken.current}-view`);
+      const { fbc, fbp } = captureMetaClickData(slug);
       fetch(`${API_BASE}/api/forms/${slug}/events`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event: 'view', session_token: sessionToken.current }),
+        body: JSON.stringify({
+          event: 'view',
+          session_token: sessionToken.current,
+          event_id: `${sessionToken.current}-view`,
+          page_url: window.location.href,
+          fbc,
+          fbp,
+        }),
       }).catch(() => { /* ignore */ });
     }
   }, [data, slug]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -1409,13 +1466,13 @@ export default function FormPublicoPage() {
           settings={settings}
           onStart={() => {
             setDirection('forward');
-            trackFormStart();
+            trackFormStart(`${sessionToken.current}-start`);
             // Fire backend start event (was missing — only pixel was firing before)
             if (slug) {
               fetch(`${API_BASE}/api/forms/${slug}/events`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ event: 'start', session_token: sessionToken.current }),
+                body: JSON.stringify({ event: 'start', session_token: sessionToken.current, event_id: `${sessionToken.current}-start`, page_url: window.location.href, ...captureMetaClickData(slug!) }),
               }).catch(() => { /* ignore */ });
             }
             const firstNonWelcome = fields.findIndex(
@@ -1469,12 +1526,12 @@ export default function FormPublicoPage() {
         (f) => f.type !== 'welcome' && f.type !== 'thank_you',
       );
       if (first >= 0) {
-        trackFormStart();
+        trackFormStart(`${sessionToken.current}-start`);
         if (slug) {
           fetch(`${API_BASE}/api/forms/${slug}/events`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ event: 'start', session_token: sessionToken.current }),
+            body: JSON.stringify({ event: 'start', session_token: sessionToken.current, event_id: `${sessionToken.current}-start`, page_url: window.location.href, ...captureMetaClickData(slug!) }),
           }).catch(() => { /* ignore */ });
         }
         setCurrentIndex(first);
