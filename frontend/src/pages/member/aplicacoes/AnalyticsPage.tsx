@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '../../../lib/cn.ts';
 import { fetchAnalytics, applicationKeys } from '../../../api/applications.ts';
-import type { AnalyticsLead } from '../../../api/applications.ts';
+import type { AnalyticsLead, AnalyticsData } from '../../../api/applications.ts';
 import type { ApplicationShellContext } from './ApplicationShell.tsx';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -563,6 +563,164 @@ function HourlyHeatmap({ hourly }: { hourly: Array<{ hour: number; views: number
   );
 }
 
+// ─── Traffic Pie Chart ────────────────────────────────────────────────────────
+
+function TrafficPieChart({ traffic_split }: { traffic_split: AnalyticsData['traffic_split'] }) {
+  const { paid, organic, total } = traffic_split;
+  if (total === 0 || paid === 0) return null; // só mostra quando houver tráfego pago
+
+  const R = 52;
+  const cx = 70;
+  const cy = 70;
+  const circ = 2 * Math.PI * R;
+  const paidPct  = paid  / total;
+  const orgPct   = organic / total;
+  const paidDash = paidPct * circ;
+  const orgDash  = orgPct  * circ;
+  // paid starts at top (rotate -90°)
+  const orgOffset = -circ * (1 - orgPct); // paid first, then organic
+
+  return (
+    <div
+      className="p-5 rounded-xl"
+      style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)' }}
+    >
+      <h3 className="text-[13px] font-semibold text-[var(--text-primary)] mb-1">Origem do tráfego</h3>
+      <p className="text-[11px] text-[var(--text-tertiary)] mb-4">Com base nos leads convertidos no período</p>
+
+      <div className="flex items-center gap-8 flex-wrap">
+        {/* Donut SVG */}
+        <svg width={140} height={140} viewBox="0 0 140 140">
+          {/* organic (base ring) */}
+          <circle
+            cx={cx} cy={cy} r={R}
+            fill="none"
+            stroke="rgba(124,92,252,0.2)"
+            strokeWidth={18}
+          />
+          {/* paid arc */}
+          <circle
+            cx={cx} cy={cy} r={R}
+            fill="none"
+            stroke="#7c5cfc"
+            strokeWidth={18}
+            strokeDasharray={`${paidDash} ${circ - paidDash}`}
+            strokeDashoffset={circ / 4} // start at top
+            strokeLinecap="round"
+            style={{ transition: 'stroke-dasharray 0.6s ease' }}
+          />
+          {/* organic arc */}
+          <circle
+            cx={cx} cy={cy} r={R}
+            fill="none"
+            stroke="rgba(124,92,252,0.35)"
+            strokeWidth={18}
+            strokeDasharray={`${orgDash} ${circ - orgDash}`}
+            strokeDashoffset={circ / 4 - paidDash}
+            strokeLinecap="round"
+            style={{ transition: 'stroke-dasharray 0.6s ease' }}
+          />
+          {/* center text */}
+          <text x={cx} y={cy - 8} textAnchor="middle" fontSize={22} fontWeight={700} fill="var(--text-primary)">
+            {Math.round(paidPct * 100)}%
+          </text>
+          <text x={cx} y={cy + 12} textAnchor="middle" fontSize={10} fill="var(--text-tertiary)">
+            pago
+          </text>
+        </svg>
+
+        {/* Legend + numbers */}
+        <div className="flex flex-col gap-4 flex-1">
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: '#7c5cfc' }} />
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] text-[var(--text-primary)] font-medium">Tráfego pago</span>
+                <span className="text-[13px] font-bold text-[var(--text-primary)]">{paid}</span>
+              </div>
+              <div className="mt-1 h-1.5 rounded-full" style={{ background: 'var(--border-hairline)' }}>
+                <div className="h-full rounded-full" style={{ width: `${paidPct * 100}%`, background: '#7c5cfc', transition: 'width 0.6s ease' }} />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: 'rgba(124,92,252,0.4)' }} />
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] text-[var(--text-primary)] font-medium">Orgânico / Direto</span>
+                <span className="text-[13px] font-bold text-[var(--text-primary)]">{organic}</span>
+              </div>
+              <div className="mt-1 h-1.5 rounded-full" style={{ background: 'var(--border-hairline)' }}>
+                <div className="h-full rounded-full" style={{ width: `${orgPct * 100}%`, background: 'rgba(124,92,252,0.4)', transition: 'width 0.6s ease' }} />
+              </div>
+            </div>
+          </div>
+          <p className="text-[11px] text-[var(--text-tertiary)] pt-1" style={{ borderTop: '1px solid var(--border-hairline)' }}>
+            {total} lead{total !== 1 ? 's' : ''} no período
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── UTM Breakdown ────────────────────────────────────────────────────────────
+
+function UTMBreakdown({ utm_breakdown }: { utm_breakdown: AnalyticsData['utm_breakdown'] }) {
+  if (utm_breakdown.length === 0) return null;
+
+  const max = utm_breakdown[0]?.count || 1;
+  const PAID_SOURCES = /facebook|instagram|google|tiktok|youtube|twitter|linkedin|meta|ads/i;
+
+  return (
+    <div
+      className="p-5 rounded-xl"
+      style={{ background: 'var(--bg-surface-1)', border: '1px solid var(--border-hairline)' }}
+    >
+      <h3 className="text-[13px] font-semibold text-[var(--text-primary)] mb-1">UTM Source — leads por origem</h3>
+      <p className="text-[11px] text-[var(--text-tertiary)] mb-4">Baseado nos leads convertidos (utm_source da URL)</p>
+
+      <div className="space-y-3">
+        {utm_breakdown.map(({ source, count }) => {
+          const pct = (count / max) * 100;
+          const isPaid = PAID_SOURCES.test(source) && source !== '(direto / orgânico)';
+          const barColor = isPaid ? '#7c5cfc' : 'rgba(124,92,252,0.4)';
+
+          return (
+            <div key={source}>
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  {isPaid && (
+                    <span
+                      className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wider"
+                      style={{ background: 'rgba(124,92,252,0.15)', color: '#7c5cfc' }}
+                    >
+                      pago
+                    </span>
+                  )}
+                  <span className="text-[12px] text-[var(--text-primary)] font-medium">{source}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-[var(--text-tertiary)]">
+                    {Math.round((count / utm_breakdown.reduce((s, x) => s + x.count, 0)) * 100)}%
+                  </span>
+                  <span className="text-[12px] font-semibold text-[var(--text-primary)] w-6 text-right">{count}</span>
+                </div>
+              </div>
+              <div className="h-1.5 rounded-full" style={{ background: 'var(--border-hairline)' }}>
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{ width: `${pct}%`, background: barColor }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Leads Table ──────────────────────────────────────────────────────────────
 
 function LeadsTable({ leads }: { leads: AnalyticsLead[] }) {
@@ -754,6 +912,14 @@ export default function AnalyticsPage() {
 
             {/* Hourly heatmap */}
             <HourlyHeatmap hourly={data.hourly} />
+
+            {/* Traffic split pie + UTM breakdown — só mostra se houver leads */}
+            {data.leads.length > 0 && (
+              <>
+                <TrafficPieChart traffic_split={data.traffic_split} />
+                <UTMBreakdown utm_breakdown={data.utm_breakdown} />
+              </>
+            )}
 
             {/* Leads table */}
             <LeadsTable leads={data.leads} />

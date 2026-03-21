@@ -322,6 +322,8 @@ export interface AnalyticsData {
   timeline: Array<{ date: string; views: number; starts: number; submits: number }>;
   hourly: Array<{ hour: number; views: number; starts: number; submits: number }>;
   leads: AnalyticsLead[];
+  utm_breakdown: Array<{ source: string; count: number }>;
+  traffic_split: { paid: number; organic: number; total: number };
 }
 
 export interface ApplicationTemplate {

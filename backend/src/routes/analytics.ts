@@ -153,6 +153,20 @@ router.get('/:id/analytics', requireAuth, async (req: AuthenticatedRequest, res)
     });
   }
 
+  // ── UTM aggregation (from converted leads) ───────────────────────────────
+  const utmCounts: Record<string, number> = {};
+  for (const lead of leads) {
+    const source = lead.utm_source?.trim() || '(direto / orgânico)';
+    utmCounts[source] = (utmCounts[source] || 0) + 1;
+  }
+  const utm_breakdown = Object.entries(utmCounts)
+    .map(([source, count]) => ({ source, count }))
+    .sort((a, b) => b.count - a.count);
+
+  const paid    = leads.filter((l) => l.utm_source?.trim()).length;
+  const organic = leads.length - paid;
+  const traffic_split = { paid, organic, total: leads.length };
+
   res.json({
     data: {
       views,
@@ -165,6 +179,8 @@ router.get('/:id/analytics', requireAuth, async (req: AuthenticatedRequest, res)
       timeline,
       hourly,
       leads,
+      utm_breakdown,
+      traffic_split,
       period: resolvedPeriod,
       from:   sinceISO.slice(0, 10),
       to:     untilISO.slice(0, 10),
