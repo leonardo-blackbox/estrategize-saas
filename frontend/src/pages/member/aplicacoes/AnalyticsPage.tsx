@@ -578,8 +578,6 @@ function TrafficPieChart({ traffic_split }: { traffic_split: AnalyticsData['traf
   const paidDash = paidPct * circ;
   const orgDash  = orgPct  * circ;
   // paid starts at top (rotate -90°)
-  const orgOffset = -circ * (1 - orgPct); // paid first, then organic
-
   return (
     <div
       className="p-5 rounded-xl"
