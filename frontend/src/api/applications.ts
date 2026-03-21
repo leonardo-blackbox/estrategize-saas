@@ -298,6 +298,16 @@ export interface NotificationConfig {
   digestMode: 'instant' | 'daily';
 }
 
+export interface AnalyticsLead {
+  name?: string;
+  email?: string;
+  phone?: string;
+  instagram?: string;
+  submitted_at: string;
+  utm_source?: string;
+  utm_campaign?: string;
+}
+
 export interface AnalyticsData {
   views: number;
   starts: number;
@@ -305,8 +315,13 @@ export interface AnalyticsData {
   total_responses: number;
   start_rate: number;
   completion_rate: number;
+  overall_rate: number;
   period: string;
+  from: string;
+  to: string;
   timeline: Array<{ date: string; views: number; starts: number; submits: number }>;
+  hourly: Array<{ hour: number; views: number; starts: number; submits: number }>;
+  leads: AnalyticsLead[];
 }
 
 export interface ApplicationTemplate {
@@ -366,10 +381,15 @@ export async function updateNotificationConfig(
 export async function fetchAnalytics(
   id: string,
   period: '7d' | '30d' | '90d' = '30d',
+  customRange?: { from: string; to: string },
 ): Promise<AnalyticsData> {
-  const res = await client
-    .get(`/api/applications/${id}/analytics?period=${period}`)
-    .json<{ data: AnalyticsData }>();
+  let url = `/api/applications/${id}/analytics`;
+  if (customRange) {
+    url += `?from=${customRange.from}&to=${customRange.to}`;
+  } else {
+    url += `?period=${period}`;
+  }
+  const res = await client.get(url).json<{ data: AnalyticsData }>();
   return res.data;
 }
 
