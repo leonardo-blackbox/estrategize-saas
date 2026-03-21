@@ -150,6 +150,21 @@ router.get('/', async (req: AuthenticatedRequest, res) => {
       return;
     }
 
+    // Fetch real response counts from application_responses (bypasses stale denormalized counter)
+    const appIds = (applications ?? []).map((a) => a.id);
+    const { data: responseCounts } = appIds.length > 0
+      ? await supabaseAdmin
+          .from('application_responses')
+          .select('application_id')
+          .in('application_id', appIds)
+          .eq('status', 'complete')
+      : { data: [] };
+
+    const realCountMap: Record<string, number> = {};
+    for (const row of responseCounts ?? []) {
+      realCountMap[row.application_id] = (realCountMap[row.application_id] ?? 0) + 1;
+    }
+
     // Normalise the count shape returned by PostgREST (array with one {count} object)
     const normalised = (applications ?? []).map((app) => {
       const raw = app.application_fields as unknown;
@@ -160,7 +175,8 @@ router.get('/', async (req: AuthenticatedRequest, res) => {
       const { application_fields: _dropped, ...rest } = app as typeof app & {
         application_fields: unknown;
       };
-      return { ...rest, field_count: fieldCount };
+      const liveCount = realCountMap[app.id] ?? 0;
+      return { ...rest, field_count: fieldCount, response_count: liveCount };
     });
 
     res.json({ data: normalised });
@@ -323,7 +339,9 @@ router.put('/:id', async (req: AuthenticatedRequest, res) => {
   }
 });
 
-// DELETE /api/applications/:id (soft delete — archives)
+// DELETE /api/applications/:id
+//   • published/draft → soft delete (archive)
+//   • archived        → permanent delete (cascade all related rows)
 router.delete('/:id', async (req: AuthenticatedRequest, res) => {
   try {
     if (!supabaseAdmin) {
@@ -338,15 +356,47 @@ router.delete('/:id', async (req: AuthenticatedRequest, res) => {
       return;
     }
 
-    const { error } = await supabaseAdmin
-      .from('applications')
-      .update({ status: 'archived' })
-      .eq('id', id)
-      .eq('user_id', req.userId!);
+    if (existing.status === 'archived') {
+      // Permanent delete: cascade through child tables manually
+      // 1. response answers (FK on response_id, not application_id)
+      const { data: responseIds } = await supabaseAdmin
+        .from('application_responses')
+        .select('id')
+        .eq('application_id', id);
 
-    if (error) {
-      res.status(500).json({ error: error.message });
-      return;
+      if (responseIds && responseIds.length > 0) {
+        const ids = responseIds.map((r: { id: string }) => r.id);
+        await supabaseAdmin.from('application_response_answers').delete().in('response_id', ids);
+      }
+
+      // 2. responses, events, fields
+      await supabaseAdmin.from('application_responses').delete().eq('application_id', id);
+      await supabaseAdmin.from('application_events').delete().eq('application_id', id);
+      await supabaseAdmin.from('application_fields').delete().eq('application_id', id);
+
+      // 3. application itself
+      const { error } = await supabaseAdmin
+        .from('applications')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', req.userId!);
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
+    } else {
+      // Soft delete: archive
+      const { error } = await supabaseAdmin
+        .from('applications')
+        .update({ status: 'archived' })
+        .eq('id', id)
+        .eq('user_id', req.userId!);
+
+      if (error) {
+        res.status(500).json({ error: error.message });
+        return;
+      }
     }
 
     res.json({ ok: true });
