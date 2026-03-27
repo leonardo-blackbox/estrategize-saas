@@ -1,4 +1,3 @@
-import { cn } from '../../../../lib/cn.ts';
 import type { LessonLink } from '../../services/admin.api.ts';
 
 interface AdminCursoDetailLessonsProps {

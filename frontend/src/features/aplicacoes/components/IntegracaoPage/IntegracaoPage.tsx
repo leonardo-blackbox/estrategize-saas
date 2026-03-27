@@ -7,7 +7,7 @@ import { IntegracaoNotificacoes } from '../IntegracaoNotificacoes';
 
 export function IntegracaoPage() {
   const { application } = useOutletContext<ApplicationShellContext>();
-  const h = useIntegracao(application);
+  const h = useIntegracao(application ?? null);
 
   if (!application) {
     return (
