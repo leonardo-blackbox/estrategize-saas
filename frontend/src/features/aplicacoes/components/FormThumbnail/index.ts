@@ -1,0 +1,1 @@
+export { FormThumbnail } from './FormThumbnail';

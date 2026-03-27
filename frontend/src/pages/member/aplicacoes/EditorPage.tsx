@@ -7,9 +7,9 @@ import {
   applicationKeys,
 } from '../../../api/applications.ts';
 import { useEditorStore } from '../../../stores/editorStore.ts';
-import { FieldsListPanel } from '../../../components/aplicacoes/editor/FieldsList.tsx';
-import { LivePreviewPanel } from '../../../components/aplicacoes/editor/LivePreview.tsx';
-import { FieldOptionsPanel } from '../../../components/aplicacoes/editor/FieldOptions.tsx';
+import { FieldsListPanel } from '../../../features/aplicacoes/components/FieldsList/index.ts';
+import { LivePreviewPanel } from '../../../features/aplicacoes/components/LivePreview/index.ts';
+import { FieldOptionsPanel } from '../../../features/aplicacoes/components/FieldOptions/index.ts';
 import type { ApplicationShellContext } from './ApplicationShell.tsx';
 
 type MobilePanel = 'fields' | 'preview' | 'options';

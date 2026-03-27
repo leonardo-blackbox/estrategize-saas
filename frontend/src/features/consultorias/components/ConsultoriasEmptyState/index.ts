@@ -1,0 +1,1 @@
+export { ConsultoriasEmptyState } from './ConsultoriasEmptyState';

@@ -1,0 +1,1 @@
+export { AplicacoesToolbar } from './AplicacoesToolbar';

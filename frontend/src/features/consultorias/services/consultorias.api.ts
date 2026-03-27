@@ -1,0 +1,35 @@
+export {
+  fetchConsultancies,
+  createConsultancy,
+  updateConsultancy,
+  fetchConsultancy,
+  fetchMeetings,
+  fetchActionItems,
+  fetchDeliverables,
+  fetchAIContext,
+  chatWithAI,
+  fetchAIMemory,
+  addAIMemory,
+  deleteAIMemory,
+  summarizeMeeting,
+  generateDeliverable,
+  type Consultancy,
+  type ConsultancyStats,
+  type ConsultancyPhase,
+  type ConsultancyPriority,
+  type ConsultancyTemplate,
+  type Meeting,
+  type ActionItem,
+  type AIMessage,
+  type AIMemoryItem,
+  type InsightCards,
+  type ActionPriority,
+  type DeliverableType,
+  phaseConfig,
+  templateConfig,
+  consultancyKeys,
+} from '../../../api/consultancies.ts';
+
+export { getDiagnosis, type Diagnosis } from '../../../api/diagnoses.ts';
+
+export { client } from '../../../api/client.ts';

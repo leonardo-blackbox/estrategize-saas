@@ -1,0 +1,1 @@
+export { FormacaoMaterialModal } from './FormacaoMaterialModal';

@@ -1,0 +1,1 @@
+export { RespostasPage } from './RespostasPage';

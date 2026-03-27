@@ -1,0 +1,1 @@
+export { FormacaoSectionBlock } from './FormacaoSectionBlock';

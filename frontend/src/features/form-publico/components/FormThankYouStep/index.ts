@@ -1,0 +1,1 @@
+export { FormThankYouStep } from './FormThankYouStep';

@@ -1,0 +1,1 @@
+export { ConsultoriaCard } from './ConsultoriaCard';

@@ -1,0 +1,1 @@
+export { FormacaoHero } from './FormacaoHero';

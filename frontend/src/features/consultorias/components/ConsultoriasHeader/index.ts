@@ -1,0 +1,1 @@
+export { ConsultoriasHeader } from './ConsultoriasHeader';

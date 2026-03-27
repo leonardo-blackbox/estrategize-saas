@@ -1,0 +1,1 @@
+export { IntegracaoMetaPixelId } from './IntegracaoMetaPixelId';

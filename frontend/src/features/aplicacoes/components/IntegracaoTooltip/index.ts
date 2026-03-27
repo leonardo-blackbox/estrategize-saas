@@ -1,0 +1,1 @@
+export { IntegracaoTooltip } from './IntegracaoTooltip';

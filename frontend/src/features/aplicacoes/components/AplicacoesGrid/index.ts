@@ -1,0 +1,1 @@
+export { AplicacoesGrid } from './AplicacoesGrid';

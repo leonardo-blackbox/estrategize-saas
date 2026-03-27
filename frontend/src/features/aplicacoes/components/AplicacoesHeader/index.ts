@@ -1,0 +1,1 @@
+export { AplicacoesHeader } from './AplicacoesHeader';

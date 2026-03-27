@@ -1,0 +1,1 @@
+export { IntegracaoNotificacoes } from './IntegracaoNotificacoes';

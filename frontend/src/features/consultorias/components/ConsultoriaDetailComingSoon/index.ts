@@ -1,0 +1,1 @@
+export { ConsultoriaDetailComingSoon } from './ConsultoriaDetailComingSoon';

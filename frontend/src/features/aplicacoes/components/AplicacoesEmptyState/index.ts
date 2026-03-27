@@ -1,0 +1,1 @@
+export { AplicacoesEmptyState } from './AplicacoesEmptyState';

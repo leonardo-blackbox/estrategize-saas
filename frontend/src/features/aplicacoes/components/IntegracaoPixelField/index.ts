@@ -1,0 +1,1 @@
+export { IntegracaoPixelField } from './IntegracaoPixelField';

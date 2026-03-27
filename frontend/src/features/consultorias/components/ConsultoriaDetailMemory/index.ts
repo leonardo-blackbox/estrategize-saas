@@ -1,0 +1,1 @@
+export { ConsultoriaDetailMemory } from './ConsultoriaDetailMemory';

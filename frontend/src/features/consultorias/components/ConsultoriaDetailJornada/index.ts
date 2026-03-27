@@ -1,0 +1,1 @@
+export { ConsultoriaDetailJornada } from './ConsultoriaDetailJornada';

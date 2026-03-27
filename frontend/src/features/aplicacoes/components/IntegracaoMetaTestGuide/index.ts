@@ -1,0 +1,1 @@
+export { IntegracaoMetaTestGuide } from './IntegracaoMetaTestGuide';

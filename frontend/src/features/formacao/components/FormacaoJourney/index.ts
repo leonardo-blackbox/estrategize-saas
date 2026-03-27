@@ -1,0 +1,1 @@
+export { FormacaoJourney } from './FormacaoJourney';

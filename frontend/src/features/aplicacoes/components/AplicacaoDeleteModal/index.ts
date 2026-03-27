@@ -1,0 +1,1 @@
+export { AplicacaoDeleteModal } from './AplicacaoDeleteModal';

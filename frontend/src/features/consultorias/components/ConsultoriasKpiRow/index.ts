@@ -1,0 +1,1 @@
+export { ConsultoriasKpiRow } from './ConsultoriasKpiRow';

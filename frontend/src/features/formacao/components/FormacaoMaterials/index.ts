@@ -1,0 +1,1 @@
+export { FormacaoMaterials } from './FormacaoMaterials';

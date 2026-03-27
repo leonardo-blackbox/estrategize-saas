@@ -1,0 +1,1 @@
+export { RespostasIndividualView } from './RespostasIndividualView';

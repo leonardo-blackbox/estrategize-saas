@@ -1,0 +1,1 @@
+export { RespostasSidebar } from './RespostasSidebar';

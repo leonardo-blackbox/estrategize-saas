@@ -1,0 +1,1 @@
+export { IntegracaoMetaCapiFields } from './IntegracaoMetaCapiFields';

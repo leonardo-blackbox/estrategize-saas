@@ -1,0 +1,1 @@
+export { IntegracaoMeta } from './IntegracaoMeta';

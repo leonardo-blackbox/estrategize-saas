@@ -1,0 +1,1 @@
+export { RespostasDetailHeader } from './RespostasDetailHeader';

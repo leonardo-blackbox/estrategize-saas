@@ -1,0 +1,1 @@
+export { ConsultoriasGrid } from './ConsultoriasGrid';

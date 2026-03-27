@@ -143,6 +143,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         conditional_logic: f.conditional_logic,
       }));
 
+    const savedIdx = sessionStorage.getItem(`editorSelectedField_${app.id}`);
+    const parsedIdx = savedIdx !== null ? parseInt(savedIdx, 10) : null;
+    const restoredIndex =
+      parsedIdx !== null && !isNaN(parsedIdx) && parsedIdx >= 0 && parsedIdx < fields.length
+        ? parsedIdx
+        : null;
+
     set({
       applicationId: app.id,
       title: app.title,
@@ -150,7 +157,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       themeConfig: app.theme_config ?? DEFAULT_THEME,
       settings: app.settings ?? DEFAULT_SETTINGS,
       fields,
-      selectedFieldIndex: null,
+      selectedFieldIndex: restoredIndex,
       isDirty: false,
       saveStatus: 'idle',
       saveTimer: null,
@@ -220,6 +227,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   selectField: (index: number | null) => {
+    const { applicationId } = get();
+    if (applicationId) {
+      if (index !== null) {
+        sessionStorage.setItem(`editorSelectedField_${applicationId}`, String(index));
+      } else {
+        sessionStorage.removeItem(`editorSelectedField_${applicationId}`);
+      }
+    }
     set({ selectedFieldIndex: index });
   },
 

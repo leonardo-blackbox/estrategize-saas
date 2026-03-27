@@ -1,0 +1,1 @@
+export { FormacaoMaterialIcon } from './FormacaoMaterialIcon';

@@ -1,0 +1,1 @@
+export { IntegracaoPage } from './IntegracaoPage';

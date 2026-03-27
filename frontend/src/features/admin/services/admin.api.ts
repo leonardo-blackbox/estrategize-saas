@@ -1,0 +1,32 @@
+// Re-export all admin API functions used by admin features
+export {
+  getHomeSettings,
+  adminUpdateHomeSettings,
+  adminGetFormacaoSections,
+  adminCreateSection,
+  adminUpdateSection,
+  adminDeleteSection,
+  adminUpdateSectionCourses,
+  adminReorderSections,
+  adminListCourses,
+  adminGetCourse,
+  adminUpdateCourse,
+  adminCreateModule,
+  adminUpdateModule,
+  adminDeleteModule,
+  adminCreateLesson,
+  adminUpdateLesson,
+  adminDeleteLesson,
+  adminUpdateCourseSales,
+  adminGetUser,
+  adminGrantEntitlement,
+  adminRevokeEntitlement,
+  adminGetUserCreditTransactions,
+  adminGetUserCreditBalance,
+  adminAdjustCredits,
+  adminUpdateUserProfile,
+  adminGetUserProgress,
+  adminGetUserAuditLogs,
+} from '../../../api/courses.ts';
+
+export type { LessonLink } from '../../../api/courses.ts';

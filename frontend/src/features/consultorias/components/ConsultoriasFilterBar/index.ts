@@ -1,0 +1,1 @@
+export { ConsultoriasFilterBar } from './ConsultoriasFilterBar';

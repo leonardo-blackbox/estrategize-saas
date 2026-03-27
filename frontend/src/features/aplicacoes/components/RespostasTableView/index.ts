@@ -1,0 +1,1 @@
+export { RespostasTableView } from './RespostasTableView';

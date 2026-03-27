@@ -1,0 +1,1 @@
+export { AplicacoesPage } from './AplicacoesPage';

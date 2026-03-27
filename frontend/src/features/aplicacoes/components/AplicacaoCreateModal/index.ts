@@ -1,0 +1,1 @@
+export { AplicacaoCreateModal } from './AplicacaoCreateModal';

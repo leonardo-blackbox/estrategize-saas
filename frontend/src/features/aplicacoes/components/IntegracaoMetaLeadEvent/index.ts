@@ -1,0 +1,1 @@
+export { IntegracaoMetaLeadEvent } from './IntegracaoMetaLeadEvent';

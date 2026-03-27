@@ -1,0 +1,1 @@
+export { IntegracaoMetaTestPanel } from './IntegracaoMetaTestPanel';

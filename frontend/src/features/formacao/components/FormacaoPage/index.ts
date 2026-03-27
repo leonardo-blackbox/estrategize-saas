@@ -1,0 +1,1 @@
+export { FormacaoPage } from './FormacaoPage';

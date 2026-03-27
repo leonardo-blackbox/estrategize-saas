@@ -1,0 +1,1 @@
+export { ConsultoriaDetailDados } from './ConsultoriaDetailDados';

@@ -1,0 +1,1 @@
+export { ConsultoriaDetailChat } from './ConsultoriaDetailChat';

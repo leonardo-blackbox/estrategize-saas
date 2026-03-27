@@ -1,0 +1,1 @@
+export { ConsultoriasPage } from './ConsultoriasPage';

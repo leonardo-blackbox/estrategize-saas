@@ -1,0 +1,1 @@
+export { FormPublicoAggregator } from './FormPublicoAggregator';

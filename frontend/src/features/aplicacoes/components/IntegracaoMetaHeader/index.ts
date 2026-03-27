@@ -1,0 +1,1 @@
+export { IntegracaoMetaHeader } from './IntegracaoMetaHeader';
