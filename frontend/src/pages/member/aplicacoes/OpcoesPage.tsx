@@ -174,57 +174,6 @@ export default function OpcoesPage() {
 
         <div style={{ height: 1, background: 'var(--border-hairline)' }} />
 
-        {/* ── Aparência ── */}
-        <section className="py-6">
-          <div className="mb-4">
-            <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">Aparência</h3>
-            <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
-              Cores, logo, fonte e estilo visual do formulário.
-            </p>
-          </div>
-          <button
-            onClick={() => navigate(`/aplicacoes/${application.id}/editor`)}
-            className={cn(
-              'w-full flex items-center justify-between px-4 py-3.5 rounded-xl',
-              'border border-[var(--border-hairline)] hover:border-[var(--accent)]',
-              'bg-[var(--bg-surface-1)] hover:bg-[rgba(124,92,252,0.05)]',
-              'text-left cursor-pointer transition-all duration-150 group',
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(124,92,252,0.12)' }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c5cfc" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="13.5" cy="6.5" r=".5" fill="#7c5cfc" />
-                  <circle cx="17.5" cy="10.5" r=".5" fill="#7c5cfc" />
-                  <circle cx="8.5" cy="7.5" r=".5" fill="#7c5cfc" />
-                  <circle cx="6.5" cy="12.5" r=".5" fill="#7c5cfc" />
-                  <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-                </svg>
-              </div>
-              <div>
-                <div className="text-[13px] font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
-                  Personalizar aparência
-                </div>
-                <div className="text-[12px] text-[var(--text-tertiary)] mt-0.5">
-                  Cores, logo, fonte, imagem de fundo e bordas
-                </div>
-              </div>
-            </div>
-            <svg
-              width="14" height="14" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-              className="text-[var(--text-tertiary)] group-hover:text-[var(--accent)] transition-colors flex-shrink-0"
-            >
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        </section>
-
-        <div style={{ height: 1, background: 'var(--border-hairline)' }} />
-
         {/* ── Configurações do formulário ── */}
         <Section title="Configurações do formulário">
           <div className="space-y-1">
