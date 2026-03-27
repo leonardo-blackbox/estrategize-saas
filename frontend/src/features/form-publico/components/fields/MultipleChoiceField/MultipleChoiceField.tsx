@@ -1,16 +1,24 @@
 import { motion } from 'framer-motion';
 import type { ApplicationField, ThemeConfig } from '../../../types';
-import { getFieldOptions, getOptionFromOptions, hexToRgb, LETTER_KEYS } from '../../../utils/form-publico.helpers';
+import { getFieldOptions, hexToRgb, LETTER_KEYS } from '../../../utils/form-publico.helpers';
 
-interface MultipleChoiceFieldProps { field: ApplicationField; value: string[]; onChange: (v: string[]) => void; theme: ThemeConfig; }
+interface MultipleChoiceFieldProps { field: ApplicationField; value: string[]; onChange: (v: string[]) => void; theme: ThemeConfig; onAutoAdvance?: () => void; }
 
-export function MultipleChoiceField({ field, value, onChange, theme }: MultipleChoiceFieldProps) {
+export function MultipleChoiceField({ field, value, onChange, theme, onAutoAdvance }: MultipleChoiceFieldProps) {
   const options = getFieldOptions(field);
-  const allowMultiple = (getOptionFromOptions(field, 'allowMultiple') as boolean | undefined) || false;
+  const conditionalData = field.conditional_logic as unknown as Record<string, unknown>;
+  const allowMultiple = Boolean(conditionalData?.allowMultiple);
   const buttonColorRgb = hexToRgb(theme.buttonColor);
   const toggle = (optionId: string) => {
-    if (allowMultiple) { onChange(value.includes(optionId) ? value.filter((v) => v !== optionId) : [...value, optionId]); }
-    else { onChange(value.includes(optionId) ? [] : [optionId]); }
+    if (allowMultiple) {
+      onChange(value.includes(optionId) ? value.filter((v) => v !== optionId) : [...value, optionId]);
+    } else {
+      const newVal = value.includes(optionId) ? [] : [optionId];
+      onChange(newVal);
+      if (newVal.length > 0 && onAutoAdvance) {
+        setTimeout(() => onAutoAdvance(), 280);
+      }
+    }
   };
 
   return (

@@ -44,6 +44,14 @@ export function FormPublicoAggregator() {
     if (currentField.type === 'thank_you') {
       return <FormThankYouStep settings={settings} theme={theme} onReset={handleReset} redirectCountdown={redirectCountdown} />;
     }
+    const fieldLogic = currentField.conditional_logic as unknown as Record<string, unknown>;
+    const isMultipleChoice = currentField.type === 'multiple_choice';
+    const allowMultiple = isMultipleChoice && Boolean(fieldLogic?.allowMultiple);
+    const isAutoAdvance = isMultipleChoice && !allowMultiple;
+    const buttonLabel = isMultipleChoice
+      ? (fieldLogic?.buttonLabel as string | undefined)
+      : (currentField.options as Record<string, unknown>)?.buttonLabel as string | undefined;
+
     return (
       <FormQuestionStep
         field={currentField}
@@ -61,7 +69,9 @@ export function FormPublicoAggregator() {
         validationError={validationError}
         onClearError={() => setValidationError(null)}
         isTouchDevice={isTouchDevice}
-        buttonLabel={(currentField.options as Record<string, unknown>)?.buttonLabel as string | undefined}
+        buttonLabel={buttonLabel}
+        onAutoAdvance={isAutoAdvance ? handleNext : undefined}
+        hideOkButton={isAutoAdvance}
       />
     );
   };

@@ -21,12 +21,15 @@ interface FormQuestionStepProps {
   onClearError?: () => void;
   isTouchDevice?: boolean;
   buttonLabel?: string;
+  onAutoAdvance?: () => void;
+  hideOkButton?: boolean;
 }
 
 export function FormQuestionStep({
   field, questionNumber, value, onChange, onNext, onBack,
   theme, settings, isLast, isMutating, direction,
   validationError, onClearError, isTouchDevice, buttonLabel,
+  onAutoAdvance, hideOkButton,
 }: FormQuestionStepProps) {
   const xOffset = direction === 'forward' ? 40 : -40;
   const isMessage = field.type === 'message';
@@ -59,7 +62,7 @@ export function FormQuestionStep({
         )}
         {!isMessage && (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14, duration: 0.35, ease: "easeOut" as const }}>
-            <FieldInput field={field} value={value} onChange={(v) => { onChange(v); onClearError?.(); }} theme={theme} />
+            <FieldInput field={field} value={value} onChange={(v) => { onChange(v); onClearError?.(); }} theme={theme} onAutoAdvance={onAutoAdvance} />
             {validationError && (
               <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} style={{ color: '#ff453a', fontSize: 13, margin: 0, marginTop: 8 }} role="alert" aria-live="polite">
                 {validationError}
@@ -73,7 +76,7 @@ export function FormQuestionStep({
           </motion.div>
         )}
         <FormActions canProceed={canProceed} isMutating={isMutating} isLast={isLast} isMessage={isMessage}
-          isTouchDevice={isTouchDevice} questionNumber={questionNumber} buttonLabel={buttonLabel} theme={theme} onNext={onNext} onBack={onBack} />
+          isTouchDevice={isTouchDevice} questionNumber={questionNumber} buttonLabel={buttonLabel} hideOkButton={hideOkButton} theme={theme} onNext={onNext} onBack={onBack} />
       </div>
     </motion.div>
   );

@@ -6,6 +6,8 @@ interface FormWelcomeStepProps { field: ApplicationField; theme: ThemeConfig; se
 
 export function FormWelcomeStep({ field, theme, settings, onStart }: FormWelcomeStepProps) {
   const buttonText = (getOptionFromOptions(field, 'buttonText') as string | undefined) || 'Comecar →';
+  const descriptionFromOpts = getOptionFromOptions(field, 'description') as string | undefined;
+  const welcomeDescription = descriptionFromOpts || field.description || '';
   const logoPosition = theme.logoPosition === 'center' ? 'center' : theme.logoPosition === 'right' ? 'flex-end' : 'flex-start';
   const containerVariants = { initial: {}, animate: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } } };
   const itemVariants = { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } } };
@@ -39,11 +41,11 @@ export function FormWelcomeStep({ field, theme, settings, onStart }: FormWelcome
         }}>
           {field.title}
         </motion.h1>
-        {field.description && (
+        {welcomeDescription && (
           <motion.p variants={itemVariants} style={{
             fontSize: 18, color: theme.answerColor, opacity: 0.75, margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap',
           }}>
-            {field.description}
+            {welcomeDescription}
           </motion.p>
         )}
         {settings.estimatedTime && (

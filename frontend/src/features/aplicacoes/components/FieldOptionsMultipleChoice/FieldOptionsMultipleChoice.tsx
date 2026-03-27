@@ -1,7 +1,7 @@
 import { useEditorStore, type LocalField } from '../../../../stores/editorStore.ts';
 import { type FieldOption } from '../../../../api/applications.ts';
 import { cn } from '../../../../lib/cn.ts';
-import { OptionRow, AutoTextarea, Toggle } from '../FieldOptionsShared/index.ts';
+import { OptionRow, AutoTextarea, Toggle, TextInput } from '../FieldOptionsShared/index.ts';
 
 interface FieldOptionsMultipleChoiceProps {
   field: LocalField;
@@ -12,9 +12,9 @@ export function FieldOptionsMultipleChoice({ field, index }: FieldOptionsMultipl
   const { updateField } = useEditorStore();
   const rawOptions = Array.isArray(field.options) ? (field.options as FieldOption[]) : [];
   const options = rawOptions;
-  const allowMultiple = Boolean(
-    (field.conditional_logic as unknown as Record<string, unknown>).allowMultiple,
-  );
+  const logicData = field.conditional_logic as unknown as Record<string, unknown>;
+  const allowMultiple = Boolean(logicData.allowMultiple);
+  const buttonLabel = (logicData.buttonLabel as string | undefined) ?? '';
 
   function updateOptions(updated: FieldOption[]) {
     updateField(index, { options: updated });
@@ -96,13 +96,30 @@ export function FieldOptionsMultipleChoice({ field, index }: FieldOptionsMultipl
           onChange={(v) =>
             updateField(index, {
               conditional_logic: {
-                ...(field.conditional_logic as unknown as Record<string, unknown>),
+                ...logicData,
                 allowMultiple: v,
               } as unknown as LocalField['conditional_logic'],
             })
           }
         />
       </div>
+
+      {allowMultiple && (
+        <OptionRow label="Texto do botao OK">
+          <TextInput
+            value={buttonLabel}
+            onChange={(v) =>
+              updateField(index, {
+                conditional_logic: {
+                  ...logicData,
+                  buttonLabel: v || undefined,
+                } as unknown as LocalField['conditional_logic'],
+              })
+            }
+            placeholder="OK"
+          />
+        </OptionRow>
+      )}
 
       <div
         className="flex items-center justify-between px-3 py-2.5 rounded-lg"
