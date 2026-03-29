@@ -48,6 +48,7 @@ interface NormalizedEvent {
   customer_name?: string;
   plan_id?: string;
   course_id?: string;
+  user_id?: string;
   raw: Record<string, unknown>;
 }
 
@@ -68,6 +69,7 @@ function normalizeStripe(body: Record<string, unknown>): NormalizedEvent {
     customer_email: data.customer_email ?? data.customer_details?.email ?? '',
     customer_name: data.customer_details?.name,
     plan_id: data.metadata?.plan_id,
+    user_id: data.client_reference_id ?? data.metadata?.user_id,
     raw: body,
   };
 }
@@ -260,6 +262,7 @@ router.post('/:provider', async (req: Request, res: Response) => {
       customer_name: event.customer_name,
       plan_id: event.plan_id,
       course_id: event.course_id,
+      user_id: event.user_id,
       provider,
     };
 
