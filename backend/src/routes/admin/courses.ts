@@ -33,12 +33,14 @@ const courseSchema = z.object({
   banner_url: z.string().url().optional().nullable(),
   status: z.enum(['draft', 'published', 'archived']).optional(),
   sort_order: z.number().int().min(0).optional(),
+  stripe_product_id: z.string().uuid().optional().nullable(),
 });
 
 router.get('/', async (_req, res) => {
   const { data, error } = await supabaseAdmin!
     .from('courses')
     .select(`id, title, status, cover_url, sort_order, created_at,
+      stripe_product_id, stripe_products (id, name, price_cents, billing_interval),
       modules (id, lessons (id))`)
     .order('sort_order');
   if (error) return res.status(500).json({ error: error.message });
@@ -61,7 +63,8 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { data, error } = await supabaseAdmin!
     .from('courses')
-    .select(`*, modules (*, lessons (*, lesson_attachments (*), lesson_links (*)))`)
+    .select(`*, stripe_product_id, stripe_products (id, name, price_cents, billing_interval),
+      modules (*, lessons (*, lesson_attachments (*), lesson_links (*)))`)
     .eq('id', req.params.id)
     .single();
   if (error || !data) return res.status(404).json({ error: 'Not found' });
