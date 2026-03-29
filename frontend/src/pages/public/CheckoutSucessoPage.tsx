@@ -59,7 +59,7 @@ export function CheckoutSucessoPage() {
             marginBottom: '2rem',
           }}
         >
-          Seu acesso sera liberado em instantes. Voce recebera um email com os proximos passos.
+          Seu acesso será liberado em instantes. Você receberá um e-mail com os próximos passos.
         </p>
 
         <Link
