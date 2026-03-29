@@ -18,7 +18,7 @@
 ### Checkout
 
 - [x] **CHKT-01**: Visitante pode ver planos disponíveis sem estar logado
-- [ ] **CHKT-02**: Usuária autenticada pode iniciar checkout Stripe a partir da página de planos
+- [x] **CHKT-02**: Usuária autenticada pode iniciar checkout Stripe a partir da página de planos
 - [ ] **CHKT-03**: Após pagamento, usuária é redirecionada para página de confirmação
 - [ ] **CHKT-04**: Acesso ao curso e créditos são liberados automaticamente após webhook Stripe
 - [ ] **CHKT-05**: Usuária pode ver plano atual e data de renovação em /conta
@@ -97,7 +97,7 @@
 | ADMN-06 | Phase 1 (Admin: Layout) | Complete |
 | ADMN-07 | Phase 2 (Admin: Planos Stripe) | Complete |
 | CHKT-01 | Phase 6 (Página de Planos) | Complete |
-| CHKT-02 | Phase 7 (Stripe Checkout) | Pending |
+| CHKT-02 | Phase 7 (Stripe Checkout) | Complete |
 | CHKT-03 | Phase 8 (Retorno Checkout) | Pending |
 | CHKT-04 | Phase 8 (Retorno Checkout) | Pending |
 | CHKT-05 | Phase 9 (Conta: Assinatura) | Pending |
