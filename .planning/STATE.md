@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in_progress
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-29T02:58:32.188Z"
-last_activity: 2026-03-29 — Phase 1 Plan 01 complete: AdminShell flat nav + Vitest setup
+status: executing
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-29T03:01:47.154Z"
+last_activity: "2026-03-29 — Plan 01-01 complete: AdminShell flat nav + Vitest + 3 placeholder routes"
 progress:
   total_phases: 20
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
   completed_plans: 3
-  percent: 100
+  percent: 67
 ---
 
 # Project State
@@ -54,6 +54,7 @@ Progress: [███████░░░] 67%
 *Updated after each plan completion*
 | Phase 01 P03 | 5 min | 2 tasks | 19 files |
 | Phase 01 P01 | 14 min | 3 tasks | 14 files |
+| Phase 01 P02 | 8 min | 3 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,7 @@ Recent decisions affecting current work:
 - Recall.ai para MVP (bot de reunião): time-to-market dias vs semanas do LiveKit
 - pgvector no Supabase para RAG: evita serviço separado
 - Dois escopos de conhecimento (global + consultancy): metodologia Iris compartilhada; contexto do cliente isolado
+- [Phase 01]: Mutations delegated from modals to aggregators — modals receive onSubmit/onSave callbacks for pure UI separation
 
 ### Pending Todos
 
@@ -78,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T02:58:48Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-03-29T03:01:41.460Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
