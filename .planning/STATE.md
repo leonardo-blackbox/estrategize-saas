@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-03-29T04:22:45.612Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-29T04:24:03.854Z"
 progress:
   total_phases: 20
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Project State
@@ -56,6 +56,7 @@ Plan: 1 of 2
 | Phase 03-admin-cursos P03 | 3 | 2 tasks | 9 files |
 | Phase 03-admin-cursos P02 | 7 | 2 tasks | 10 files |
 | Phase 04-admin-usuárias P02 | 5 | 2 tasks | 5 files |
+| Phase 04-admin-usuárias P01 | 10 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - [Phase 03-admin-cursos]: PlanSelect extracted as micro-module from CourseCreateModal when inline version exceeded 80-line limit
 - [Phase 03-admin-cursos]: Unpublish uses adminUpdateCourse({status: draft}) not adminArchiveCourse — archive is semantically distinct from unpublish
 - [Phase 04-admin-usuárias]: adminListCourses query with shared admin-courses queryKey populates grant entitlement dropdown; Array.isArray guard consistent with AdminFormacaoPage pattern
+- [Phase 04-admin-usuárias]: intersect() helper in users.ts avoids TypeScript narrowing issues on null union type for filter composition
+- [Phase 04-admin-usuárias]: Plan badge uses emerald tokens; no-plan badge uses CSS variable tokens for dark-mode compatibility
 
 ### Pending Todos
 
@@ -92,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T04:22:42.438Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-29T04:24:03.851Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
