@@ -5,7 +5,7 @@ import { staggerContainer, staggerItem } from '../../../../lib/motion.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import {
   adminGetTurmas, adminCreateTurma, adminUpdateTurma, adminDeleteTurma,
-  adminGetTurmaEnrollments, adminAddTurmaEnrollment, adminRemoveTurmaEnrollment,
+  adminAddTurmaEnrollment, adminRemoveTurmaEnrollment,
   adminGetCourses, type Turma,
 } from '../../../../api/courses.ts';
 import { TurmaCard } from './TurmaCard.tsx';
