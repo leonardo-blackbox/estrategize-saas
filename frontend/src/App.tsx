@@ -36,6 +36,7 @@ import OpcoesPage from './pages/member/aplicacoes/OpcoesPage.tsx';
 import IntegracaoPage from './pages/member/aplicacoes/IntegracaoPage.tsx';
 import AnalyticsPage from './pages/member/aplicacoes/AnalyticsPage.tsx';
 import FormPublicoPage from './pages/public/FormPublicoPage.tsx';
+import { PlanosPage } from './pages/public/PlanosPage.tsx';
 
 // Admin pages
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx';
@@ -69,6 +70,7 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/f/:slug" element={<FormPublicoPage />} />
+        <Route path="/planos" element={<PlanosPage />} />
 
         {/* ── Member App (new UI) ── */}
         <Route
