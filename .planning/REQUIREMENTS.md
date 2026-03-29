@@ -13,7 +13,7 @@
 - [ ] **ADMN-04**: Admin pode fazer upload de documentos da metodologia Iris para base de conhecimento global
 - [ ] **ADMN-05**: Admin pode testar a IA global com uma pergunta antes de publicar
 - [x] **ADMN-06**: Admin consegue navegar entre todas as seções em < 3 cliques
-- [ ] **ADMN-07**: Admin visualiza eventos de webhook Stripe recentes
+- [x] **ADMN-07**: Admin visualiza eventos de webhook Stripe recentes
 
 ### Checkout
 
@@ -95,7 +95,7 @@
 | ADMN-04 | Phase 5 (Admin: IA Global) | Pending |
 | ADMN-05 | Phase 5 (Admin: IA Global) | Pending |
 | ADMN-06 | Phase 1 (Admin: Layout) | Complete |
-| ADMN-07 | Phase 2 (Admin: Planos Stripe) | Pending |
+| ADMN-07 | Phase 2 (Admin: Planos Stripe) | Complete |
 | CHKT-01 | Phase 6 (Página de Planos) | Pending |
 | CHKT-02 | Phase 7 (Stripe Checkout) | Pending |
 | CHKT-03 | Phase 8 (Retorno Checkout) | Pending |
