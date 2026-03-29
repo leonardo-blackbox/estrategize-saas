@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-03-29T03:36:14.388Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-29T04:00:22.831Z"
 progress:
   total_phases: 20
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 9
+  completed_plans: 7
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 02 — Admin Planos e Stripe
+**Current focus:** Phase 03 — Admin Cursos
 
 ## Current Position
 
-Phase: 02 (Admin Planos e Stripe) — EXECUTING
-Plan: 2 of 3
+Phase: 03 (Admin Cursos) — EXECUTING
+Plan: 1 of 3
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Plan: 2 of 3
 | Phase 02 P01 | 2 | 2 tasks | 4 files |
 | Phase 02 P03 | 5 | 1 tasks | 2 files |
 | Phase 02-admin-planos-e-stripe P02 | 4 | 2 tasks | 7 files |
+| Phase 03-admin-cursos P01 | 1 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,7 @@ Recent decisions affecting current work:
 - [Phase 02]: EVENT_TYPE_LABELS in WebhooksTab (not aggregator) — label logic colocated with rendering component
 - [Phase 02-admin-planos-e-stripe]: PlanFormModal delegates mutations to aggregator via onSubmit — modal is pure UI with zero API knowledge
 - [Phase 02-admin-planos-e-stripe]: BRL price input: user types decimal (97.00), aggregator converts to integer cents (9700) before API call
+- [Phase 03-admin-cursos]: 1:N FK on courses.stripe_product_id (ON DELETE SET NULL) — no junction table; Supabase FK join syntax in select string for stripe_products join
 
 ### Pending Todos
 
@@ -82,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T03:36:14.383Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-03-29T04:00:22.824Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None

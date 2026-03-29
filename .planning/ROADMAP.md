@@ -297,7 +297,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|-----------|----------------|--------|-----------|
 | 1. Admin Layout e Navegação | 3/3 | Complete   | 2026-03-29 | - |
 | 2. Admin Planos e Stripe | 3/3 | Complete   | 2026-03-29 | - |
-| 3. Admin Cursos | A — Admin Robusto | 0/3 | Planned | - |
+| 3. Admin Cursos | 1/3 | In Progress|  | - |
 | 4. Admin Usuárias | A — Admin Robusto | 0/TBD | Not started | - |
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
 | 6. Página de Planos | B — Checkout Stripe | 0/TBD | Not started | - |
