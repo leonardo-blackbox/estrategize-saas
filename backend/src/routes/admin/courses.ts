@@ -287,6 +287,7 @@ const lessonSchema = z.object({
   sort_order: z.number().int().min(0).optional(),
   drip_days: z.number().int().min(0).optional(),
   is_free_preview: z.boolean().optional(),
+  status: z.enum(['draft', 'published']).optional(),
 });
 
 router.post('/modules/:moduleId/lessons', async (req, res) => {
@@ -320,6 +321,28 @@ router.delete('/lessons/:id', async (req, res) => {
   const { error } = await supabaseAdmin!.from('lessons').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
+});
+
+router.post('/lessons/:id/publish', async (req, res) => {
+  const { data, error } = await supabaseAdmin!
+    .from('lessons')
+    .update({ status: 'published' })
+    .eq('id', req.params.id)
+    .select()
+    .single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ data });
+});
+
+router.post('/lessons/:id/unpublish', async (req, res) => {
+  const { data, error } = await supabaseAdmin!
+    .from('lessons')
+    .update({ status: 'draft' })
+    .eq('id', req.params.id)
+    .select()
+    .single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ data });
 });
 
 // ─── ATTACHMENTS ───────────────────────────────────────────────
