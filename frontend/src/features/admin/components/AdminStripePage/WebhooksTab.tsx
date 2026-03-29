@@ -1,5 +1,18 @@
 import { cn } from '../../../../lib/cn.ts';
 
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  'checkout.session.completed': 'Checkout concluido',
+  'invoice.paid': 'Fatura paga',
+  'invoice.payment_failed': 'Pagamento falhou',
+  'customer.subscription.created': 'Assinatura criada',
+  'customer.subscription.updated': 'Assinatura atualizada',
+  'customer.subscription.deleted': 'Assinatura cancelada',
+  'PURCHASE_COMPLETE': 'Compra concluida (Hotmart)',
+  'PURCHASE_CANCELED': 'Compra cancelada (Hotmart)',
+  'order_paid': 'Pedido pago (Kiwify)',
+  'subscription_canceled': 'Assinatura cancelada (Kiwify)',
+};
+
 interface WebhooksTabProps {
   webhooks: { id: string; event_type: string; event_id: string; provider: string; status: string; created_at?: string | null; error?: string | null }[];
   total: number; page: number; limit: number; isLoading: boolean;
@@ -38,11 +51,14 @@ export function WebhooksTab({ webhooks, total, page, limit, isLoading, statusFil
         ) : webhooks.map((ev) => (
           <div key={ev.id} className="grid grid-cols-[1fr_100px_100px_140px_80px] gap-x-3 items-center px-4 py-3 border-b border-[var(--border-hairline)] last:border-0 hover:bg-[var(--bg-hover)] transition-colors">
             <div className="min-w-0">
-              <p className="text-xs font-medium text-[var(--text-primary)] truncate">{ev.event_type}</p>
+              <p className="text-xs font-medium text-[var(--text-primary)] truncate">{EVENT_TYPE_LABELS[ev.event_type] ?? ev.event_type}</p>
               <p className="text-[10px] text-[var(--text-tertiary)] font-mono truncate">{ev.event_id}</p>
             </div>
             <span className="text-xs text-[var(--text-secondary)] capitalize">{ev.provider}</span>
-            <span className={cn('inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded truncate', statusStyle[ev.status] ?? statusStyle.pending)}>{ev.status}</span>
+            <span className={cn('inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded truncate', statusStyle[ev.status] ?? statusStyle.pending)}>
+              <span className="w-1.5 h-1.5 rounded-full bg-current mr-1 inline-block shrink-0" />
+              {ev.status}
+            </span>
             <span className="text-[11px] text-[var(--text-tertiary)]">{formatDate(ev.created_at)}</span>
             <span className="text-[10px] text-[var(--text-tertiary)] truncate" title={ev.error ?? ''}>{ev.error ? '⚠ erro' : '—'}</span>
           </div>

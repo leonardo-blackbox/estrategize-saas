@@ -10,10 +10,10 @@ import { AuditTab } from './AuditTab.tsx';
 type Tab = 'webhooks' | 'audit';
 
 const STATUS_STYLE: Record<string, string> = {
-  processed: 'text-[var(--text-primary)] bg-[var(--bg-hover)]',
-  failed: 'text-[var(--text-tertiary)] bg-[var(--bg-surface-1)] border border-[var(--border-hairline)]',
-  processing: 'text-[var(--text-secondary)] bg-[var(--bg-hover)]',
-  pending: 'text-[var(--text-tertiary)] bg-[var(--bg-hover)]',
+  processed: 'text-emerald-400 bg-emerald-400/10',
+  failed: 'text-red-400 bg-red-400/10',
+  processing: 'text-amber-400 bg-amber-400/10',
+  pending: 'text-amber-400/70 bg-amber-400/5',
 };
 
 function formatDate(iso?: string | null) {
