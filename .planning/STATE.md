@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-03-29T04:57:46.283Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-29T05:01:10.242Z"
 progress:
   total_phases: 20
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 17
-  completed_plans: 14
+  completed_plans: 15
 ---
 
 # Project State
@@ -60,6 +60,7 @@ Plan: 1 of 2
 | Phase 06-pagina-de-planos P01 | 1 | 2 tasks | 4 files |
 | Phase 06-pagina-de-planos P02 | 5 | 2 tasks | 7 files |
 | Phase 07-stripe-checkout P01 | 1 | 2 tasks | 2 files |
+| Phase 07-stripe-checkout P02 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,8 @@ Recent decisions affecting current work:
 - [Phase 07-stripe-checkout]: price_id validated as UUID against stripe_products table before hitting Stripe API — prevents invalid Stripe calls and leaks
 - [Phase 07-stripe-checkout]: mode auto-detected from billing_interval: one_time → payment mode, month/year → subscription mode
 - [Phase 07-stripe-checkout]: client_reference_id set to req.userId for Stripe webhook to correlate session with platform user
+- [Phase 07-stripe-checkout]: activePlanId tracks which card is loading so isLoading scopes to only the clicked PlanCard
+- [Phase 07-stripe-checkout]: Auth gate in PlanosPage aggregator keeps PlanCard micro-module free of navigation concerns
 
 ### Pending Todos
 
@@ -105,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T04:57:46.279Z
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-03-29T05:01:10.239Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
