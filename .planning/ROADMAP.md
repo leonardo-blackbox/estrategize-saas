@@ -312,7 +312,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
 | 6. Página de Planos | 2/2 | Complete   | 2026-03-29 | - |
 | 7. Stripe Checkout Session | 2/2 | Complete   | 2026-03-29 | - |
-| 8. Retorno e Confirmação | B — Checkout Stripe | 0/2 | Planning | - |
+| 8. Retorno e Confirmação | 1/2 | In Progress|  | - |
 | 9. Conta e Assinatura | B — Checkout Stripe | 0/TBD | Not started | - |
 | 10. Pipeline de Embeddings | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 11. API Docs Globais | C — IA Base de Conhecimento | 0/TBD | Not started | - |

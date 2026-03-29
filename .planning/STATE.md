@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-03-29T05:01:10.242Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-29T05:12:13.960Z"
 progress:
   total_phases: 20
   completed_phases: 6
-  total_plans: 17
-  completed_plans: 15
+  total_plans: 19
+  completed_plans: 16
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 07 — stripe-checkout
+**Current focus:** Phase 08 — retorno-e-confirmacao
 
 ## Current Position
 
-Phase: 07 (stripe-checkout) — EXECUTING
+Phase: 08 (retorno-e-confirmacao) — EXECUTING
 Plan: 1 of 2
 
 ## Performance Metrics
@@ -61,6 +61,7 @@ Plan: 1 of 2
 | Phase 06-pagina-de-planos P02 | 5 | 2 tasks | 7 files |
 | Phase 07-stripe-checkout P01 | 1 | 2 tasks | 2 files |
 | Phase 07-stripe-checkout P02 | 4 | 2 tasks | 4 files |
+| Phase 08-retorno-e-confirmacao P02 | 1 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,8 @@ Recent decisions affecting current work:
 - [Phase 07-stripe-checkout]: client_reference_id set to req.userId for Stripe webhook to correlate session with platform user
 - [Phase 07-stripe-checkout]: activePlanId tracks which card is loading so isLoading scopes to only the clicked PlanCard
 - [Phase 07-stripe-checkout]: Auth gate in PlanosPage aggregator keeps PlanCard micro-module free of navigation concerns
+- [Phase 08-retorno-e-confirmacao]: CheckoutSucessoPage self-contained (no aggregator) — purely informational, no API calls, single responsibility under 80 lines
+- [Phase 08-retorno-e-confirmacao]: /checkout/sucesso route outside ProtectedRoute — Stripe redirect may arrive before Supabase session is re-established on client
 
 ### Pending Todos
 
@@ -108,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T05:01:10.239Z
-Stopped at: Completed 07-02-PLAN.md
+Last session: 2026-03-29T05:12:13.958Z
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None
