@@ -313,7 +313,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Stripe Checkout Session | 2/2 | Complete   | 2026-03-29 | - |
 | 8. Retorno e Confirmação | 2/2 | Complete   | 2026-03-29 | - |
 | 9. Conta e Assinatura | 2/2 | Complete   | 2026-03-29 | - |
-| 10. Pipeline de Embeddings | 1/1 | Complete   | 2026-03-29 | - |
+| 10. Pipeline de Embeddings | 1/1 | Complete    | 2026-03-29 | - |
 | 11. API Docs Globais | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 12. API Docs por Consultoria | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 13. Chat RAG | C — IA Base de Conhecimento | 0/TBD | Not started | - |
