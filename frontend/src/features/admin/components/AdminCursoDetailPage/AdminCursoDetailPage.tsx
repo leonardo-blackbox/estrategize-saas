@@ -67,6 +67,9 @@ export function AdminCursoDetailPage() {
             onEditLesson={c.openEditLesson}
             onLinksLesson={c.setLinksLesson}
             onAddLesson={(moduleId) => c.setShowLessonModal(moduleId)}
+            onPublishLesson={(id) => c.publishLessonMutation.mutate(id)}
+            onUnpublishLesson={(id) => c.unpublishLessonMutation.mutate(id)}
+            isPublishLessonPending={c.publishLessonMutation.isPending || c.unpublishLessonMutation.isPending}
           />
         )}
       </motion.div>

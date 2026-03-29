@@ -189,6 +189,14 @@ export async function adminDeleteLesson(id: string) {
   return client.delete(`/api/admin/courses/lessons/${id}`).json();
 }
 
+export async function adminPublishLesson(id: string) {
+  return client.post(`/api/admin/courses/lessons/${id}/publish`).json();
+}
+
+export async function adminUnpublishLesson(id: string) {
+  return client.post(`/api/admin/courses/lessons/${id}/unpublish`).json();
+}
+
 export async function adminCreateLessonLink(lessonId: string, data: Partial<LessonLink>) {
   return client.post(`/api/admin/courses/lessons/${lessonId}/links`, { json: data }).json();
 }

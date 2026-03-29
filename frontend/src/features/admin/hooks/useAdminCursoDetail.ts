@@ -10,6 +10,8 @@ import {
   adminCreateLesson,
   adminUpdateLesson,
   adminDeleteLesson,
+  adminPublishLesson,
+  adminUnpublishLesson,
 } from '../services/admin.api.ts';
 import type { LessonLink } from '../services/admin.api.ts';
 
@@ -110,6 +112,16 @@ export function useAdminCursoDetail() {
     },
   });
 
+  const publishLessonMutation = useMutation({
+    mutationFn: adminPublishLesson,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-course', id] }),
+  });
+
+  const unpublishLessonMutation = useMutation({
+    mutationFn: adminUnpublishLesson,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-course', id] }),
+  });
+
   const openEditCourse = () => {
     setCourseForm({
       title: course?.title ?? '',
@@ -163,6 +175,7 @@ export function useAdminCursoDetail() {
     editingLesson, setEditingLesson, editLessonForm, setEditLessonForm,
     confirmDeleteLesson, setConfirmDeleteLesson,
     createLessonMutation, updateLessonMutation, deleteLessonMutation,
+    publishLessonMutation, unpublishLessonMutation,
     openEditLesson, linksLesson, setLinksLesson,
   };
 }

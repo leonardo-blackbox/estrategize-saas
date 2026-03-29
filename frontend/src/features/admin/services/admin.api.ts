@@ -17,6 +17,8 @@ export {
   adminCreateLesson,
   adminUpdateLesson,
   adminDeleteLesson,
+  adminPublishLesson,
+  adminUnpublishLesson,
   adminUpdateCourseSales,
   adminGetUser,
   adminGrantEntitlement,

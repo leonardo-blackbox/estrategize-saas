@@ -21,6 +21,9 @@ interface AdminCursoDetailModulesProps {
   onEditLesson: (lesson: any) => void;
   onLinksLesson: (data: { id: string; title: string; links: LessonLink[] }) => void;
   onAddLesson: (moduleId: string) => void;
+  onPublishLesson: (id: string) => void;
+  onUnpublishLesson: (id: string) => void;
+  isPublishLessonPending: boolean;
 }
 
 export function AdminCursoDetailModules({
@@ -29,6 +32,7 @@ export function AdminCursoDetailModules({
   onEditModule, onCreateModule,
   confirmDeleteLesson, setConfirmDeleteLesson, deleteLessonMutation,
   onEditLesson, onLinksLesson, onAddLesson,
+  onPublishLesson, onUnpublishLesson, isPublishLessonPending,
 }: AdminCursoDetailModulesProps) {
   return (
     <motion.div variants={staggerItem} className="space-y-2">
@@ -87,6 +91,9 @@ export function AdminCursoDetailModules({
                   onCancelDeleteLesson={() => setConfirmDeleteLesson(null)}
                   onLinksLesson={onLinksLesson}
                   onAddLesson={() => onAddLesson(mod.id)}
+                  onPublishLesson={onPublishLesson}
+                  onUnpublishLesson={onUnpublishLesson}
+                  isPublishLessonPending={isPublishLessonPending}
                 />
               )}
             </div>

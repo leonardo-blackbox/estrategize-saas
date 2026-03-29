@@ -1,4 +1,5 @@
 import type { LessonLink } from '../../services/admin.api.ts';
+import { LessonPublishButton } from './LessonPublishButton.tsx';
 
 interface AdminCursoDetailLessonsProps {
   lessons: any[];
@@ -9,18 +10,29 @@ interface AdminCursoDetailLessonsProps {
   onCancelDeleteLesson: () => void;
   onLinksLesson: (data: { id: string; title: string; links: LessonLink[] }) => void;
   onAddLesson: () => void;
+  onPublishLesson: (id: string) => void;
+  onUnpublishLesson: (id: string) => void;
+  isPublishLessonPending: boolean;
 }
 
 export function AdminCursoDetailLessons({
   lessons, confirmDeleteLesson, deleteLessonMutation,
   onEditLesson, onDeleteLesson, onCancelDeleteLesson,
   onLinksLesson, onAddLesson,
+  onPublishLesson, onUnpublishLesson, isPublishLessonPending,
 }: AdminCursoDetailLessonsProps) {
   return (
     <div className="border-t border-[var(--border-hairline)]">
       {(lessons ?? []).map((lesson: any, li: number) => (
         <div key={lesson.id} className="flex items-center gap-3 px-4 py-2.5 border-b border-[var(--border-hairline)] last:border-0">
           <span className="shrink-0 text-[11px] font-medium text-[var(--text-tertiary)] w-5 text-center">{li + 1}</span>
+          <LessonPublishButton
+            lessonId={lesson.id}
+            status={lesson.status ?? 'draft'}
+            onPublish={onPublishLesson}
+            onUnpublish={onUnpublishLesson}
+            isPending={isPublishLessonPending}
+          />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-medium text-[var(--text-primary)] truncate">{lesson.title}</p>
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
