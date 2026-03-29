@@ -139,8 +139,10 @@ Plans:
   4. Acesso ao curso está disponível sem intervenção manual dentro de 5 minutos do pagamento
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 08-01-PLAN.md — Backend: webhook normalizer + onboardingService credit granting
+- [ ] 08-02-PLAN.md — Frontend: CheckoutSucessoPage + route wiring
+
+
 ### Phase 9: Conta e Assinatura
 **Goal**: Usuária consegue ver seu plano atual e gerenciar ou cancelar assinatura sem contato com admin
 **Depends on**: Phase 8
@@ -310,7 +312,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
 | 6. Página de Planos | 2/2 | Complete   | 2026-03-29 | - |
 | 7. Stripe Checkout Session | 2/2 | Complete   | 2026-03-29 | - |
-| 8. Retorno e Confirmação | B — Checkout Stripe | 0/TBD | Not started | - |
+| 8. Retorno e Confirmação | B — Checkout Stripe | 0/2 | Planning | - |
 | 9. Conta e Assinatura | B — Checkout Stripe | 0/TBD | Not started | - |
 | 10. Pipeline de Embeddings | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 11. API Docs Globais | C — IA Base de Conhecimento | 0/TBD | Not started | - |
