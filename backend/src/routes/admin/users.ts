@@ -13,6 +13,8 @@ router.get('/', async (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 50, 100);
   const offset = Number(req.query.offset) || 0;
   const search = (req.query.q as string | undefined)?.toLowerCase().trim();
+  const planId = req.query.plan_id as string | undefined;
+  const status = req.query.status as string | undefined;
 
   const { data: { users: authUsers } = { users: [] } } =
     await supabaseAdmin!.auth.admin.listUsers({ perPage: 1000 });
@@ -29,11 +31,62 @@ router.get('/', async (req, res) => {
       .map((u) => u.id);
   }
 
+  // Build filterUserIds from plan_id and status filters
+  let filterUserIds: string[] | null = null;
+  let excludeUserIds: string[] | null = null;
+
+  function intersect(current: string[] | null, incoming: string[]): string[] {
+    return current === null ? incoming : current.filter((id: string) => incoming.includes(id));
+  }
+
+  if (planId) {
+    const { data: subRows } = await supabaseAdmin!
+      .from('subscriptions')
+      .select('user_id')
+      .eq('plan_id', planId)
+      .eq('status', 'active');
+    filterUserIds = intersect(filterUserIds, (subRows ?? []).map((r: any) => r.user_id as string));
+  }
+
+  if (status === 'active') {
+    const { data: subRows } = await supabaseAdmin!
+      .from('subscriptions')
+      .select('user_id')
+      .eq('status', 'active');
+    filterUserIds = intersect(filterUserIds, (subRows ?? []).map((r: any) => r.user_id as string));
+  } else if (status === 'no_plan') {
+    const { data: subRows } = await supabaseAdmin!
+      .from('subscriptions')
+      .select('user_id')
+      .eq('status', 'active');
+    excludeUserIds = (subRows ?? []).map((r: any) => r.user_id as string);
+  } else if (status === 'suspended') {
+    const { data: entRows } = await supabaseAdmin!
+      .from('user_entitlements')
+      .select('user_id')
+      .eq('access', 'deny')
+      .is('course_id', null);
+    filterUserIds = intersect(filterUserIds, (entRows ?? []).map((r: any) => r.user_id as string));
+  }
+
+  // Early return if filter yields empty set
+  if (filterUserIds !== null && filterUserIds.length === 0) {
+    return res.json({ users: [], total: 0, limit, offset });
+  }
+
   let query = supabaseAdmin!
     .from('profiles')
     .select('id, full_name, role, created_at', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
+
+  if (filterUserIds !== null) {
+    query = query.in('id', filterUserIds);
+  }
+
+  if (excludeUserIds !== null && excludeUserIds.length > 0) {
+    query = query.not('id', 'in', `(${excludeUserIds.join(',')})`);
+  }
 
   if (search) {
     if (filteredAuthIds !== null) {
@@ -50,8 +103,34 @@ router.get('/', async (req, res) => {
   const { data, error, count } = await query;
   if (error) return res.status(500).json({ error: error.message });
 
-  const users = (data ?? []).map((u: any) => ({ ...u, email: emailMap[u.id] ?? null }));
+  // Fetch active subscriptions for the returned users
+  const userIds = (data ?? []).map((u: any) => u.id);
+  let subMap = new Map<string, any>();
+  if (userIds.length > 0) {
+    const { data: subs } = await supabaseAdmin!
+      .from('subscriptions')
+      .select('user_id, status, plans (name)')
+      .in('user_id', userIds)
+      .eq('status', 'active');
+    subMap = new Map((subs ?? []).map((s: any) => [s.user_id, s]));
+  }
+
+  const users = (data ?? []).map((u: any) => ({
+    ...u,
+    email: emailMap[u.id] ?? null,
+    subscription: subMap.get(u.id) ?? null,
+  }));
   res.json({ users, total: count ?? 0, limit, offset });
+});
+
+// ─── PLANS SUMMARY (for filter dropdown) ───────────────────────
+router.get('/plans-summary', async (_req, res) => {
+  const { data, error } = await supabaseAdmin!
+    .from('plans')
+    .select('id, name')
+    .order('name');
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data ?? []);
 });
 
 // ─── STATIC ROUTES (must be before /:id to avoid param capture) ─
