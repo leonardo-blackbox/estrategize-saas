@@ -1,0 +1,1 @@
+export { AdminOfertasPage } from './AdminOfertasPage';
