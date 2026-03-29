@@ -37,6 +37,7 @@ import IntegracaoPage from './pages/member/aplicacoes/IntegracaoPage.tsx';
 import AnalyticsPage from './pages/member/aplicacoes/AnalyticsPage.tsx';
 import FormPublicoPage from './pages/public/FormPublicoPage.tsx';
 import { PlanosPage } from './pages/public/PlanosPage.tsx';
+import { CheckoutSucessoPage } from './pages/public/CheckoutSucessoPage.tsx';
 
 // Admin pages
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage.tsx';
@@ -71,6 +72,7 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/f/:slug" element={<FormPublicoPage />} />
         <Route path="/planos" element={<PlanosPage />} />
+        <Route path="/checkout/sucesso" element={<CheckoutSucessoPage />} />
 
         {/* ── Member App (new UI) ── */}
         <Route
