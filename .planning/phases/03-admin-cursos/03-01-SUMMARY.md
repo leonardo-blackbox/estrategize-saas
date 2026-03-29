@@ -104,6 +104,14 @@ CREATE INDEX idx_courses_stripe_product_id
 - Backend is ready to receive `stripe_product_id` associations from the admin UI
 - Frontend course editor (03-02) can now render a plan dropdown using `GET /api/admin/stripe/products` and save via `PUT /api/admin/courses/:id`
 
+## Self-Check: PASSED
+
+- `backend/src/database/migrations/024_course_plan_link.sql` — FOUND
+- `backend/src/routes/admin/courses.ts` — FOUND (stripe_product_id in schema + GET joins)
+- Commit `a981a7c` — FOUND
+- Commit `56ea766` — FOUND
+- `.planning/phases/03-admin-cursos/03-01-SUMMARY.md` — FOUND
+
 ---
 *Phase: 03-admin-cursos*
 *Completed: 2026-03-29*

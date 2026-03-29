@@ -19,7 +19,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 - [x] **Phase 1: Admin Layout e Navegação** - Redesign do shell do admin com sidebar clara e navegação < 3 cliques (completed 2026-03-29)
 - [x] **Phase 2: Admin Planos e Stripe** - Interface para criar/editar planos no Stripe sem terminal (completed 2026-03-29)
 - [ ] **Phase 3: Admin Cursos** - UX de publicação de cursos e aulas em 1 clique
-- [x] **Phase 4: Admin Usuárias** - Filtros, busca e gestão de entitlements por usuária
+- [x] **Phase 4: Admin Usuários** - Filtros, busca e gestão de entitlements por usuária
 - [ ] **Phase 5: Admin IA Global** - Upload de documentos da metodologia Iris e teste da IA
 
 ### Milestone B — Checkout Stripe
@@ -98,7 +98,7 @@ Plans:
 - [ ] 03-02-PLAN.md — Frontend: status tabs, plan dropdown no modal/header, UX polish
 - [ ] 03-03-PLAN.md — Backend+Frontend: lesson publish/unpublish (status field + endpoints + UI button)
 
-### Phase 4: Admin Usuárias
+### Phase 4: Admin Usuários
 **Goal**: A Iris encontra uma usuária e altera seu acesso em menos de 1 minuto
 **Depends on**: Phase 1
 **Requirements**: ADMN-03
@@ -301,7 +301,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Admin Layout e Navegação | 3/3 | Complete   | 2026-03-29 | - |
 | 2. Admin Planos e Stripe | 3/3 | Complete   | 2026-03-29 | - |
 | 3. Admin Cursos | 2/3 | In Progress|  | - |
-| 4. Admin Usuárias | 1/2 | In Progress|  | - |
+| 4. Admin Usuários | 1/2 | In Progress|  | - |
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
 | 6. Página de Planos | B — Checkout Stripe | 0/TBD | Not started | - |
 | 7. Stripe Checkout Session | B — Checkout Stripe | 0/TBD | Not started | - |

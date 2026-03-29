@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 04 — admin-usuárias
+**Current focus:** Phase 04 — admin-usuarios
 
 ## Current Position
 
-Phase: 04 (admin-usuárias) — EXECUTING
+Phase: 04 (admin-usuarios) — EXECUTING
 Plan: 1 of 2
 
 ## Performance Metrics
@@ -55,8 +55,8 @@ Plan: 1 of 2
 | Phase 03-admin-cursos P01 | 1 | 2 tasks | 2 files |
 | Phase 03-admin-cursos P03 | 3 | 2 tasks | 9 files |
 | Phase 03-admin-cursos P02 | 7 | 2 tasks | 10 files |
-| Phase 04-admin-usuárias P02 | 5 | 2 tasks | 5 files |
-| Phase 04-admin-usuárias P01 | 10 | 2 tasks | 6 files |
+| Phase 04-admin-usuarios P02 | 5 | 2 tasks | 5 files |
+| Phase 04-admin-usuarios P01 | 10 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -79,9 +79,9 @@ Recent decisions affecting current work:
 - [Phase 03-admin-cursos]: Dedicated POST publish/unpublish endpoints for lessons — consistent with existing course publish/archive pattern
 - [Phase 03-admin-cursos]: PlanSelect extracted as micro-module from CourseCreateModal when inline version exceeded 80-line limit
 - [Phase 03-admin-cursos]: Unpublish uses adminUpdateCourse({status: draft}) not adminArchiveCourse — archive is semantically distinct from unpublish
-- [Phase 04-admin-usuárias]: adminListCourses query with shared admin-courses queryKey populates grant entitlement dropdown; Array.isArray guard consistent with AdminFormacaoPage pattern
-- [Phase 04-admin-usuárias]: intersect() helper in users.ts avoids TypeScript narrowing issues on null union type for filter composition
-- [Phase 04-admin-usuárias]: Plan badge uses emerald tokens; no-plan badge uses CSS variable tokens for dark-mode compatibility
+- [Phase 04-admin-usuarios]: adminListCourses query with shared admin-courses queryKey populates grant entitlement dropdown; Array.isArray guard consistent with AdminFormacaoPage pattern
+- [Phase 04-admin-usuarios]: intersect() helper in users.ts avoids TypeScript narrowing issues on null union type for filter composition
+- [Phase 04-admin-usuarios]: Plan badge uses emerald tokens; no-plan badge uses CSS variable tokens for dark-mode compatibility
 
 ### Pending Todos
 
