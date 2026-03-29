@@ -153,8 +153,8 @@ Plans:
   3. Informações de assinatura refletem estado real do Stripe
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 09-01-PLAN.md — Backend: subscription record in webhook + account endpoints (subscription info + billing portal)
+- [ ] 09-02-PLAN.md — Frontend: decompose ContaPage into 3-layer + SubscriptionCard micro-module
 ### Phase 10: Pipeline de Embeddings
 **Goal**: Upload de PDF de 10 páginas gera chunks indexados no pgvector em menos de 30 segundos
 **Depends on**: Nothing (pgvector extension deve estar habilitada no Supabase antes da execução)
@@ -313,7 +313,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Página de Planos | 2/2 | Complete   | 2026-03-29 | - |
 | 7. Stripe Checkout Session | 2/2 | Complete   | 2026-03-29 | - |
 | 8. Retorno e Confirmação | 2/2 | Complete   | 2026-03-29 | - |
-| 9. Conta e Assinatura | B — Checkout Stripe | 0/TBD | Not started | - |
+| 9. Conta e Assinatura | B — Checkout Stripe | 0/2 | Not started | - |
 | 10. Pipeline de Embeddings | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 11. API Docs Globais | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 12. API Docs por Consultoria | C — IA Base de Conhecimento | 0/TBD | Not started | - |
