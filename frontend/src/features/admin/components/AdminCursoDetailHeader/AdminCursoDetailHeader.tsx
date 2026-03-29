@@ -17,9 +17,9 @@ export function AdminCursoDetailHeader({ course, onEditClick }: AdminCursoDetail
   const { data: productsData } = useQuery({ queryKey: ['admin-stripe-products'], queryFn: adminListProducts });
   const activeProducts = productsData?.data.filter((p) => p.status === 'active') ?? [];
 
-  const planMutation = useMutation({ mutationFn: (planId: string | null) => adminUpdateCourse(course.id, { stripe_product_id: planId } as any), onSuccess: invalidate });
+  const planMutation = useMutation({ mutationFn: (planId: string | null) => adminUpdateCourse(course.id, { stripe_product_id: planId }), onSuccess: invalidate });
   const publishMutation = useMutation({ mutationFn: () => adminPublishCourse(course.id), onSuccess: invalidate });
-  const unpublishMutation = useMutation({ mutationFn: () => adminUpdateCourse(course.id, { status: 'draft' } as any), onSuccess: invalidate });
+  const unpublishMutation = useMutation({ mutationFn: () => adminUpdateCourse(course.id, { status: 'draft' }), onSuccess: invalidate });
   const isMutating = planMutation.isPending || publishMutation.isPending || unpublishMutation.isPending;
 
   return (

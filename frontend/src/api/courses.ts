@@ -71,6 +71,7 @@ export interface Course {
   banner_url?: string;
   status: string;
   sort_order: number;
+  stripe_product_id?: string | null;
   modules: Module[];
 }
 
