@@ -7,7 +7,56 @@ export interface PurchaseEvent {
   plan_id?: string;
   course_id?: string;
   user_id?: string;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
   provider: string;
+}
+
+/**
+ * createSubscriptionRecord — creates or replaces the subscription record for a user.
+ * Resolves plan_id via stripe_price_id chain: stripe_products -> plans
+ */
+async function createSubscriptionRecord(
+  userId: string,
+  event: PurchaseEvent,
+  stripePriceId: string | null,
+): Promise<void> {
+  if (!supabaseAdmin || !event.plan_id) return;
+
+  let planDbId: string | null = null;
+
+  if (stripePriceId) {
+    const { data: plan } = await supabaseAdmin
+      .from('plans')
+      .select('id')
+      .eq('stripe_price_id', stripePriceId)
+      .single();
+
+    planDbId = plan?.id ?? null;
+  }
+
+  if (!planDbId) {
+    console.warn('[onboarding] Cannot create subscription: no matching plans row for stripe_price_id', stripePriceId);
+    return;
+  }
+
+  // Delete existing subscription for this user, then insert new
+  await supabaseAdmin.from('subscriptions').delete().eq('user_id', userId);
+
+  const { error } = await supabaseAdmin.from('subscriptions').insert({
+    user_id: userId,
+    plan_id: planDbId,
+    stripe_customer_id: event.stripe_customer_id ?? null,
+    stripe_subscription_id: event.stripe_subscription_id ?? null,
+    status: 'active',
+    current_period_start: new Date().toISOString(),
+  });
+
+  if (error) {
+    console.error('[onboarding] Failed to create subscription record:', error.message);
+  } else {
+    console.log(`[onboarding] Subscription record created for user ${userId}, plan ${planDbId}`);
+  }
 }
 
 /**
@@ -112,7 +161,7 @@ export async function processPurchase(event: PurchaseEvent): Promise<void> {
     // ─── 4b. Grant credits from plan ──────────────────────────────
     const { data: planProduct } = await supabaseAdmin
       .from('stripe_products')
-      .select('credits')
+      .select('credits, stripe_price_id')
       .eq('id', event.plan_id)
       .single();
 
@@ -126,6 +175,9 @@ export async function processPurchase(event: PurchaseEvent): Promise<void> {
       );
       console.log(`[onboarding] Granted ${planProduct.credits} credits to user ${userId}`);
     }
+
+    // ─── 4c. Create subscription record ───────────────────────────
+    await createSubscriptionRecord(userId, event, planProduct?.stripe_price_id ?? null);
   }
 
   // ─── 5. Audit log ──────────────────────────────────────────────
