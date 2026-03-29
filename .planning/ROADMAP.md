@@ -121,7 +121,10 @@ Plans:
   2. Lista mostra documentos indexados com status: processando / pronto / erro
   3. Botão "Remover" deleta documento e seus chunks
   4. Campo "Testar IA" retorna resposta baseada nos documentos indexados
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 6: Página de Planos
 **Goal**: Visitante acessa `/planos` e vê todos os planos disponíveis sem precisar estar logado
@@ -132,7 +135,10 @@ Plans:
   2. Cards de plano mostram nome, preço, intervalo, créditos e features
   3. Loading state e empty state estão presentes
   4. Layout é mobile-first e funciona em 375px
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 7: Stripe Checkout Session
 **Goal**: Usuária autenticada clica "Assinar" e é redirecionada para página de checkout real do Stripe
@@ -143,7 +149,10 @@ Plans:
   2. Botão "Assinar" no frontend redireciona para URL da sessão Stripe
   3. Usuária não autenticada é redirecionada para login antes do checkout
   4. Erros do Stripe são tratados com mensagem clara para o usuário
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 8: Retorno e Confirmação
 **Goal**: Após pagamento concluído, usuária vê confirmação e tem acesso liberado automaticamente em até 5 minutos
@@ -154,7 +163,10 @@ Plans:
   2. Cancelamento retorna usuária para `/planos`
   3. Webhook `checkout.session.completed` dispara `onboardingService` e libera matrícula + créditos
   4. Acesso ao curso está disponível sem intervenção manual dentro de 5 minutos do pagamento
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 9: Conta e Assinatura
 **Goal**: Usuária consegue ver seu plano atual e gerenciar ou cancelar assinatura sem contato com admin
@@ -164,7 +176,10 @@ Plans:
   1. Aba "Assinatura" em `/conta` mostra plano atual, data de renovação e créditos disponíveis
   2. Botão "Gerenciar assinatura" abre Stripe Customer Portal
   3. Informações de assinatura refletem estado real do Stripe
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 10: Pipeline de Embeddings
 **Goal**: Upload de PDF de 10 páginas gera chunks indexados no pgvector em menos de 30 segundos
@@ -175,7 +190,10 @@ Plans:
   2. `knowledgeService.ts` processa PDF, .txt e .md em chunks de 300-500 tokens com overlap
   3. Embeddings são gerados via `text-embedding-3-small` e armazenados como `vector(1536)`
   4. Metadados de scope, consultancy_id e document_name são preservados em cada chunk
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 11: API de Documentos Globais
 **Goal**: Admin adiciona um documento da metodologia Iris e ele aparece como indexado na interface
@@ -186,7 +204,10 @@ Plans:
   2. `POST /api/admin/knowledge` dispara upload + indexação e retorna documento com status `processing`
   3. Status evolui para `ready` ou `error` conforme pipeline conclui
   4. `DELETE /api/admin/knowledge/:id` remove documento e todos os seus chunks
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 12: API de Documentos por Consultoria
 **Goal**: Consultora sobe PDF do cliente em uma consultoria e ele é usado no chat daquela consultoria
@@ -197,7 +218,10 @@ Plans:
   2. `POST /api/consultancies/:id/documents` faz upload e indexa com `scope = 'consultancy'`
   3. `DELETE /api/consultancies/:id/documents/:docId` remove documento sem afetar outras consultorias
   4. RLS garante que consultora acessa apenas documentos de suas próprias consultorias
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 13: Chat RAG
 **Goal**: Pergunta sobre a metodologia da Iris retorna resposta alinhada com os documentos indexados, usando contexto global + da consultoria
@@ -208,7 +232,10 @@ Plans:
   2. Busca combina scope `global` + scope `consultancy` para a consultoria ativa
   3. Chunks injetados no system prompt como contexto adicional
   4. Resposta do chat referencia conteúdo dos documentos quando relevante
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 14: Integração Recall.ai Backend
 **Goal**: Bot entra em reunião real e webhook é recebido e processado pelo sistema
@@ -219,7 +246,10 @@ Plans:
   2. `POST /api/meetings/bot` cria bot Recall.ai, salva sessão com status `pending`
   3. Bot entra na reunião identificado como "Iris AI Notetaker"
   4. `POST /webhooks/recall` recebe transcrição raw e salva na sessão correspondente
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 15: Pipeline Transcript → IA
 **Goal**: Após reunião, resumo executivo e action items aparecem automaticamente na consultoria sem ação manual
@@ -230,7 +260,10 @@ Plans:
   2. `meeting_transcripts` salva `formatted_transcript`, `summary` e `speakers`
   3. Action items são inseridos automaticamente na tabela `action_items` da consultoria
   4. Pipeline completa em menos de 10 minutos após fim da reunião
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 16: Reuniões UI
 **Goal**: Consultora ativa o bot em menos de 30 segundos e acompanha status em tempo real
@@ -241,7 +274,10 @@ Plans:
   2. Status do bot atualiza em tempo real: aguardando / em reunião / processando / pronto
   3. Aba "Reuniões" lista reuniões com data, status e duração; card expandido mostra transcrição, resumo e action items
   4. Badge de status é visualmente distinto por estado
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 17: Lista de Consultorias com KPIs
 **Goal**: Consultora enxerga status de todos os seus clientes de relance ao abrir a página
@@ -252,7 +288,10 @@ Plans:
   2. Cards mostram nome, @instagram, nicho, etapa, próxima reunião e progresso %
   3. Filtros funcionam por todas, por etapa e por status
   4. Empty state tem value proposition clara e CTA para criar primeira consultoria
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 18: Wizard de Criação
 **Goal**: Nova consultoria criada em menos de 3 minutos com todas as informações base e contexto estratégico
@@ -263,7 +302,10 @@ Plans:
   2. Etapa 2 coleta: objetivo principal, dores relatadas, estágio atual, tem equipe, tem site
   3. Consultoria criada tem stage inicial "onboarding" e tabs vazias prontas para uso
   4. Fluxo completo é concluível em menos de 3 minutos
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 19: Central da Cliente Tabs
 **Goal**: Consultora encontra qualquer informação da cliente em menos de 2 cliques
@@ -274,7 +316,10 @@ Plans:
   2. Overview mostra: status atual, progresso, próxima reunião, últimas atividades, insight mais recente
   3. Tabs existentes (Chat, Diagnóstico, etc.) têm UX ajustada e funcionam corretamente
   4. Navegação entre tabs é fluida e não perde estado
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ### Phase 20: Integração Reunião → Consultoria
 **Goal**: Após reunião, a Central da Cliente reflete automaticamente o que foi discutido sem ação da consultora
@@ -285,7 +330,10 @@ Plans:
   2. Resumo da reunião aparece na timeline do Overview com data e link para reunião
   3. Transcrição da reunião é indexada e usada como contexto adicional no Chat IA via RAG
   4. Nenhuma ação manual da consultora é necessária para que os dados apareçam
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
+- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
 
 ---
 
