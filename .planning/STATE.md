@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-29T05:13:03.905Z"
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-29T05:31:29.419Z"
 progress:
   total_phases: 20
   completed_phases: 7
-  total_plans: 19
-  completed_plans: 17
+  total_plans: 21
+  completed_plans: 18
 ---
 
 # Project State
@@ -63,6 +63,7 @@ Plan: 1 of 2
 | Phase 07-stripe-checkout P02 | 4 | 2 tasks | 4 files |
 | Phase 08-retorno-e-confirmacao P02 | 1 | 2 tasks | 2 files |
 | Phase 08-retorno-e-confirmacao P01 | 8 | 2 tasks | 2 files |
+| Phase 09-conta-e-assinatura P01 | 17 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,8 @@ Recent decisions affecting current work:
 - [Phase 08-01]: Dynamic import of grantCredits inside processPurchase avoids circular dependency between onboardingService and creditService
 - [Phase 08-01]: client_reference_id as primary source for user_id in Stripe webhook; metadata.user_id as fallback — both set in checkout.ts
 - [Phase 08-01]: Email-based listUsers scan preserved as fallback path for Hotmart/Kiwify webhooks that do not carry a platform user_id
+- [Phase 09-01]: delete+insert used for subscriptions table (no unique constraint on user_id)
+- [Phase 09-01]: Stripe subscription data enriched at read time with DB fallback on error
 
 ### Pending Todos
 
@@ -115,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T05:13:03.835Z
-Stopped at: Completed 08-01-PLAN.md
+Last session: 2026-03-29T05:31:29.416Z
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None

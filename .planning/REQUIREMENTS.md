@@ -21,8 +21,8 @@
 - [x] **CHKT-02**: Usuária autenticada pode iniciar checkout Stripe a partir da página de planos
 - [x] **CHKT-03**: Após pagamento, usuária é redirecionada para página de confirmação
 - [x] **CHKT-04**: Acesso ao curso e créditos são liberados automaticamente após webhook Stripe
-- [ ] **CHKT-05**: Usuária pode ver plano atual e data de renovação em /conta
-- [ ] **CHKT-06**: Usuária pode gerenciar assinatura via Stripe Customer Portal
+- [x] **CHKT-05**: Usuária pode ver plano atual e data de renovação em /conta
+- [x] **CHKT-06**: Usuária pode gerenciar assinatura via Stripe Customer Portal
 
 ### Knowledge Base (IA)
 
@@ -100,8 +100,8 @@
 | CHKT-02 | Phase 7 (Stripe Checkout) | Complete |
 | CHKT-03 | Phase 8 (Retorno Checkout) | Complete |
 | CHKT-04 | Phase 8 (Retorno Checkout) | Complete |
-| CHKT-05 | Phase 9 (Conta: Assinatura) | Pending |
-| CHKT-06 | Phase 9 (Conta: Assinatura) | Pending |
+| CHKT-05 | Phase 9 (Conta: Assinatura) | Complete |
+| CHKT-06 | Phase 9 (Conta: Assinatura) | Complete |
 | KNWL-01 | Phase 10 (Pipeline Embeddings) | Pending |
 | KNWL-02 | Phase 11 (API Docs Global) | Pending |
 | KNWL-03 | Phase 12 (API Docs Consultoria) | Pending |
