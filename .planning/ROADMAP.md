@@ -11,7 +11,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 ### Milestone A — Admin Robusto
 - [x] **Phase 1: Admin Layout e Navegação** - Redesign do shell do admin com sidebar clara e navegação < 3 cliques (completed 2026-03-29)
 - [x] **Phase 2: Admin Planos e Stripe** - Interface para criar/editar planos no Stripe sem terminal (completed 2026-03-29)
-- [ ] **Phase 3: Admin Cursos** - UX de publicação de cursos e aulas em 1 clique
+- [x] **Phase 3: Admin Cursos** - UX de publicação de cursos e aulas em 1 clique (completed 2026-03-29)
 - [x] **Phase 4: Admin Usuários** - Filtros, busca e gestão de entitlements por usuária
 - [ ] **Phase 5: Admin IA Global** - Upload de documentos da metodologia Iris e teste da IA
 ### Milestone B — Checkout Stripe
@@ -157,17 +157,16 @@ Plans:
 - [ ] 09-02-PLAN.md — Frontend: decompose ContaPage into 3-layer + SubscriptionCard micro-module
 ### Phase 10: Pipeline de Embeddings
 **Goal**: Upload de PDF de 10 páginas gera chunks indexados no pgvector em menos de 30 segundos
-**Depends on**: Nothing (pgvector extension deve estar habilitada no Supabase antes da execução)
+**Depends on**: Nothing (pgvector extension deve estar habilitada no Supabase antes da execucao)
 **Requirements**: KNWL-01
 **Success Criteria** (what must be TRUE):
-  1. Migration 023 cria tabelas `knowledge_documents` e `knowledge_chunks` com RLS correto
-  2. `knowledgeService.ts` processa PDF, .txt e .md em chunks de 300-500 tokens com overlap
-  3. Embeddings são gerados via `text-embedding-3-small` e armazenados como `vector(1536)`
-  4. Metadados de scope, consultancy_id e document_name são preservados em cada chunk
-**Plans**: 2 plans
+  1. Migration 026 cria tabelas knowledge_documents e knowledge_chunks com RLS correto
+  2. knowledgeService.ts processa PDF, .txt e .md em chunks de 300-500 tokens com overlap
+  3. Embeddings sao gerados via text-embedding-3-small e armazenados como vector(1536)
+  4. Metadados de scope, consultancy_id e document_name sao preservados em cada chunk
+**Plans**: 1 plan
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 10-01-PLAN.md -- Migration 026 (knowledge tables + pgvector + RLS) + knowledgeService + embeddingService
 ### Phase 11: API de Documentos Globais
 **Goal**: Admin adiciona um documento da metodologia Iris e ele aparece como indexado na interface
 **Depends on**: Phase 10
@@ -314,7 +313,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Stripe Checkout Session | 2/2 | Complete   | 2026-03-29 | - |
 | 8. Retorno e Confirmação | 2/2 | Complete   | 2026-03-29 | - |
 | 9. Conta e Assinatura | 2/2 | Complete   | 2026-03-29 | - |
-| 10. Pipeline de Embeddings | C — IA Base de Conhecimento | 0/TBD | Not started | - |
+| 10. Pipeline de Embeddings | C — IA Base de Conhecimento | 0/1 | Not started | - |
 | 11. API Docs Globais | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 12. API Docs por Consultoria | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 13. Chat RAG | C — IA Base de Conhecimento | 0/TBD | Not started | - |
