@@ -5,6 +5,7 @@ const require = createRequire(import.meta.url);
 const pdfParse = require('pdf-parse') as (buffer: Buffer) => Promise<{ text: string }>;
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { generateEmbeddings } from './embeddingService.js';
+export { generateEmbeddings };
 
 // ============================================================================
 // Constants
@@ -69,7 +70,7 @@ function estimateTokens(text: string): number {
 // File Parsing
 // ============================================================================
 
-async function parseFile(fileType: 'pdf' | 'txt' | 'md', fileBuffer: Buffer): Promise<string> {
+export async function parseFile(fileType: 'pdf' | 'txt' | 'md', fileBuffer: Buffer): Promise<string> {
   if (fileType === 'pdf') {
     const result = await pdfParse(fileBuffer);
     return result.text;
@@ -81,7 +82,7 @@ async function parseFile(fileType: 'pdf' | 'txt' | 'md', fileBuffer: Buffer): Pr
 // Chunking
 // ============================================================================
 
-function chunkText(text: string): Chunk[] {
+export function chunkText(text: string): Chunk[] {
   const paragraphs = text.split(/\n\n+/).filter((p) => p.trim().length > 0);
   const chunks: Chunk[] = [];
   let currentContent = '';
