@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-03-29T05:12:13.960Z"
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-03-29T05:13:03.905Z"
 progress:
   total_phases: 20
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 19
-  completed_plans: 16
+  completed_plans: 17
 ---
 
 # Project State
@@ -62,6 +62,7 @@ Plan: 1 of 2
 | Phase 07-stripe-checkout P01 | 1 | 2 tasks | 2 files |
 | Phase 07-stripe-checkout P02 | 4 | 2 tasks | 4 files |
 | Phase 08-retorno-e-confirmacao P02 | 1 | 2 tasks | 2 files |
+| Phase 08-retorno-e-confirmacao P01 | 8 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,9 @@ Recent decisions affecting current work:
 - [Phase 07-stripe-checkout]: Auth gate in PlanosPage aggregator keeps PlanCard micro-module free of navigation concerns
 - [Phase 08-retorno-e-confirmacao]: CheckoutSucessoPage self-contained (no aggregator) — purely informational, no API calls, single responsibility under 80 lines
 - [Phase 08-retorno-e-confirmacao]: /checkout/sucesso route outside ProtectedRoute — Stripe redirect may arrive before Supabase session is re-established on client
+- [Phase 08-01]: Dynamic import of grantCredits inside processPurchase avoids circular dependency between onboardingService and creditService
+- [Phase 08-01]: client_reference_id as primary source for user_id in Stripe webhook; metadata.user_id as fallback — both set in checkout.ts
+- [Phase 08-01]: Email-based listUsers scan preserved as fallback path for Hotmart/Kiwify webhooks that do not carry a platform user_id
 
 ### Pending Todos
 
@@ -111,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T05:12:13.958Z
-Stopped at: Completed 08-02-PLAN.md
+Last session: 2026-03-29T05:13:03.835Z
+Stopped at: Completed 08-01-PLAN.md
 Resume file: None
