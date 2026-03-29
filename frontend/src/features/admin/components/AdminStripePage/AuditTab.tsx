@@ -45,7 +45,7 @@ export function AuditTab({ logs, total, page, limit, isLoading, onPageChange, fo
                 <p className="text-[11px] text-[var(--text-secondary)] truncate">
                   {log.profiles?.full_name ?? 'Sistema'} → {log.target_type} {log.target_id?.slice(0, 8)}
                 </p>
-                {log.metadata && (
+                {log.metadata != null && (
                   <p className="text-[10px] text-[var(--text-tertiary)] font-mono truncate">
                     {JSON.stringify(log.metadata)}
                   </p>

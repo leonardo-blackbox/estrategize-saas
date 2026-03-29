@@ -1,0 +1,1 @@
+export { AdminPlanosPage } from './AdminPlanosPage';

@@ -1,0 +1,1 @@
+export { AdminIAPage } from './AdminIAPage';

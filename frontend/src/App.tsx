@@ -49,6 +49,9 @@ import { AdminCursoDetailPage } from './pages/admin/AdminCursoDetailPage.tsx';
 import { AdminUserDetailPage } from './pages/admin/AdminUserDetailPage.tsx';
 import { AdminFormacaoPage } from './pages/admin/AdminFormacaoPage.tsx';
 import { AdminHomePage } from './pages/admin/AdminHomePage.tsx';
+import { AdminPlanosPage } from './pages/admin/AdminPlanosPage.tsx';
+import { AdminIAPage } from './pages/admin/AdminIAPage.tsx';
+import { AdminConfigPage } from './pages/admin/AdminConfigPage.tsx';
 
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
@@ -123,6 +126,9 @@ export default function App() {
           <Route path="/admin/stripe" element={<AdminStripePage />} />
           <Route path="/admin/formacao" element={<AdminFormacaoPage />} />
           <Route path="/admin/home" element={<AdminHomePage />} />
+          <Route path="/admin/planos" element={<AdminPlanosPage />} />
+          <Route path="/admin/ia" element={<AdminIAPage />} />
+          <Route path="/admin/config" element={<AdminConfigPage />} />
         </Route>
 
         {/* ── Catch-all redirect ── */}
