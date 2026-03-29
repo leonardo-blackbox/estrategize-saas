@@ -191,8 +191,8 @@ Plans:
   4. RLS garante que consultora acessa apenas documentos de suas próprias consultorias
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 12-01-PLAN.md — Backend: member document routes (GET/POST/DELETE) + app.ts registration
+- [ ] 12-02-PLAN.md — Frontend: consultancyDocuments API + hook + ConsultoriaDocumentos micro-module + tabs wiring
 ### Phase 13: Chat RAG
 **Goal**: Pergunta sobre a metodologia da Iris retorna resposta alinhada com os documentos indexados, usando contexto global + da consultoria
 **Depends on**: Phase 11, Phase 12
@@ -315,7 +315,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 9. Conta e Assinatura | 2/2 | Complete   | 2026-03-29 | - |
 | 10. Pipeline de Embeddings | 1/1 | Complete    | 2026-03-29 | - |
 | 11. API Docs Globais | 2/2 | Complete    | 2026-03-29 | - |
-| 12. API Docs por Consultoria | C — IA Base de Conhecimento | 0/TBD | Not started | - |
+| 12. API Docs por Consultoria | C — IA Base de Conhecimento | 0/2 | Planned | - |
 | 13. Chat RAG | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 14. Integração Recall.ai Backend | D — Reuniões com Transcrição | 0/TBD | Not started | - |
 | 15. Pipeline Transcript → IA | D — Reuniões com Transcrição | 0/TBD | Not started | - |
