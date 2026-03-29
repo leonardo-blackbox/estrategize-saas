@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-03-29T03:35:01.413Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-03-29T03:36:14.388Z"
 progress:
   total_phases: 20
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 02 (Admin Planos e Stripe) — EXECUTING
-Plan: 1 of 3
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: 1 of 3
 | Phase 01 P02 | 8 min | 3 tasks | 18 files |
 | Phase 02 P01 | 2 | 2 tasks | 4 files |
 | Phase 02 P03 | 5 | 1 tasks | 2 files |
+| Phase 02-admin-planos-e-stripe P02 | 4 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting current work:
 - [Phase 02]: Stripe apiVersion 2026-01-28.clover; RLS stripe_products with service_role only; one_time billing creates non-recurring Stripe price
 - [Phase 02]: Tailwind color palette with /10 opacity variants for status badge backgrounds — dark-mode compatible without CSS variables
 - [Phase 02]: EVENT_TYPE_LABELS in WebhooksTab (not aggregator) — label logic colocated with rendering component
+- [Phase 02-admin-planos-e-stripe]: PlanFormModal delegates mutations to aggregator via onSubmit — modal is pure UI with zero API knowledge
+- [Phase 02-admin-planos-e-stripe]: BRL price input: user types decimal (97.00), aggregator converts to integer cents (9700) before API call
 
 ### Pending Todos
 
@@ -79,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T03:35:01.409Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-03-29T03:36:14.383Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

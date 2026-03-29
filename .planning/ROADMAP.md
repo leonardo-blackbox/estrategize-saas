@@ -17,7 +17,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 ### Milestone A — Admin Robusto
 
 - [x] **Phase 1: Admin Layout e Navegação** - Redesign do shell do admin com sidebar clara e navegação < 3 cliques (completed 2026-03-29)
-- [ ] **Phase 2: Admin Planos e Stripe** - Interface para criar/editar planos no Stripe sem terminal
+- [x] **Phase 2: Admin Planos e Stripe** - Interface para criar/editar planos no Stripe sem terminal (completed 2026-03-29)
 - [ ] **Phase 3: Admin Cursos** - UX de publicação de cursos e aulas em 1 clique
 - [ ] **Phase 4: Admin Usuárias** - Filtros, busca e gestão de entitlements por usuária
 - [ ] **Phase 5: Admin IA Global** - Upload de documentos da metodologia Iris e teste da IA
@@ -292,7 +292,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Admin Layout e Navegação | 3/3 | Complete   | 2026-03-29 | - |
-| 2. Admin Planos e Stripe | 2/3 | In Progress|  | - |
+| 2. Admin Planos e Stripe | 3/3 | Complete   | 2026-03-29 | - |
 | 3. Admin Cursos | A — Admin Robusto | 0/TBD | Not started | - |
 | 4. Admin Usuárias | A — Admin Robusto | 0/TBD | Not started | - |
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
