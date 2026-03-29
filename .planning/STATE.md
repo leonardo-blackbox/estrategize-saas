@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-03-29T04:05:07.761Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-03-29T04:06:30.461Z"
 progress:
   total_phases: 20
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -54,6 +54,7 @@ Plan: 1 of 3
 | Phase 02-admin-planos-e-stripe P02 | 4 | 2 tasks | 7 files |
 | Phase 03-admin-cursos P01 | 1 | 2 tasks | 2 files |
 | Phase 03-admin-cursos P03 | 3 | 2 tasks | 9 files |
+| Phase 03-admin-cursos P02 | 7 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,8 @@ Recent decisions affecting current work:
 - [Phase 03-admin-cursos]: 1:N FK on courses.stripe_product_id (ON DELETE SET NULL) — no junction table; Supabase FK join syntax in select string for stripe_products join
 - [Phase 03-admin-cursos]: Lesson status defaults to draft — existing lessons require explicit publish action by admin
 - [Phase 03-admin-cursos]: Dedicated POST publish/unpublish endpoints for lessons — consistent with existing course publish/archive pattern
+- [Phase 03-admin-cursos]: PlanSelect extracted as micro-module from CourseCreateModal when inline version exceeded 80-line limit
+- [Phase 03-admin-cursos]: Unpublish uses adminUpdateCourse({status: draft}) not adminArchiveCourse — archive is semantically distinct from unpublish
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T04:05:07.759Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-03-29T04:06:30.457Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
