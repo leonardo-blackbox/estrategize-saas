@@ -18,6 +18,7 @@ import adminHomeRouter from './routes/admin/home.js';
 import adminStripeRouter from './routes/admin/stripe.js';
 import applicationsRouter from './routes/applications.js';
 import publicFormsRouter from './routes/public/forms.js';
+import publicPlansRouter from './routes/public/plans.js';
 import assetsRouter from './routes/assets.js';
 import analyticsRouter from './routes/analytics.js';
 import templatesRouter from './routes/templates.js';
@@ -120,6 +121,7 @@ app.use('/api/applications', assetsRouter);
 app.use('/api/applications', analyticsRouter);
 app.use('/api/templates', templatesRouter);
 app.use('/api/forms', publicFormsRouter);
+app.use('/api/plans', publicPlansRouter);
 
 app.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
   res.json({ user_id: req.userId });
