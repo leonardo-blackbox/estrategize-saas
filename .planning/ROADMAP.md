@@ -18,7 +18,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 - [x] **Phase 6: Página de Planos** - Visitante vê planos disponíveis sem estar logado (completed 2026-03-29)
 - [x] **Phase 7: Stripe Checkout Session** - Botão "Assinar" redireciona para Stripe real (completed 2026-03-29)
 - [x] **Phase 8: Retorno e Confirmação** - Página de sucesso e acesso liberado via webhook (completed 2026-03-29)
-- [ ] **Phase 9: Conta e Assinatura** - Usuária vê plano atual e acessa portal Stripe
+- [x] **Phase 9: Conta e Assinatura** - Usuária vê plano atual e acessa portal Stripe (completed 2026-03-29)
 ### Milestone C — IA Base de Conhecimento
 - [ ] **Phase 10: Pipeline de Embeddings** - Backend processa PDF/txt e gera chunks indexados no pgvector
 - [ ] **Phase 11: API de Documentos Globais** - Admin gerencia base de conhecimento da metodologia Iris
@@ -313,7 +313,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Página de Planos | 2/2 | Complete   | 2026-03-29 | - |
 | 7. Stripe Checkout Session | 2/2 | Complete   | 2026-03-29 | - |
 | 8. Retorno e Confirmação | 2/2 | Complete   | 2026-03-29 | - |
-| 9. Conta e Assinatura | 1/2 | In Progress|  | - |
+| 9. Conta e Assinatura | 2/2 | Complete   | 2026-03-29 | - |
 | 10. Pipeline de Embeddings | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 11. API Docs Globais | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 12. API Docs por Consultoria | C — IA Base de Conhecimento | 0/TBD | Not started | - |
