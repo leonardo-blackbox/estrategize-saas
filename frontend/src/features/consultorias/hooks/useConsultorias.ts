@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchConsultancies,
   updateConsultancy,
+  deleteConsultancy,
   consultancyKeys,
   type Consultancy,
   type ConsultancyStats,
@@ -14,8 +15,8 @@ export function useConsultorias() {
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [archivedVisible, setArchivedVisible] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const qc = useQueryClient();
@@ -24,7 +25,20 @@ export function useConsultorias() {
     mutationFn: (id: string) => updateConsultancy(id, { status: 'archived' }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: consultancyKeys.all });
-      setSelectedId(null);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteConsultancy(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: consultancyKeys.all });
+    },
+  });
+
+  const unarchiveMutation = useMutation({
+    mutationFn: (id: string) => updateConsultancy(id, { status: 'active' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: consultancyKeys.all });
     },
   });
 
@@ -52,6 +66,8 @@ export function useConsultorias() {
     };
   }, [search]);
 
+  const archived = consultancies.filter((c) => c.status === 'archived');
+
   const filtered = consultancies
     .filter((c) => c.status !== 'archived')
     .filter((c) => phaseFilter === 'all' || c.phase === phaseFilter)
@@ -78,24 +94,26 @@ export function useConsultorias() {
       return 0;
     });
 
-  const selected = consultancies.find((c) => c.id === selectedId) ?? null;
-
-  const handleSelect = useCallback((c: Consultancy) => {
-    setSelectedId((prev) => (prev === c.id ? null : c.id));
-  }, []);
-
   const handleArchive = useCallback(
-    (id: string) => {
-      archiveMutation.mutate(id);
-    },
+    (id: string) => { archiveMutation.mutate(id); },
     [archiveMutation],
+  );
+
+  const handleDelete = useCallback(
+    (id: string) => { deleteMutation.mutate(id); },
+    [deleteMutation],
+  );
+
+  const handleUnarchive = useCallback(
+    (id: string) => { unarchiveMutation.mutate(id); },
+    [unarchiveMutation],
   );
 
   return {
     // Data
     stats,
     filtered,
-    selected,
+    archived,
     isLoading,
     isError,
     error,
@@ -107,10 +125,13 @@ export function useConsultorias() {
     search,
     setSearch,
     debouncedSearch,
-    // Selection
-    selectedId,
-    handleSelect,
+    // Actions
     handleArchive,
+    handleDelete,
+    handleUnarchive,
+    // Archived visibility
+    archivedVisible,
+    setArchivedVisible,
     // Create modal
     showCreate,
     setShowCreate,

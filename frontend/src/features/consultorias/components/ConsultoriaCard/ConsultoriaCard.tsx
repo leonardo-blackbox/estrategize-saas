@@ -9,29 +9,37 @@ import { PhaseBadge } from '../PhaseBadge';
 
 interface ConsultoriaCardProps {
   consultancy: Consultancy;
-  selected: boolean;
-  onSelect: (c: Consultancy) => void;
   onArchive: (id: string) => void;
+  onDelete: (id: string) => void;
+  onUnarchive: (id: string) => void;
 }
 
-export function ConsultoriaCard({ consultancy: c, selected, onSelect, onArchive }: ConsultoriaCardProps) {
+export function ConsultoriaCard({ consultancy: c, onArchive, onDelete, onUnarchive }: ConsultoriaCardProps) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   const phase = c.phase ?? 'onboarding';
   const phaseCfg = phaseConfig[phase];
+  const isArchived = c.status === 'archived';
 
   return (
-    <motion.div variants={staggerItem} layout onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={() => onSelect(c)}
+    <motion.div variants={staggerItem} layout
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => navigate('/consultorias/' + c.id)}
       className={cn('relative rounded-[var(--radius-md)] p-4 border cursor-pointer overflow-hidden transition-colors duration-150',
-        selected ? 'border-[var(--consulting-iris)] bg-[var(--consulting-iris-subtle)]' : 'border-[var(--border-hairline)] bg-[var(--bg-surface-1)] hover:border-[var(--border-default)] hover:bg-[var(--bg-hover)]')}>
+        'border-[var(--border-hairline)] bg-[var(--bg-surface-1)] hover:border-[var(--border-default)] hover:bg-[var(--bg-hover)]',
+        isArchived && 'opacity-60')}>
       <AnimatePresence>
         {hovered && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}
             className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 px-3 py-2 bg-gradient-to-t from-[var(--bg-surface-1)] to-transparent"
             onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => navigate(`/consultorias/${c.id}`)} className="flex-1 rounded-[var(--radius-sm)] py-1 text-[11px] font-semibold text-[var(--text-primary)] bg-[var(--bg-surface-2)] hover:bg-[var(--bg-hover)] transition-colors">Abrir</button>
             <button onClick={() => navigate(`/consultorias/${c.id}/ai`)} className="flex-1 rounded-[var(--radius-sm)] py-1 text-[11px] font-semibold text-white transition-colors" style={{ background: 'var(--consulting-ai-gradient)' }}>IA Dedicada</button>
-            <button onClick={() => onArchive(c.id)} className="rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-semibold text-[var(--text-muted)] bg-[var(--bg-surface-2)] hover:text-[var(--color-error)] transition-colors">Arquivar</button>
+            {isArchived
+              ? <button onClick={() => onUnarchive(c.id)} className="rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-semibold text-[var(--text-muted)] bg-[var(--bg-surface-2)] hover:text-[var(--color-success)] transition-colors">Reativar</button>
+              : <button onClick={() => onArchive(c.id)} className="rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-semibold text-[var(--text-muted)] bg-[var(--bg-surface-2)] hover:text-[var(--color-error)] transition-colors">Arquivar</button>
+            }
+            <button onClick={() => onDelete(c.id)} className="rounded-[var(--radius-sm)] px-2 py-1 text-[11px] font-semibold text-[var(--text-muted)] bg-[var(--bg-surface-2)] hover:text-[var(--color-error)] transition-colors">Excluir</button>
           </motion.div>
         )}
       </AnimatePresence>

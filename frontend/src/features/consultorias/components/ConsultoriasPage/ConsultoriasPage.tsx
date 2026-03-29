@@ -5,14 +5,13 @@ import { ConsultoriasHeader } from '../ConsultoriasHeader';
 import { ConsultoriasKpiRow } from '../ConsultoriasKpiRow';
 import { ConsultoriasFilterBar } from '../ConsultoriasFilterBar';
 import { ConsultoriasGrid } from '../ConsultoriasGrid';
-import { SmartSidebar } from '../SmartSidebar';
 import { CreateConsultancyWizard } from '../CreateConsultancyWizard';
 
 export function ConsultoriasPage() {
   const {
     stats,
     filtered,
-    selected,
+    archived,
     isLoading,
     isError,
     error,
@@ -23,9 +22,11 @@ export function ConsultoriasPage() {
     search,
     setSearch,
     debouncedSearch,
-    selectedId,
-    handleSelect,
     handleArchive,
+    handleDelete,
+    handleUnarchive,
+    archivedVisible,
+    setArchivedVisible,
     showCreate,
     setShowCreate,
   } = useConsultorias();
@@ -55,7 +56,6 @@ export function ConsultoriasPage() {
           onPhaseFilterChange={setPhaseFilter}
         />
 
-        {/* Error state */}
         {isError && (
           <motion.div
             variants={staggerItem}
@@ -67,21 +67,19 @@ export function ConsultoriasPage() {
           </motion.div>
         )}
 
-        {/* Two-column layout */}
-        <motion.div variants={staggerItem} className="flex flex-col lg:flex-row gap-4 items-start">
+        <motion.div variants={staggerItem}>
           <ConsultoriasGrid
             consultancies={filtered}
-            selectedId={selectedId}
             isLoading={isLoading}
             hasSearch={!!debouncedSearch}
-            onSelect={handleSelect}
             onArchive={handleArchive}
+            onDelete={handleDelete}
+            onUnarchive={handleUnarchive}
+            archived={archived}
+            archivedVisible={archivedVisible}
+            onToggleArchived={() => setArchivedVisible((v) => !v)}
             onCreateClick={() => setShowCreate(true)}
           />
-
-          <div className="w-full lg:w-72 xl:w-80 shrink-0">
-            <SmartSidebar selected={selected} />
-          </div>
         </motion.div>
       </motion.div>
 

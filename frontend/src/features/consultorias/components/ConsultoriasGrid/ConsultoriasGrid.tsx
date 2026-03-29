@@ -6,25 +6,33 @@ import { SkeletonCard } from '../SkeletonCard';
 
 interface ConsultoriasGridProps {
   consultancies: Consultancy[];
-  selectedId: string | null;
   isLoading: boolean;
   hasSearch: boolean;
-  onSelect: (c: Consultancy) => void;
   onArchive: (id: string) => void;
+  onDelete: (id: string) => void;
+  onUnarchive: (id: string) => void;
+  archived: Consultancy[];
+  archivedVisible: boolean;
+  onToggleArchived: () => void;
   onCreateClick: () => void;
 }
 
 export function ConsultoriasGrid({
   consultancies,
-  selectedId,
   isLoading,
   hasSearch,
-  onSelect,
   onArchive,
+  onDelete,
+  onUnarchive,
+  archived,
+  archivedVisible,
+  onToggleArchived,
   onCreateClick,
 }: ConsultoriasGridProps) {
+  const cardProps = { onArchive, onDelete, onUnarchive };
+
   return (
-    <div className="flex-1 min-w-0">
+    <div className="flex-1 min-w-0 space-y-6">
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {[...Array(6)].map((_, i) => (
@@ -36,15 +44,28 @@ export function ConsultoriasGrid({
       ) : (
         <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {consultancies.map((c) => (
-            <ConsultoriaCard
-              key={c.id}
-              consultancy={c}
-              selected={selectedId === c.id}
-              onSelect={onSelect}
-              onArchive={onArchive}
-            />
+            <ConsultoriaCard key={c.id} consultancy={c} {...cardProps} />
           ))}
         </motion.div>
+      )}
+
+      {archived.length > 0 && (
+        <div className="space-y-3">
+          <button
+            onClick={onToggleArchived}
+            className="text-[12px] font-medium text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+          >
+            {archivedVisible ? `Ocultar arquivadas (${archived.length})` : `Arquivadas (${archived.length})`}
+          </button>
+
+          {archivedVisible && (
+            <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+              {archived.map((c) => (
+                <ConsultoriaCard key={c.id} consultancy={c} {...cardProps} />
+              ))}
+            </motion.div>
+          )}
+        </div>
       )}
     </div>
   );
