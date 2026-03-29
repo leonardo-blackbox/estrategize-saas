@@ -1,4 +1,8 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usePlans } from '../../hooks/usePlans.ts';
+import { useCheckout } from '../../hooks/useCheckout.ts';
+import { useAuthStore } from '../../../../stores/authStore.ts';
 import { PlanCard } from '../PlanCard';
 
 function SkeletonCard() {
@@ -9,9 +13,18 @@ function SkeletonCard() {
 
 export function PlanosPage() {
   const { data: plans, isLoading } = usePlans();
+  const user = useAuthStore((s) => s.user);
+  const navigate = useNavigate();
+  const checkout = useCheckout();
+  const [activePlanId, setActivePlanId] = useState<string | null>(null);
 
   function handleSubscribe(planId: string) {
-    console.log('Subscribe:', planId);
+    if (!user) {
+      navigate('/login', { state: { from: '/planos' } });
+      return;
+    }
+    setActivePlanId(planId);
+    checkout.mutate(planId);
   }
 
   return (
@@ -39,7 +52,13 @@ export function PlanosPage() {
         {!isLoading && plans && plans.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {plans.map((plan) => (
-              <PlanCard key={plan.id} plan={plan} onSubscribe={handleSubscribe} />
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                onSubscribe={handleSubscribe}
+                isLoading={checkout.isPending && activePlanId === plan.id}
+                error={activePlanId === plan.id && checkout.error ? checkout.error.message : null}
+              />
             ))}
           </div>
         )}

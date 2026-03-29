@@ -3,6 +3,8 @@ import { type PublicPlan } from '../../../../api/plans.ts';
 export interface PlanCardProps {
   plan: PublicPlan;
   onSubscribe: (planId: string) => void;
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 const INTERVAL_LABEL: Record<PublicPlan['billing_interval'], string> = {
@@ -27,7 +29,7 @@ function formatPrice(priceCents: number, interval: PublicPlan['billing_interval'
   return `${formatted}${suffix}`;
 }
 
-export function PlanCard({ plan, onSubscribe }: PlanCardProps) {
+export function PlanCard({ plan, onSubscribe, isLoading, error }: PlanCardProps) {
   const [priceBase, priceSuffix] = formatPrice(plan.price_cents, plan.billing_interval).split(
     /(\/mes|\/ano| \(unico\))$/
   );
@@ -59,10 +61,14 @@ export function PlanCard({ plan, onSubscribe }: PlanCardProps) {
 
       <button
         onClick={() => onSubscribe(plan.id)}
-        className="mt-auto w-full rounded-lg bg-[#7c5cfc] hover:bg-[#6b4ee0] text-white font-medium py-3 px-4 transition-colors"
+        disabled={isLoading}
+        className={`mt-auto w-full rounded-lg bg-[#7c5cfc] hover:bg-[#6b4ee0] text-white font-medium py-3 px-4 transition-colors${isLoading ? ' opacity-60 cursor-not-allowed' : ''}`}
       >
-        Assinar
+        {isLoading ? 'Processando...' : 'Assinar'}
       </button>
+      {error && (
+        <p className="text-xs text-red-400 mt-2 text-center">{error}</p>
+      )}
     </div>
   );
 }
