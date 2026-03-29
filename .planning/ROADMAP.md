@@ -178,8 +178,8 @@ Plans:
   4. `DELETE /api/admin/knowledge/:id` remove documento e todos os seus chunks
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 11-01-PLAN.md — Backend: admin knowledge routes (GET list, POST upload, DELETE) + app.ts registration
+- [ ] 11-02-PLAN.md — Frontend: knowledge.api.ts + useKnowledge hook + AdminIAPage aggregator + KnowledgeUpload + KnowledgeList
 ### Phase 12: API de Documentos por Consultoria
 **Goal**: Consultora sobe PDF do cliente em uma consultoria e ele é usado no chat daquela consultoria
 **Depends on**: Phase 10
@@ -314,7 +314,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 8. Retorno e Confirmação | 2/2 | Complete   | 2026-03-29 | - |
 | 9. Conta e Assinatura | 2/2 | Complete   | 2026-03-29 | - |
 | 10. Pipeline de Embeddings | 1/1 | Complete    | 2026-03-29 | - |
-| 11. API Docs Globais | C — IA Base de Conhecimento | 0/TBD | Not started | - |
+| 11. API Docs Globais | C — IA Base de Conhecimento | 0/2 | Not started | - |
 | 12. API Docs por Consultoria | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 13. Chat RAG | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 14. Integração Recall.ai Backend | D — Reuniões com Transcrição | 0/TBD | Not started | - |
