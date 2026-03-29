@@ -62,7 +62,11 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
   2. Todas as páginas admin existentes estão linkadas e acessíveis via sidebar
   3. Navegação entre qualquer duas seções do admin requer no máximo 2 cliques
   4. Layout é responsivo e funciona em 375px
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 01-01-PLAN.md — Sidebar flat nav + placeholder pages + routes
+- [ ] 01-02-PLAN.md — Decompose 3 largest admin pages (FormacaoPage, TurmasPage, OfertasPage)
+- [ ] 01-03-PLAN.md — Decompose 5 remaining admin pages (CursosPage, StripePage, DashboardPage, UsuariosPage, NovaOfertaPage)
 
 ### Phase 2: Admin Planos e Stripe
 **Goal**: A Iris cria um novo plano (nome, preço, créditos, cursos incluídos) e ele aparece no Stripe sem abrir terminal
@@ -283,7 +287,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. Admin Layout e Navegação | A — Admin Robusto | 0/TBD | Not started | - |
+| 1. Admin Layout e Navegação | A — Admin Robusto | 0/3 | Planning complete | - |
 | 2. Admin Planos e Stripe | A — Admin Robusto | 0/TBD | Not started | - |
 | 3. Admin Cursos | A — Admin Robusto | 0/TBD | Not started | - |
 | 4. Admin Usuárias | A — Admin Robusto | 0/TBD | Not started | - |
