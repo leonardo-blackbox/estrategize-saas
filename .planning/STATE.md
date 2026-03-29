@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 10-01-PLAN.md
-last_updated: "2026-03-29T23:15:27.765Z"
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-03-29T23:30:01.924Z"
 progress:
   total_phases: 20
   completed_phases: 9
-  total_plans: 22
-  completed_plans: 20
+  total_plans: 24
+  completed_plans: 21
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 10 — Pipeline de Embeddings
+**Current focus:** Phase 11 — API de Documentos Globais
 
 ## Current Position
 
-Phase: 10 (Pipeline de Embeddings) — EXECUTING
-Plan: 1 of 1
+Phase: 11 (API de Documentos Globais) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Plan: 1 of 1
 | Phase 09-conta-e-assinatura P01 | 17 | 2 tasks | 4 files |
 | Phase 09-conta-e-assinatura P02 | 15 | 1 tasks | 10 files |
 | Phase 10-pipeline-de-embeddings P01 | 3 | 2 tasks | 4 files |
+| Phase 11-api-de-documentos-globais P01 | 5 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,7 @@ Recent decisions affecting current work:
 - [Phase 09-02]: STATUS_LABELS and STATUS_CLASSES as module-level lookup objects in SubscriptionCard avoid inline ternary chains
 - [Phase 10-pipeline-de-embeddings]: createRequire pattern for pdf-parse CJS import in ESM project with moduleResolution bundler
 - [Phase 10-pipeline-de-embeddings]: Embedding vector stored as string [v1,v2,...] for PostgREST vector type conversion; supabaseAdmin (service role) used server-side to bypass RLS
+- [Phase 11-api-de-documentos-globais]: parseFile and chunkText exported from knowledgeService; POST returns 201 with status processing and fires background IIFE for parse/chunk/embed
 
 ### Pending Todos
 
@@ -124,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T23:12:07.689Z
-Stopped at: Completed 10-01-PLAN.md
+Last session: 2026-03-29T23:30:01.918Z
+Stopped at: Completed 11-01-PLAN.md
 Resume file: None

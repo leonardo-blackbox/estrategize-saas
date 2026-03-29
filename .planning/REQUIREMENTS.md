@@ -27,7 +27,7 @@
 ### Knowledge Base (IA)
 
 - [x] **KNWL-01**: Sistema processa PDF/txt/md e gera chunks com embeddings
-- [ ] **KNWL-02**: Admin pode adicionar/remover documentos globais (metodologia Iris)
+- [x] **KNWL-02**: Admin pode adicionar/remover documentos globais (metodologia Iris)
 - [ ] **KNWL-03**: Consultora pode fazer upload de documentos do cliente por consultoria
 - [ ] **KNWL-04**: Consultora pode remover documentos da consultoria
 - [ ] **KNWL-05**: Chat IA da consultoria usa documentos globais + documentos da consultoria como contexto
@@ -103,7 +103,7 @@
 | CHKT-05 | Phase 9 (Conta: Assinatura) | Complete |
 | CHKT-06 | Phase 9 (Conta: Assinatura) | Complete |
 | KNWL-01 | Phase 10 (Pipeline Embeddings) | Complete |
-| KNWL-02 | Phase 11 (API Docs Global) | Pending |
+| KNWL-02 | Phase 11 (API Docs Global) | Complete |
 | KNWL-03 | Phase 12 (API Docs Consultoria) | Pending |
 | KNWL-04 | Phase 12 (API Docs Consultoria) | Pending |
 | KNWL-05 | Phase 13 (Chat RAG) | Pending |
