@@ -92,10 +92,11 @@ Plans:
   2. Upload de thumbnail do curso funciona via interface
   3. Admin consegue associar curso a um plano via dropdown
   4. Organização visual da página de cursos torna o fluxo intuitivo
-**Plans**: 2 plans
+**Plans**: 3 plans
 Plans:
 - [ ] 03-01-PLAN.md — Backend: migration course-plan link + atualizar GET/PUT para incluir stripe_product_id
 - [ ] 03-02-PLAN.md — Frontend: status tabs, plan dropdown no modal/header, UX polish
+- [ ] 03-03-PLAN.md — Backend+Frontend: lesson publish/unpublish (status field + endpoints + UI button)
 
 ### Phase 4: Admin Usuárias
 **Goal**: A Iris encontra uma usuária e altera seu acesso em menos de 1 minuto
@@ -296,7 +297,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|-----------|----------------|--------|-----------|
 | 1. Admin Layout e Navegação | 3/3 | Complete   | 2026-03-29 | - |
 | 2. Admin Planos e Stripe | 3/3 | Complete   | 2026-03-29 | - |
-| 3. Admin Cursos | A — Admin Robusto | 0/2 | Planned | - |
+| 3. Admin Cursos | A — Admin Robusto | 0/3 | Planned | - |
 | 4. Admin Usuárias | A — Admin Robusto | 0/TBD | Not started | - |
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
 | 6. Página de Planos | B — Checkout Stripe | 0/TBD | Not started | - |
