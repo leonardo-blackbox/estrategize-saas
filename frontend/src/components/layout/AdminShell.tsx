@@ -33,6 +33,14 @@ function IconCreditCard() {
   );
 }
 
+function IconBolt() {
+  return (
+    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+    </svg>
+  );
+}
+
 function IconSettings() {
   return (
     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -78,8 +86,9 @@ function IconSparkles() {
 const NAV_ITEMS: NavItem[] = [
   { to: '/admin',          label: 'Dashboard',       icon: <IconGrid />,       end: true },
   { to: '/admin/cursos',   label: 'Cursos',          icon: <IconPlay />,       activePaths: ['/admin/formacao', '/admin/home'] },
-  { to: '/admin/usuarios', label: 'Usuarias',        icon: <IconUsers /> },
-  { to: '/admin/planos',   label: 'Planos / Stripe', icon: <IconCreditCard />, activePaths: ['/admin/ofertas', '/admin/turmas', '/admin/stripe'] },
+  { to: '/admin/usuarios', label: 'Usuários',         icon: <IconUsers /> },
+  { to: '/admin/planos',   label: 'Planos',          icon: <IconCreditCard />, activePaths: ['/admin/ofertas', '/admin/turmas'] },
+  { to: '/admin/stripe',   label: 'Stripe',          icon: <IconBolt /> },
   { to: '/admin/ia',       label: 'IA Global',       icon: <IconSparkles />,   badge: 'em breve' },
   { to: '/admin/config',   label: 'Configuracoes',   icon: <IconSettings />,   disabled: true },
 ];

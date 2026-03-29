@@ -53,7 +53,7 @@ export function useConsultorias() {
   }, [search]);
 
   const filtered = consultancies
-    .filter((c) => c.status === 'active')
+    .filter((c) => c.status !== 'archived')
     .filter((c) => phaseFilter === 'all' || c.phase === phaseFilter)
     .filter((c) => {
       if (!debouncedSearch) return true;
