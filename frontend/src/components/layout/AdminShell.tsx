@@ -9,16 +9,11 @@ import { cn } from '../../lib/cn.ts';
 interface NavItem {
   to: string;
   label: string;
+  icon: React.ReactNode;
   end?: boolean;
   disabled?: boolean;
   badge?: string;
-}
-
-interface NavGroup {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  items: NavItem[];
+  activePaths?: string[];
 }
 
 // ─── Icons ────────────────────────────────────────────────────────
@@ -47,25 +42,6 @@ function IconSettings() {
   );
 }
 
-function IconPlug() {
-  return (
-    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-    </svg>
-  );
-}
-
-function IconChevron({ open }: { open: boolean }) {
-  return (
-    <svg
-      className={cn('w-3 h-3 transition-transform duration-150', open && 'rotate-90')}
-      fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-    </svg>
-  );
-}
-
 function IconMenu() {
   return (
     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -82,52 +58,43 @@ function IconGrid() {
   );
 }
 
+function IconUsers() {
+  return (
+    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+    </svg>
+  );
+}
+
+function IconSparkles() {
+  return (
+    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+    </svg>
+  );
+}
+
 // ─── Nav structure ────────────────────────────────────────────────
-const NAV_GROUPS: NavGroup[] = [
-  {
-    id: 'membros',
-    label: 'Área de Membros',
-    icon: <IconPlay />,
-    items: [
-      { to: '/admin/cursos', label: 'Conteúdos' },
-      { to: '/admin/home', label: 'Home' },
-      { to: '/admin/usuarios', label: 'Usuários' },
-      { to: '/admin/turmas', label: 'Turmas' },
-    ],
-  },
-  {
-    id: 'pagamentos',
-    label: 'Pagamentos',
-    icon: <IconCreditCard />,
-    items: [
-      { to: '/admin/ofertas', label: 'Ofertas' },
-      { to: '/admin/stripe', label: 'Logs & Webhooks' },
-    ],
-  },
-  {
-    id: 'configuracoes',
-    label: 'Configurações',
-    icon: <IconSettings />,
-    items: [
-      { to: '/admin/configuracoes', label: 'Geral', disabled: true, badge: 'em breve' },
-    ],
-  },
-  {
-    id: 'integracoes',
-    label: 'Integrações',
-    icon: <IconPlug />,
-    items: [
-      { to: '/admin/integracoes', label: 'Webhooks externos', disabled: true, badge: 'em breve' },
-    ],
-  },
+const NAV_ITEMS: NavItem[] = [
+  { to: '/admin',          label: 'Dashboard',       icon: <IconGrid />,       end: true },
+  { to: '/admin/cursos',   label: 'Cursos',          icon: <IconPlay />,       activePaths: ['/admin/formacao', '/admin/home'] },
+  { to: '/admin/usuarios', label: 'Usuarias',        icon: <IconUsers /> },
+  { to: '/admin/planos',   label: 'Planos / Stripe', icon: <IconCreditCard />, activePaths: ['/admin/ofertas', '/admin/turmas', '/admin/stripe'] },
+  { to: '/admin/ia',       label: 'IA Global',       icon: <IconSparkles />,   badge: 'em breve' },
+  { to: '/admin/config',   label: 'Configuracoes',   icon: <IconSettings />,   disabled: true },
 ];
 
-// ─── NavSubItem ───────────────────────────────────────────────────
-function NavSubItem({ item }: { item: NavItem }) {
+// ─── NavItemLink ──────────────────────────────────────────────────
+function NavItemLink({ item }: { item: NavItem }) {
+  const location = useLocation();
+
   if (item.disabled) {
     return (
-      <div className="flex items-center justify-between pl-3 pr-2 py-1.5 rounded-[var(--radius-sm)] opacity-40 cursor-default select-none">
-        <span className="text-xs text-[var(--text-tertiary)]">{item.label}</span>
+      <div className="flex items-center justify-between px-2.5 py-2 rounded-[var(--radius-sm)] opacity-40 cursor-default select-none">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[var(--text-tertiary)]">{item.icon}</span>
+          <span className="text-xs text-[var(--text-tertiary)]">{item.label}</span>
+        </div>
         {item.badge && (
           <span className="text-[9px] font-medium text-[var(--text-tertiary)] bg-[var(--bg-hover)] px-1.5 py-0.5 rounded">
             {item.badge}
@@ -137,65 +104,29 @@ function NavSubItem({ item }: { item: NavItem }) {
     );
   }
 
+  const extraActive = item.activePaths?.some(p => location.pathname.startsWith(p)) ?? false;
+
   return (
     <NavLink
       to={item.to}
       end={item.end}
       className={({ isActive }) =>
         cn(
-          'flex items-center pl-3 pr-2 py-1.5 rounded-[var(--radius-sm)] text-xs transition-colors',
-          isActive
+          'flex items-center gap-2.5 px-2.5 py-2 rounded-[var(--radius-sm)] text-sm transition-colors',
+          (isActive || extraActive)
             ? 'bg-[var(--bg-hover)] text-[var(--text-primary)] font-medium'
-            : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]',
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]',
         )
       }
     >
-      {item.label}
-    </NavLink>
-  );
-}
-
-// ─── NavGroupItem ─────────────────────────────────────────────────
-function NavGroupItem({
-  group,
-  expanded,
-  onToggle,
-}: {
-  group: NavGroup;
-  expanded: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <div>
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
-      >
-        <span className="text-[var(--text-tertiary)]">{group.icon}</span>
-        <span className="flex-1 text-left">{group.label}</span>
-        <span className="text-[var(--text-tertiary)]">
-          <IconChevron open={expanded} />
+      <span className="text-[var(--text-tertiary)]">{item.icon}</span>
+      <span className="flex-1">{item.label}</span>
+      {item.badge && (
+        <span className="text-[9px] font-medium text-[var(--text-tertiary)] bg-[var(--bg-hover)] px-1.5 py-0.5 rounded">
+          {item.badge}
         </span>
-      </button>
-
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.15, ease: 'easeInOut' }}
-            style={{ overflow: 'hidden' }}
-          >
-            <div className="mt-0.5 ml-2 space-y-0.5 border-l border-[var(--border-hairline)] pl-2">
-              {group.items.map((item) => (
-                <NavSubItem key={item.to} item={item} />
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      )}
+    </NavLink>
   );
 }
 
@@ -209,41 +140,6 @@ function AdminSidebar({
   signOut: () => void;
   onNavClick?: () => void;
 }) {
-  const location = useLocation();
-
-  // Persist expanded state in localStorage
-  const [expanded, setExpanded] = useState<string[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('admin_nav_expanded') ?? '["membros"]') as string[];
-    } catch {
-      return ['membros'];
-    }
-  });
-
-  // Auto-expand groups with active child
-  useEffect(() => {
-    const autoExpand: string[] = [];
-    for (const group of NAV_GROUPS) {
-      const hasActive = group.items.some(
-        (item) => !item.disabled && location.pathname.startsWith(item.to),
-      );
-      if (hasActive) autoExpand.push(group.id);
-    }
-    if (autoExpand.length > 0) {
-      setExpanded((prev) => Array.from(new Set([...prev, ...autoExpand])));
-    }
-  }, [location.pathname]);
-
-  useEffect(() => {
-    localStorage.setItem('admin_nav_expanded', JSON.stringify(expanded));
-  }, [expanded]);
-
-  const toggleGroup = (id: string) => {
-    setExpanded((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
-
   return (
     <div className="flex flex-col h-full">
       {/* Brand */}
@@ -257,32 +153,9 @@ function AdminSidebar({
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1" onClick={onNavClick}>
-        {/* Dashboard direct link */}
-        <NavLink
-          to="/admin"
-          end
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-2 px-2 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium transition-colors',
-              isActive
-                ? 'bg-[var(--bg-hover)] text-[var(--text-primary)]'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]',
-            )
-          }
-        >
-          <span className="text-[var(--text-tertiary)]"><IconGrid /></span>
-          Dashboard
-        </NavLink>
-
-        {/* Groups */}
-        {NAV_GROUPS.map((group) => (
-          <NavGroupItem
-            key={group.id}
-            group={group}
-            expanded={expanded.includes(group.id)}
-            onToggle={() => toggleGroup(group.id)}
-          />
+      <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5" onClick={onNavClick}>
+        {NAV_ITEMS.map((item) => (
+          <NavItemLink key={item.to} item={item} />
         ))}
       </nav>
 
@@ -313,7 +186,7 @@ function AdminSidebar({
  * Desktop: fixed sidebar + content area.
  * Mobile: header with hamburger + drawer.
  */
-export function AdminShell() {
+export function AdminShell({ children }: { children?: React.ReactNode }) {
   const { user, signOut } = useAuthStore();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -367,11 +240,13 @@ export function AdminShell() {
 
         {/* Page content */}
         <main className="flex-1 px-4 sm:px-6 py-4 sm:py-6">
-          <AnimatePresence mode="wait">
-            <PageTransition key={location.pathname}>
-              <Outlet />
-            </PageTransition>
-          </AnimatePresence>
+          {children ?? (
+            <AnimatePresence mode="wait">
+              <PageTransition key={location.pathname}>
+                <Outlet />
+              </PageTransition>
+            </AnimatePresence>
+          )}
         </main>
       </div>
 

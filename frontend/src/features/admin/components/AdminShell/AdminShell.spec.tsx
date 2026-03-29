@@ -4,15 +4,19 @@ import { MemoryRouter } from 'react-router-dom'
 import { AdminShell } from '../../../../components/layout/AdminShell'
 
 describe('AdminShell — sidebar navigation', () => {
-  it('renders exactly 6 nav items', () => {
+  it('renders 6 nav items (5 links + 1 disabled item)', () => {
     render(
       <MemoryRouter initialEntries={['/admin']}>
         <AdminShell><div /></AdminShell>
       </MemoryRouter>
     )
+    // 5 NavLink items (Dashboard, Cursos, Usuarias, Planos/Stripe, IA Global)
+    // + 1 disabled div (Configuracoes) = 6 total nav items
     const navLinks = screen.getAllByRole('link')
-    const navLinks6 = navLinks.filter(el => el.closest('nav'))
-    expect(navLinks6.length).toBeGreaterThanOrEqual(6)
+    const navLinksInNav = navLinks.filter(el => el.closest('nav'))
+    expect(navLinksInNav.length).toBeGreaterThanOrEqual(5)
+    // Check disabled item exists as non-link element
+    expect(screen.getByText('Configuracoes')).toBeTruthy()
   })
 
   it('Dashboard NavLink uses end=true (active only on exact /admin)', () => {
