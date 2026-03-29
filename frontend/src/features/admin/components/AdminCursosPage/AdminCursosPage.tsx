@@ -11,20 +11,29 @@ import { staggerContainer, staggerItem } from '../../../../lib/motion.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { CourseCard } from './CourseCard.tsx';
 import { CourseCreateModal } from './CourseCreateModal.tsx';
+import { CourseStatusTabs } from './CourseStatusTabs.tsx';
 
 interface CourseFormData {
   title: string;
   description: string;
   cover_url: string;
   banner_url: string;
+  stripe_product_id?: string | null;
 }
 
-const initialForm: CourseFormData = { title: '', description: '', cover_url: '', banner_url: '' };
+const initialForm: CourseFormData = {
+  title: '',
+  description: '',
+  cover_url: '',
+  banner_url: '',
+  stripe_product_id: null,
+};
 
 export function AdminCursosPage() {
   const qc = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState<CourseFormData>(initialForm);
+  const [statusFilter, setStatusFilter] = useState('all');
   const pendingIdRef = useRef<string>(crypto.randomUUID());
 
   const openCreate = () => {
@@ -64,8 +73,20 @@ export function AdminCursosPage() {
       description: form.description || undefined,
       cover_url: form.cover_url || undefined,
       banner_url: form.banner_url || undefined,
+      stripe_product_id: form.stripe_product_id || undefined,
     });
   };
+
+  const allCourses = courses as any[];
+  const counts = {
+    all: allCourses.length,
+    published: allCourses.filter((c) => c.status === 'published').length,
+    draft: allCourses.filter((c) => c.status === 'draft').length,
+    archived: allCourses.filter((c) => c.status === 'archived').length,
+  };
+  const filteredCourses = statusFilter === 'all'
+    ? allCourses
+    : allCourses.filter((c) => c.status === statusFilter);
 
   return (
     <>
@@ -87,25 +108,37 @@ export function AdminCursosPage() {
           </Button>
         </motion.div>
 
+        <motion.div variants={staggerItem}>
+          <CourseStatusTabs
+            activeStatus={statusFilter}
+            onStatusChange={setStatusFilter}
+            counts={counts}
+          />
+        </motion.div>
+
         {isLoading ? (
           <motion.div variants={staggerItem} className="space-y-2">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-16 animate-pulse rounded-[var(--radius-md)] bg-[var(--bg-surface-1)]" />
             ))}
           </motion.div>
-        ) : (courses as any[]).length === 0 ? (
+        ) : filteredCourses.length === 0 ? (
           <motion.div
             variants={staggerItem}
             className="rounded-[var(--radius-md)] p-12 bg-[var(--bg-surface-1)] border border-[var(--border-hairline)] text-center"
           >
-            <p className="text-sm text-[var(--text-tertiary)]">Nenhum curso criado ainda.</p>
-            <Button size="sm" className="mt-4" onClick={openCreate}>
-              Criar primeiro curso
-            </Button>
+            <p className="text-sm text-[var(--text-tertiary)]">
+              {statusFilter === 'all' ? 'Nenhum curso criado ainda.' : `Nenhum curso ${statusFilter === 'published' ? 'publicado' : statusFilter === 'draft' ? 'em rascunho' : 'arquivado'}.`}
+            </p>
+            {statusFilter === 'all' && (
+              <Button size="sm" className="mt-4" onClick={openCreate}>
+                Criar primeiro curso
+              </Button>
+            )}
           </motion.div>
         ) : (
           <motion.div variants={staggerItem} className="space-y-2">
-            {(courses as any[]).map((course: any) => (
+            {filteredCourses.map((course: any) => (
               <CourseCard
                 key={course.id}
                 course={course}
