@@ -1,14 +1,18 @@
+import { useQuery } from '@tanstack/react-query';
 import { Modal } from '../../../../components/ui/Modal.tsx';
 import { Input } from '../../../../components/ui/Input.tsx';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { CourseCoverUpload } from '../../../../components/admin/CourseCoverUpload.tsx';
 import { CourseBannerUpload } from '../../../../components/admin/CourseBannerUpload.tsx';
+import { adminListProducts } from '../../../../api/stripe.ts';
+import { PlanSelect } from './PlanSelect.tsx';
 
 interface CourseFormData {
   title: string;
   description: string;
   cover_url: string;
   banner_url: string;
+  stripe_product_id?: string | null;
 }
 
 interface CourseCreateModalProps {
@@ -22,11 +26,13 @@ interface CourseCreateModalProps {
 }
 
 export function CourseCreateModal({ open, form, pendingId, isPending, onClose, onSubmit, setForm }: CourseCreateModalProps) {
+  const { data: productsData } = useQuery({ queryKey: ['admin-stripe-products'], queryFn: adminListProducts });
+  const activeProducts = productsData?.data.filter((p) => p.status === 'active') ?? [];
+
   return (
     <Modal open={open} onClose={onClose} className="sm:max-w-md">
       <div className="p-6 space-y-4">
         <h2 className="text-base font-semibold text-[var(--text-primary)]">Novo curso</h2>
-
         <div className="space-y-3">
           <Input
             label="Título *"
@@ -35,17 +41,14 @@ export function CourseCreateModal({ open, form, pendingId, isPending, onClose, o
             placeholder="Ex: Estratégia Empresarial Avançada"
           />
           <div>
-            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-              Descrição
-            </label>
-            <textarea
-              value={form.description}
-              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              placeholder="Descrição breve do curso..."
-              rows={3}
-              className="w-full rounded-[var(--radius-sm)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none focus:ring-1 focus:ring-[var(--text-primary)]"
-            />
+            <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Descrição</label>
+            <textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Descrição breve do curso..." rows={3} className="w-full rounded-[var(--radius-sm)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none focus:ring-1 focus:ring-[var(--text-primary)]" />
           </div>
+          <PlanSelect
+            value={form.stripe_product_id}
+            products={activeProducts}
+            onChange={(planId) => setForm((f) => ({ ...f, stripe_product_id: planId }))}
+          />
           <CourseCoverUpload
             courseId={pendingId}
             currentUrl={form.cover_url}
@@ -57,7 +60,6 @@ export function CourseCreateModal({ open, form, pendingId, isPending, onClose, o
             onUploaded={(url) => setForm((f) => ({ ...f, banner_url: url }))}
           />
         </div>
-
         <div className="flex gap-2 pt-2">
           <Button
             onClick={onSubmit}
@@ -66,9 +68,7 @@ export function CourseCreateModal({ open, form, pendingId, isPending, onClose, o
           >
             {isPending ? 'Criando...' : 'Criar curso'}
           </Button>
-          <Button variant="ghost" onClick={onClose}>
-            Cancelar
-          </Button>
+          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
         </div>
       </div>
     </Modal>

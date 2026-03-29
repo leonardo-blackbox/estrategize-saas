@@ -3,10 +3,7 @@ import { Badge } from '../../../../components/ui/Badge.tsx';
 
 interface CourseCardProps {
   course: {
-    id: string;
-    title: string;
-    status: string;
-    cover_url?: string;
+    id: string; title: string; status: string; cover_url?: string;
     modules?: { lessons?: unknown[] }[];
     stripe_products?: { id: string; name: string; price_cents: number; billing_interval: string } | null;
   };
@@ -16,16 +13,8 @@ interface CourseCardProps {
   isArchivePending: boolean;
 }
 
-const STATUS_VARIANT: Record<string, 'success' | 'locked' | 'default'> = {
-  published: 'success',
-  draft: 'default',
-  archived: 'locked',
-};
-const STATUS_LABEL: Record<string, string> = {
-  published: 'Publicado',
-  draft: 'Rascunho',
-  archived: 'Arquivado',
-};
+const STATUS_VARIANT: Record<string, 'success' | 'locked' | 'default'> = { published: 'success', draft: 'default', archived: 'locked' };
+const STATUS_LABEL: Record<string, string> = { published: 'Publicado', draft: 'Rascunho', archived: 'Arquivado' };
 
 export function CourseCard({ course, onPublish, onArchive, isPublishPending, isArchivePending }: CourseCardProps) {
   const totalLessons = course.modules?.reduce((sum: number, m) => sum + (m.lessons?.length ?? 0), 0) ?? 0;
@@ -41,41 +30,22 @@ export function CourseCard({ course, onPublish, onArchive, isPublishPending, isA
             <h3 className="text-sm font-medium text-[var(--text-primary)] truncate">{course.title}</h3>
             <Badge variant={STATUS_VARIANT[course.status] ?? 'default'}>{STATUS_LABEL[course.status] ?? course.status}</Badge>
           </div>
-          <p className="text-xs text-[var(--text-tertiary)] mt-0.5">
-            {course.modules?.length ?? 0} módulos · {totalLessons} aulas
-          </p>
+          <p className="text-xs text-[var(--text-tertiary)] mt-0.5">{course.modules?.length ?? 0} módulos · {totalLessons} aulas</p>
           {course.stripe_products && (
             <span className="text-xs text-[var(--text-muted)]">Plano: {course.stripe_products.name}</span>
           )}
         </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <Link
-          to={`/admin/cursos/${course.id}`}
-          className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors px-2 py-1"
-        >
-          Editar
-        </Link>
+        <Link to={`/admin/cursos/${course.id}`} className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors px-2 py-1">Editar</Link>
         {course.status !== 'published' && (
-          <button
-            onClick={() => onPublish(course.id)}
-            disabled={isPublishPending}
-            title="Publicar curso"
-            className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 transition-colors px-2 py-1 disabled:opacity-50"
-          >
-            <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-            Publicar
+          <button onClick={() => onPublish(course.id)} disabled={isPublishPending} title="Publicar curso" className="flex items-center gap-1 text-xs text-green-600 hover:text-green-700 transition-colors px-2 py-1 disabled:opacity-50">
+            <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />Publicar
           </button>
         )}
         {course.status === 'published' && (
-          <button
-            onClick={() => onArchive(course.id)}
-            disabled={isArchivePending}
-            title="Arquivar curso"
-            className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors px-2 py-1 disabled:opacity-50"
-          >
-            <span className="w-2 h-2 rounded-full bg-[var(--text-muted)] shrink-0" />
-            Arquivar
+          <button onClick={() => onArchive(course.id)} disabled={isArchivePending} title="Arquivar curso" className="flex items-center gap-1 text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors px-2 py-1 disabled:opacity-50">
+            <span className="w-2 h-2 rounded-full bg-[var(--text-muted)] shrink-0" />Arquivar
           </button>
         )}
       </div>
