@@ -1,58 +1,40 @@
 # Roadmap: Iris SaaS MVP
-
 ## Overview
-
 Projeto brownfield com infraestrutura robusta já construída (auth, área de membros, form builder, consultorias básicas, créditos, webhooks). Os 5 milestones a seguir entregam o que falta para a plataforma ser 100% operacional e lançável: admin que funciona sem terminal, checkout que vende, IA treinada com o método da Iris, reuniões transcritas automaticamente, e uma central da cliente refinada que integra tudo.
-
 ## Milestones
-
 - 🚧 **Milestone A — Admin Robusto** - Phases 1-5 (em planejamento)
 - 📋 **Milestone B — Checkout Stripe** - Phases 6-9 (planejado)
 - 📋 **Milestone C — IA Base de Conhecimento** - Phases 10-13 (planejado)
 - 📋 **Milestone D — Reuniões com Transcrição** - Phases 14-16 (planejado)
 - 📋 **Milestone E — Central da Cliente v2** - Phases 17-20 (planejado)
-
 ## Phases
-
 ### Milestone A — Admin Robusto
-
 - [x] **Phase 1: Admin Layout e Navegação** - Redesign do shell do admin com sidebar clara e navegação < 3 cliques (completed 2026-03-29)
 - [x] **Phase 2: Admin Planos e Stripe** - Interface para criar/editar planos no Stripe sem terminal (completed 2026-03-29)
 - [ ] **Phase 3: Admin Cursos** - UX de publicação de cursos e aulas em 1 clique
 - [x] **Phase 4: Admin Usuários** - Filtros, busca e gestão de entitlements por usuária
 - [ ] **Phase 5: Admin IA Global** - Upload de documentos da metodologia Iris e teste da IA
-
 ### Milestone B — Checkout Stripe
-
 - [ ] **Phase 6: Página de Planos** - Visitante vê planos disponíveis sem estar logado
 - [ ] **Phase 7: Stripe Checkout Session** - Botão "Assinar" redireciona para Stripe real
 - [ ] **Phase 8: Retorno e Confirmação** - Página de sucesso e acesso liberado via webhook
 - [ ] **Phase 9: Conta e Assinatura** - Usuária vê plano atual e acessa portal Stripe
-
 ### Milestone C — IA Base de Conhecimento
-
 - [ ] **Phase 10: Pipeline de Embeddings** - Backend processa PDF/txt e gera chunks indexados no pgvector
 - [ ] **Phase 11: API de Documentos Globais** - Admin gerencia base de conhecimento da metodologia Iris
 - [ ] **Phase 12: API de Documentos por Consultoria** - Consultora sobe documentos do cliente por consultoria
 - [ ] **Phase 13: Chat RAG** - Chat IA usa documentos globais + da consultoria como contexto
-
 ### Milestone D — Reuniões com Transcrição
-
 - [ ] **Phase 14: Integração Recall.ai Backend** - Bot entra no Meet e webhook recebe transcrição
 - [ ] **Phase 15: Pipeline Transcript → IA** - GPT-4 gera resumo, action items e próximos passos
 - [ ] **Phase 16: Reuniões UI** - Modal de ativação do bot e aba de reuniões com status em tempo real
-
 ### Milestone E — Central da Cliente v2
-
 - [ ] **Phase 17: Lista de Consultorias com KPIs** - Header com 4 KPIs e cards aprimorados
 - [ ] **Phase 18: Wizard de Criação** - Wizard 2 etapas cria consultoria completa em < 3 min
 - [ ] **Phase 19: Central da Cliente Tabs** - Tabs reorganizadas na ordem correta com UX refinada
 - [ ] **Phase 20: Integração Reunião → Consultoria** - Action items e resumos aparecem automaticamente na Central
-
 ---
-
 ## Phase Details
-
 ### Phase 1: Admin Layout e Navegação
 **Goal**: A Iris consegue encontrar qualquer funcionalidade do admin em menos de 3 cliques
 **Depends on**: Nothing (codebase brownfield existente)
@@ -67,7 +49,6 @@ Plans:
 - [ ] 01-01-PLAN.md — Sidebar flat nav + placeholder pages + routes
 - [ ] 01-02-PLAN.md — Decompose 3 largest admin pages (FormacaoPage, TurmasPage, OfertasPage)
 - [ ] 01-03-PLAN.md — Decompose 5 remaining admin pages (CursosPage, StripePage, DashboardPage, UsuariosPage, NovaOfertaPage)
-
 ### Phase 2: Admin Planos e Stripe
 **Goal**: A Iris cria um novo plano (nome, preço, créditos) e ele aparece no Stripe sem abrir terminal
 **Depends on**: Phase 1
@@ -76,13 +57,11 @@ Plans:
   1. Página `/admin/planos` lista planos cadastrados com status, preço e créditos
   2. Modal "Novo Plano" cria produto + preço no Stripe via API e salva `stripe_products` localmente
   3. Admin vê eventos de webhook Stripe recentes com UI melhorada
-
 **Plans**: 3 plans
 Plans:
 - [ ] 02-01-PLAN.md — Backend: DB migration (stripe_products) + Stripe service + admin API routes
 - [ ] 02-02-PLAN.md — Frontend: AdminPlanosPage aggregator + PlanCard + PlanFormModal + API client
 - [ ] 02-03-PLAN.md — Frontend: WebhooksTab UI improvement (status colors + event labels)
-
 ### Phase 3: Admin Cursos
 **Goal**: A Iris publica uma aula completa no admin sem ajuda externa
 **Depends on**: Phase 2
@@ -97,7 +76,6 @@ Plans:
 - [ ] 03-01-PLAN.md — Backend: migration course-plan link + atualizar GET/PUT para incluir stripe_product_id
 - [ ] 03-02-PLAN.md — Frontend: status tabs, plan dropdown no modal/header, UX polish
 - [ ] 03-03-PLAN.md — Backend+Frontend: lesson publish/unpublish (status field + endpoints + UI button)
-
 ### Phase 4: Admin Usuários
 **Goal**: A Iris encontra uma usuária e altera seu acesso em menos de 1 minuto
 **Depends on**: Phase 1
@@ -111,7 +89,6 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md — Backend filters (plan/status) + frontend filter UI on user list
 - [x] 04-02-PLAN.md — Course dropdown in grant modal + decompose courses tab
-
 ### Phase 5: Admin IA Global
 **Goal**: A Iris adiciona um PDF com sua metodologia e consegue testar a resposta da IA com base nele
 **Depends on**: Phase 1, Phase 10 (pipeline de embeddings deve existir)
@@ -125,7 +102,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 6: Página de Planos
 **Goal**: Visitante acessa `/planos` e vê todos os planos disponíveis sem precisar estar logado
 **Depends on**: Phase 2 (planos devem existir na tabela `stripe_products`)
@@ -137,9 +113,8 @@ Plans:
   4. Layout é mobile-first e funciona em 375px
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
+- [ ] 06-01-PLAN.md — Backend public GET /api/plans + frontend API client + React Query hook
+- [ ] 06-02-PLAN.md — PlanosPage aggregator + PlanCard micro-module + route wiring
 ### Phase 7: Stripe Checkout Session
 **Goal**: Usuária autenticada clica "Assinar" e é redirecionada para página de checkout real do Stripe
 **Depends on**: Phase 6
@@ -153,7 +128,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 8: Retorno e Confirmação
 **Goal**: Após pagamento concluído, usuária vê confirmação e tem acesso liberado automaticamente em até 5 minutos
 **Depends on**: Phase 7
@@ -167,7 +141,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 9: Conta e Assinatura
 **Goal**: Usuária consegue ver seu plano atual e gerenciar ou cancelar assinatura sem contato com admin
 **Depends on**: Phase 8
@@ -180,7 +153,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 10: Pipeline de Embeddings
 **Goal**: Upload de PDF de 10 páginas gera chunks indexados no pgvector em menos de 30 segundos
 **Depends on**: Nothing (pgvector extension deve estar habilitada no Supabase antes da execução)
@@ -194,7 +166,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 11: API de Documentos Globais
 **Goal**: Admin adiciona um documento da metodologia Iris e ele aparece como indexado na interface
 **Depends on**: Phase 10
@@ -208,7 +179,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 12: API de Documentos por Consultoria
 **Goal**: Consultora sobe PDF do cliente em uma consultoria e ele é usado no chat daquela consultoria
 **Depends on**: Phase 10
@@ -222,7 +192,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 13: Chat RAG
 **Goal**: Pergunta sobre a metodologia da Iris retorna resposta alinhada com os documentos indexados, usando contexto global + da consultoria
 **Depends on**: Phase 11, Phase 12
@@ -236,7 +205,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 14: Integração Recall.ai Backend
 **Goal**: Bot entra em reunião real e webhook é recebido e processado pelo sistema
 **Depends on**: Nothing (independente, requer conta + API key do Recall.ai)
@@ -250,7 +218,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 15: Pipeline Transcript → IA
 **Goal**: Após reunião, resumo executivo e action items aparecem automaticamente na consultoria sem ação manual
 **Depends on**: Phase 14
@@ -264,7 +231,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 16: Reuniões UI
 **Goal**: Consultora ativa o bot em menos de 30 segundos e acompanha status em tempo real
 **Depends on**: Phase 14, Phase 15
@@ -278,7 +244,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 17: Lista de Consultorias com KPIs
 **Goal**: Consultora enxerga status de todos os seus clientes de relance ao abrir a página
 **Depends on**: Nothing (melhoria sobre página existente)
@@ -292,7 +257,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 18: Wizard de Criação
 **Goal**: Nova consultoria criada em menos de 3 minutos com todas as informações base e contexto estratégico
 **Depends on**: Phase 17
@@ -306,7 +270,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 19: Central da Cliente Tabs
 **Goal**: Consultora encontra qualquer informação da cliente em menos de 2 cliques
 **Depends on**: Phase 18
@@ -320,7 +283,6 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ### Phase 20: Integração Reunião → Consultoria
 **Goal**: Após reunião, a Central da Cliente reflete automaticamente o que foi discutido sem ação da consultora
 **Depends on**: Phase 15, Phase 16, Phase 19
@@ -334,16 +296,11 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
 - [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
-
 ---
-
 ## Progress
-
 **Execution Order:**
 Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 13 → 14 → 15 → 16 → 17 → 18 → 19 → 20
-
 **Note:** Phase 5 depends on Phase 10 (embeddings pipeline). Recommended execution: run Phase 10 before Phase 5 if working on Epic C before finishing Epic A.
-
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Admin Layout e Navegação | 3/3 | Complete   | 2026-03-29 | - |
@@ -351,7 +308,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Admin Cursos | 2/3 | In Progress|  | - |
 | 4. Admin Usuários | 1/2 | In Progress|  | - |
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
-| 6. Página de Planos | B — Checkout Stripe | 0/TBD | Not started | - |
+| 6. Página de Planos | B — Checkout Stripe | 0/2 | Not started | - |
 | 7. Stripe Checkout Session | B — Checkout Stripe | 0/TBD | Not started | - |
 | 8. Retorno e Confirmação | B — Checkout Stripe | 0/TBD | Not started | - |
 | 9. Conta e Assinatura | B — Checkout Stripe | 0/TBD | Not started | - |
