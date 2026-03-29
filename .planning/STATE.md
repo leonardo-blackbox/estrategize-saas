@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-03-29T04:06:30.461Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-29T04:22:45.612Z"
 progress:
   total_phases: 20
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 03 — Admin Cursos
+**Current focus:** Phase 04 — admin-usuárias
 
 ## Current Position
 
-Phase: 03 (Admin Cursos) — EXECUTING
-Plan: 1 of 3
+Phase: 04 (admin-usuárias) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Plan: 1 of 3
 | Phase 03-admin-cursos P01 | 1 | 2 tasks | 2 files |
 | Phase 03-admin-cursos P03 | 3 | 2 tasks | 9 files |
 | Phase 03-admin-cursos P02 | 7 | 2 tasks | 10 files |
+| Phase 04-admin-usuárias P02 | 5 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,7 @@ Recent decisions affecting current work:
 - [Phase 03-admin-cursos]: Dedicated POST publish/unpublish endpoints for lessons — consistent with existing course publish/archive pattern
 - [Phase 03-admin-cursos]: PlanSelect extracted as micro-module from CourseCreateModal when inline version exceeded 80-line limit
 - [Phase 03-admin-cursos]: Unpublish uses adminUpdateCourse({status: draft}) not adminArchiveCourse — archive is semantically distinct from unpublish
+- [Phase 04-admin-usuárias]: adminListCourses query with shared admin-courses queryKey populates grant entitlement dropdown; Array.isArray guard consistent with AdminFormacaoPage pattern
 
 ### Pending Todos
 
@@ -90,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T04:06:30.457Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-03-29T04:22:42.438Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
