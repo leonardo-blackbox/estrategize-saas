@@ -20,7 +20,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 - [x] **Phase 8: Retorno e Confirmação** - Página de sucesso e acesso liberado via webhook (completed 2026-03-29)
 - [x] **Phase 9: Conta e Assinatura** - Usuária vê plano atual e acessa portal Stripe (completed 2026-03-29)
 ### Milestone C — IA Base de Conhecimento
-- [ ] **Phase 10: Pipeline de Embeddings** - Backend processa PDF/txt e gera chunks indexados no pgvector
+- [x] **Phase 10: Pipeline de Embeddings** - Backend processa PDF/txt e gera chunks indexados no pgvector (completed 2026-03-29)
 - [ ] **Phase 11: API de Documentos Globais** - Admin gerencia base de conhecimento da metodologia Iris
 - [ ] **Phase 12: API de Documentos por Consultoria** - Consultora sobe documentos do cliente por consultoria
 - [ ] **Phase 13: Chat RAG** - Chat IA usa documentos globais + da consultoria como contexto
@@ -313,7 +313,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Stripe Checkout Session | 2/2 | Complete   | 2026-03-29 | - |
 | 8. Retorno e Confirmação | 2/2 | Complete   | 2026-03-29 | - |
 | 9. Conta e Assinatura | 2/2 | Complete   | 2026-03-29 | - |
-| 10. Pipeline de Embeddings | C — IA Base de Conhecimento | 0/1 | Not started | - |
+| 10. Pipeline de Embeddings | 1/1 | Complete   | 2026-03-29 | - |
 | 11. API Docs Globais | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 12. API Docs por Consultoria | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 13. Chat RAG | C — IA Base de Conhecimento | 0/TBD | Not started | - |

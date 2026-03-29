@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: "Completed 09-02-PLAN.md Task 1; awaiting checkpoint:human-verify Task 2"
-last_updated: "2026-03-29T05:36:41.866Z"
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-03-29T23:12:07.692Z"
 progress:
   total_phases: 20
-  completed_phases: 8
-  total_plans: 21
-  completed_plans: 19
+  completed_phases: 9
+  total_plans: 22
+  completed_plans: 20
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 08 — retorno-e-confirmacao
+**Current focus:** Phase 10 — Pipeline de Embeddings
 
 ## Current Position
 
-Phase: 08 (retorno-e-confirmacao) — EXECUTING
-Plan: 1 of 2
+Phase: 10 (Pipeline de Embeddings) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Plan: 1 of 2
 | Phase 08-retorno-e-confirmacao P01 | 8 | 2 tasks | 2 files |
 | Phase 09-conta-e-assinatura P01 | 17 | 2 tasks | 4 files |
 | Phase 09-conta-e-assinatura P02 | 15 | 1 tasks | 10 files |
+| Phase 10-pipeline-de-embeddings P01 | 3 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,8 @@ Recent decisions affecting current work:
 - [Phase 09-01]: Stripe subscription data enriched at read time with DB fallback on error
 - [Phase 09-02]: window.location.href used for Stripe portal redirect (external URL outside React Router scope)
 - [Phase 09-02]: STATUS_LABELS and STATUS_CLASSES as module-level lookup objects in SubscriptionCard avoid inline ternary chains
+- [Phase 10-pipeline-de-embeddings]: createRequire pattern for pdf-parse CJS import in ESM project with moduleResolution bundler
+- [Phase 10-pipeline-de-embeddings]: Embedding vector stored as string [v1,v2,...] for PostgREST vector type conversion; supabaseAdmin (service role) used server-side to bypass RLS
 
 ### Pending Todos
 
@@ -121,6 +124,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T05:36:41.864Z
-Stopped at: Completed 09-02-PLAN.md Task 1; awaiting checkpoint:human-verify Task 2
+Last session: 2026-03-29T23:12:07.689Z
+Stopped at: Completed 10-01-PLAN.md
 Resume file: None
