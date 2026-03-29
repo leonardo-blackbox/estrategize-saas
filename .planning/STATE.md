@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-03-29T04:00:22.831Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-03-29T04:05:07.761Z"
 progress:
   total_phases: 20
   completed_phases: 2
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -53,6 +53,7 @@ Plan: 1 of 3
 | Phase 02 P03 | 5 | 1 tasks | 2 files |
 | Phase 02-admin-planos-e-stripe P02 | 4 | 2 tasks | 7 files |
 | Phase 03-admin-cursos P01 | 1 | 2 tasks | 2 files |
+| Phase 03-admin-cursos P03 | 3 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,8 @@ Recent decisions affecting current work:
 - [Phase 02-admin-planos-e-stripe]: PlanFormModal delegates mutations to aggregator via onSubmit — modal is pure UI with zero API knowledge
 - [Phase 02-admin-planos-e-stripe]: BRL price input: user types decimal (97.00), aggregator converts to integer cents (9700) before API call
 - [Phase 03-admin-cursos]: 1:N FK on courses.stripe_product_id (ON DELETE SET NULL) — no junction table; Supabase FK join syntax in select string for stripe_products join
+- [Phase 03-admin-cursos]: Lesson status defaults to draft — existing lessons require explicit publish action by admin
+- [Phase 03-admin-cursos]: Dedicated POST publish/unpublish endpoints for lessons — consistent with existing course publish/archive pattern
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T04:00:22.824Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-03-29T04:05:07.759Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
