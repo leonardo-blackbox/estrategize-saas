@@ -89,7 +89,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/admin/usuarios', label: 'Usuários',         icon: <IconUsers /> },
   { to: '/admin/planos',   label: 'Planos',          icon: <IconCreditCard />, activePaths: ['/admin/ofertas', '/admin/turmas'] },
   { to: '/admin/stripe',   label: 'Stripe',          icon: <IconBolt /> },
-  { to: '/admin/ia',       label: 'IA Global',       icon: <IconSparkles />,   badge: 'em breve' },
+  { to: '/admin/ia',       label: 'IA Global',       icon: <IconSparkles /> },
   { to: '/admin/config',   label: 'Configuracoes',   icon: <IconSettings />,   disabled: true },
 ];
 
