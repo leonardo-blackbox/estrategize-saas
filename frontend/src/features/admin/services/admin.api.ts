@@ -20,6 +20,8 @@ export {
   adminPublishLesson,
   adminUnpublishLesson,
   adminUpdateCourseSales,
+  adminGetUsers,
+  adminGetPlansSummary,
   adminGetUser,
   adminGrantEntitlement,
   adminRevokeEntitlement,

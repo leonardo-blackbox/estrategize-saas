@@ -222,13 +222,25 @@ export async function deleteLessonComment(commentId: string) {
   return client.delete(`/api/courses/lessons/comments/${commentId}`).json();
 }
 
-export async function adminGetUsers(params?: { limit?: number; offset?: number; q?: string }) {
+export async function adminGetUsers(params?: {
+  limit?: number;
+  offset?: number;
+  q?: string;
+  plan_id?: string;
+  status?: string;
+}) {
   const clean: Record<string, string> = {};
   if (params?.limit != null) clean.limit = String(params.limit);
   if (params?.offset != null) clean.offset = String(params.offset);
   if (params?.q) clean.q = params.q;
+  if (params?.plan_id) clean.plan_id = params.plan_id;
+  if (params?.status) clean.status = params.status;
   const search = new URLSearchParams(clean).toString();
   return client.get(`/api/admin/users${search ? `?${search}` : ''}`).json();
+}
+
+export async function adminGetPlansSummary(): Promise<Array<{ id: string; name: string }>> {
+  return client.get('/api/admin/users/plans-summary').json();
 }
 
 export async function adminGetUser(id: string) {

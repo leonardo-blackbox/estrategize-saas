@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { staggerContainer, staggerItem } from '../../../../lib/motion.ts';
-import { cn } from '../../../../lib/cn.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
-import { Input } from '../../../../components/ui/Input.tsx';
-import { adminGetUsers } from '../../../../api/courses.ts';
+import { adminGetUsers, adminGetPlansSummary } from '../../../../api/courses.ts';
+import { UserFilters } from './UserFilters.tsx';
+import { UserRow } from './UserRow.tsx';
 
 function useDebounce<T>(value: T, delay = 400): T {
   const [debounced, setDebounced] = useState(value);
@@ -20,20 +20,37 @@ function useDebounce<T>(value: T, delay = 400): T {
 export function AdminUsuariosPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [planId, setPlanId] = useState('');
+  const [status, setStatus] = useState('');
   const [page, setPage] = useState(0);
 
   const debouncedSearch = useDebounce(search);
   const limit = 20;
   const offset = page * limit;
 
+  const { data: plans = [] } = useQuery({
+    queryKey: ['admin-plans-summary'],
+    queryFn: adminGetPlansSummary,
+  });
+
   const { data: usersData, isLoading, error: usersError } = useQuery({
-    queryKey: ['admin-users', debouncedSearch, offset],
-    queryFn: () => adminGetUsers({ q: debouncedSearch || undefined, limit, offset }),
+    queryKey: ['admin-users', debouncedSearch, planId, status, offset],
+    queryFn: () => adminGetUsers({
+      q: debouncedSearch || undefined,
+      plan_id: planId || undefined,
+      status: status || undefined,
+      limit,
+      offset,
+    }),
   });
 
   const users = (usersData as any)?.users ?? [];
   const total = (usersData as any)?.total ?? 0;
   const totalPages = Math.ceil(total / limit);
+
+  function handleSearchChange(value: string) { setSearch(value); setPage(0); }
+  function handlePlanIdChange(value: string) { setPlanId(value); setPage(0); }
+  function handleStatusChange(value: string) { setStatus(value); setPage(0); }
 
   return (
     <motion.div
@@ -45,20 +62,22 @@ export function AdminUsuariosPage() {
       <motion.div variants={staggerItem}>
         <h1 className="text-base font-semibold text-[var(--text-primary)]">Usuários</h1>
         <p className="text-xs text-[var(--text-tertiary)] mt-0.5">
-          {total > 0 ? `${total} usuários cadastrados` : 'Gerencie acessos, entitlements e matrículas.'}
+          {total > 0 ? `${total} usuários encontrados` : 'Gerencie acessos, entitlements e matrículas.'}
         </p>
       </motion.div>
 
-      {/* Search */}
       <motion.div variants={staggerItem}>
-        <Input
-          placeholder="Buscar por nome ou email..."
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+        <UserFilters
+          search={search}
+          onSearchChange={handleSearchChange}
+          planId={planId}
+          onPlanIdChange={handlePlanIdChange}
+          status={status}
+          onStatusChange={handleStatusChange}
+          plans={plans}
         />
       </motion.div>
 
-      {/* User list */}
       <motion.div variants={staggerItem} className="space-y-1">
         {isLoading ? (
           [1, 2, 3, 4, 5].map((i) => (
@@ -77,41 +96,15 @@ export function AdminUsuariosPage() {
           </div>
         ) : (
           users.map((user: any) => (
-            <button
+            <UserRow
               key={user.id}
+              user={user}
               onClick={() => navigate(`/admin/usuarios/${user.id}`)}
-              className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] border text-left transition-colors',
-                'bg-[var(--bg-surface-1)] border-[var(--border-hairline)] hover:border-[var(--border-default)]',
-              )}
-            >
-              <div className="shrink-0 w-8 h-8 rounded-full bg-[var(--bg-hover)] flex items-center justify-center text-xs font-semibold text-[var(--text-secondary)]">
-                {(user.full_name ?? user.email ?? '?')[0].toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[var(--text-primary)] truncate">
-                  {user.full_name ?? user.email ?? '—'}
-                </p>
-                {user.full_name && (
-                  <p className="text-xs text-[var(--text-tertiary)] truncate">{user.email}</p>
-                )}
-              </div>
-              <div className="shrink-0 flex items-center gap-2">
-                {user.role === 'admin' && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[var(--text-primary)] text-[var(--bg-base)]">
-                    Admin
-                  </span>
-                )}
-                <svg className="h-4 w-4 text-[var(--text-tertiary)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                </svg>
-              </div>
-            </button>
+            />
           ))
         )}
       </motion.div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <motion.div variants={staggerItem} className="flex items-center justify-between">
           <p className="text-xs text-[var(--text-tertiary)]">
