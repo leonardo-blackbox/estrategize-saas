@@ -113,7 +113,7 @@ app.use('/api/admin/formacao', adminLimit, formacaoRouter);
 app.use('/api/admin/turmas', adminLimit, adminTurmasRouter);
 app.use('/api/admin/ofertas', adminLimit, adminOfertasRouter);
 app.use('/api/admin/home', adminLimit, adminHomeRouter);
-app.use('/api/admin/stripe', adminLimit, adminStripeRouter);
+app.use('/api/admin/stripe/products', adminLimit, adminStripeRouter);
 app.use('/api/webhooks', webhookLimit, webhooksRouter);
 app.use('/api/applications', applicationsRouter);
 app.use('/api/applications', assetsRouter);
