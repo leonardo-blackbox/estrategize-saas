@@ -6,6 +6,7 @@ export interface PurchaseEvent {
   customer_name?: string;
   plan_id?: string;
   course_id?: string;
+  user_id?: string;
   provider: string;
 }
 
@@ -23,24 +24,31 @@ export async function processPurchase(event: PurchaseEvent): Promise<void> {
   if (!event.customer_email) throw new Error('customer_email required');
 
   // ─── 1. Encontrar ou criar usuário ──────────────────────────────
-  const { data: listData } = await supabaseAdmin.auth.admin.listUsers();
-  const existing = listData.users.find((u) => u.email === event.customer_email);
-
   let userId: string;
 
-  if (!existing) {
-    const { data: invited, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
-      event.customer_email,
-      { data: { full_name: event.customer_name ?? '' } },
-    );
-    if (inviteError || !invited.user) {
-      throw new Error(`Failed to invite user: ${inviteError?.message}`);
-    }
-    userId = invited.user.id;
-    console.log(`[onboarding] New user created: ${userId} (${event.customer_email})`);
+  if (event.user_id) {
+    // Direct userId from Stripe client_reference_id — skip listUsers scan
+    userId = event.user_id;
+    console.log(`[onboarding] Using direct userId: ${userId}`);
   } else {
-    userId = existing.id;
-    console.log(`[onboarding] Existing user found: ${userId}`);
+    // Fallback: email-based lookup (for Hotmart/Kiwify webhooks)
+    const { data: listData } = await supabaseAdmin.auth.admin.listUsers();
+    const existing = listData.users.find((u) => u.email === event.customer_email);
+
+    if (!existing) {
+      const { data: invited, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+        event.customer_email,
+        { data: { full_name: event.customer_name ?? '' } },
+      );
+      if (inviteError || !invited.user) {
+        throw new Error(`Failed to invite user: ${inviteError?.message}`);
+      }
+      userId = invited.user.id;
+      console.log(`[onboarding] New user created: ${userId} (${event.customer_email})`);
+    } else {
+      userId = existing.id;
+      console.log(`[onboarding] Existing user found: ${userId}`);
+    }
   }
 
   // ─── 2. Upsert profile (segurança caso trigger falhe) ──────────
@@ -100,6 +108,24 @@ export async function processPurchase(event: PurchaseEvent): Promise<void> {
     }
 
     console.log(`[onboarding] Plan entitlements applied for plan ${event.plan_id}`);
+
+    // ─── 4b. Grant credits from plan ──────────────────────────────
+    const { data: planProduct } = await supabaseAdmin
+      .from('stripe_products')
+      .select('credits')
+      .eq('id', event.plan_id)
+      .single();
+
+    if (planProduct?.credits && planProduct.credits > 0) {
+      const { grantCredits } = await import('./creditService.js');
+      await grantCredits(
+        userId,
+        planProduct.credits,
+        'purchase',
+        `Plan purchase: ${event.plan_id} (${event.provider})`,
+      );
+      console.log(`[onboarding] Granted ${planProduct.credits} credits to user ${userId}`);
+    }
   }
 
   // ─── 5. Audit log ──────────────────────────────────────────────
