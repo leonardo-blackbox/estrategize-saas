@@ -2,6 +2,7 @@ export {
   fetchConsultancies,
   createConsultancy,
   updateConsultancy,
+  deleteConsultancy,
   fetchConsultancy,
   fetchMeetings,
   fetchActionItems,
