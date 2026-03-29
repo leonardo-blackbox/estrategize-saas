@@ -126,8 +126,8 @@ Plans:
   4. Erros do Stripe são tratados com mensagem clara para o usuário
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 07-01-PLAN.md — Backend: POST /api/stripe/checkout-session endpoint
+- [ ] 07-02-PLAN.md — Frontend: useCheckout hook + PlanCard/PlanosPage auth gate + checkout redirect
 ### Phase 8: Retorno e Confirmação
 **Goal**: Após pagamento concluído, usuária vê confirmação e tem acesso liberado automaticamente em até 5 minutos
 **Depends on**: Phase 7
