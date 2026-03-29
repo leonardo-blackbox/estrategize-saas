@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-29T04:44:03.457Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-03-29T04:47:18.628Z"
 progress:
   total_phases: 20
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # Project State
@@ -58,6 +58,7 @@ Plan: 1 of 2
 | Phase 04-admin-usuarios P02 | 5 | 2 tasks | 5 files |
 | Phase 04-admin-usuarios P01 | 10 | 2 tasks | 6 files |
 | Phase 06-pagina-de-planos P01 | 1 | 2 tasks | 4 files |
+| Phase 06-pagina-de-planos P02 | 5 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,8 @@ Recent decisions affecting current work:
 - [Phase 04-admin-usuarios]: Plan badge uses emerald tokens; no-plan badge uses CSS variable tokens for dark-mode compatibility
 - [Phase 06-pagina-de-planos]: PublicPlan omits stripe_product_id and stripe_price_id — internal Stripe IDs not exposed publicly
 - [Phase 06-pagina-de-planos]: usePlans select callback unwraps res.data to return flat PublicPlan[] array directly to consumers
+- [Phase 06-pagina-de-planos]: PlanCard splits price string on interval suffix regex to separate base price from suffix for typographic treatment (bold base + smaller suffix)
+- [Phase 06-pagina-de-planos]: SkeletonCard defined as local function in PlanosPage, not exported — only used as loading placeholder with no cross-feature reuse
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T04:44:03.453Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-03-29T04:47:18.626Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None

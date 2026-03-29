@@ -15,7 +15,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 - [x] **Phase 4: Admin Usuários** - Filtros, busca e gestão de entitlements por usuária
 - [ ] **Phase 5: Admin IA Global** - Upload de documentos da metodologia Iris e teste da IA
 ### Milestone B — Checkout Stripe
-- [ ] **Phase 6: Página de Planos** - Visitante vê planos disponíveis sem estar logado
+- [x] **Phase 6: Página de Planos** - Visitante vê planos disponíveis sem estar logado (completed 2026-03-29)
 - [ ] **Phase 7: Stripe Checkout Session** - Botão "Assinar" redireciona para Stripe real
 - [ ] **Phase 8: Retorno e Confirmação** - Página de sucesso e acesso liberado via webhook
 - [ ] **Phase 9: Conta e Assinatura** - Usuária vê plano atual e acessa portal Stripe
@@ -308,7 +308,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Admin Cursos | 2/3 | In Progress|  | - |
 | 4. Admin Usuários | 1/2 | In Progress|  | - |
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
-| 6. Página de Planos | B — Checkout Stripe | 0/2 | Not started | - |
+| 6. Página de Planos | 2/2 | Complete   | 2026-03-29 | - |
 | 7. Stripe Checkout Session | B — Checkout Stripe | 0/TBD | Not started | - |
 | 8. Retorno e Confirmação | B — Checkout Stripe | 0/TBD | Not started | - |
 | 9. Conta e Assinatura | B — Checkout Stripe | 0/TBD | Not started | - |
