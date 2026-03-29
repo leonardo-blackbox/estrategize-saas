@@ -69,18 +69,19 @@ Plans:
 - [ ] 01-03-PLAN.md — Decompose 5 remaining admin pages (CursosPage, StripePage, DashboardPage, UsuariosPage, NovaOfertaPage)
 
 ### Phase 2: Admin Planos e Stripe
-**Goal**: A Iris cria um novo plano (nome, preço, créditos, cursos incluídos) e ele aparece no Stripe sem abrir terminal
+**Goal**: A Iris cria um novo plano (nome, preço, créditos) e ele aparece no Stripe sem abrir terminal
 **Depends on**: Phase 1
 **Requirements**: ADMN-01, ADMN-07
 **Success Criteria** (what must be TRUE):
   1. Página `/admin/planos` lista planos cadastrados com status, preço e créditos
   2. Modal "Novo Plano" cria produto + preço no Stripe via API e salva `stripe_products` localmente
   3. Admin vê eventos de webhook Stripe recentes com UI melhorada
-  4. Plano criado aparece disponível para ser atribuído a cursos
-**Plans**: 2 plans
+
+**Plans**: 3 plans
 Plans:
 - [ ] 02-01-PLAN.md — Backend: DB migration (stripe_products) + Stripe service + admin API routes
 - [ ] 02-02-PLAN.md — Frontend: AdminPlanosPage aggregator + PlanCard + PlanFormModal + API client
+- [ ] 02-03-PLAN.md — Frontend: WebhooksTab UI improvement (status colors + event labels)
 
 ### Phase 3: Admin Cursos
 **Goal**: A Iris publica uma aula completa no admin sem ajuda externa
@@ -291,7 +292,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Admin Layout e Navegação | 3/3 | Complete   | 2026-03-29 | - |
-| 2. Admin Planos e Stripe | A — Admin Robusto | 0/2 | Planned | - |
+| 2. Admin Planos e Stripe | A — Admin Robusto | 0/3 | Planned | - |
 | 3. Admin Cursos | A — Admin Robusto | 0/TBD | Not started | - |
 | 4. Admin Usuárias | A — Admin Robusto | 0/TBD | Not started | - |
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
