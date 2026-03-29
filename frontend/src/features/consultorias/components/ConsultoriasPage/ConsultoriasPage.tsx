@@ -34,7 +34,7 @@ export function ConsultoriasPage() {
     <>
       <motion.div
         variants={staggerContainer}
-        initial="initial"
+        initial={false}
         animate="animate"
         className="space-y-5"
       >
