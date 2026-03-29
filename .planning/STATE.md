@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-29T04:24:03.854Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-29T04:44:03.457Z"
 progress:
   total_phases: 20
   completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 15
+  completed_plans: 12
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 04 — admin-usuarios
+**Current focus:** Phase 06 — pagina-de-planos
 
 ## Current Position
 
-Phase: 04 (admin-usuarios) — EXECUTING
+Phase: 06 (pagina-de-planos) — EXECUTING
 Plan: 1 of 2
 
 ## Performance Metrics
@@ -57,6 +57,7 @@ Plan: 1 of 2
 | Phase 03-admin-cursos P02 | 7 | 2 tasks | 10 files |
 | Phase 04-admin-usuarios P02 | 5 | 2 tasks | 5 files |
 | Phase 04-admin-usuarios P01 | 10 | 2 tasks | 6 files |
+| Phase 06-pagina-de-planos P01 | 1 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ Recent decisions affecting current work:
 - [Phase 04-admin-usuarios]: adminListCourses query with shared admin-courses queryKey populates grant entitlement dropdown; Array.isArray guard consistent with AdminFormacaoPage pattern
 - [Phase 04-admin-usuarios]: intersect() helper in users.ts avoids TypeScript narrowing issues on null union type for filter composition
 - [Phase 04-admin-usuarios]: Plan badge uses emerald tokens; no-plan badge uses CSS variable tokens for dark-mode compatibility
+- [Phase 06-pagina-de-planos]: PublicPlan omits stripe_product_id and stripe_price_id — internal Stripe IDs not exposed publicly
+- [Phase 06-pagina-de-planos]: usePlans select callback unwraps res.data to return flat PublicPlan[] array directly to consumers
 
 ### Pending Todos
 
@@ -95,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T04:24:03.851Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-29T04:44:03.453Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
