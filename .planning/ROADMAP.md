@@ -292,7 +292,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Admin Layout e Navegação | 3/3 | Complete   | 2026-03-29 | - |
-| 2. Admin Planos e Stripe | A — Admin Robusto | 0/3 | Planned | - |
+| 2. Admin Planos e Stripe | 1/3 | In Progress|  | - |
 | 3. Admin Cursos | A — Admin Robusto | 0/TBD | Not started | - |
 | 4. Admin Usuárias | A — Admin Robusto | 0/TBD | Not started | - |
 | 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |

@@ -7,7 +7,7 @@
 
 ### Admin
 
-- [ ] **ADMN-01**: Admin pode criar/editar planos Stripe via interface sem terminal
+- [x] **ADMN-01**: Admin pode criar/editar planos Stripe via interface sem terminal
 - [ ] **ADMN-02**: Admin pode publicar/despublicar cursos e aulas via interface
 - [ ] **ADMN-03**: Admin pode gerenciar usuárias (filtrar, buscar, editar entitlements)
 - [ ] **ADMN-04**: Admin pode fazer upload de documentos da metodologia Iris para base de conhecimento global
@@ -89,7 +89,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ADMN-01 | Phase 2 (Admin: Planos Stripe) | Pending |
+| ADMN-01 | Phase 2 (Admin: Planos Stripe) | Complete |
 | ADMN-02 | Phase 3 (Admin: Cursos) | Pending |
 | ADMN-03 | Phase 4 (Admin: Usuárias) | Pending |
 | ADMN-04 | Phase 5 (Admin: IA Global) | Pending |

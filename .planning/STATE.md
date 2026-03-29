@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: phase_complete
-stopped_at: Phase 1 complete — PASS
-last_updated: "2026-03-29T00:05:00.000Z"
-last_activity: "2026-03-29 — Phase 1 complete: Admin Layout e Navegação — flat nav, 3-layer compliance, Vitest"
+status: unknown
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-29T03:32:18.863Z"
 progress:
   total_phases: 20
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 5
+  total_plans: 6
+  completed_plans: 4
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 2 — Admin Planos e Stripe (próxima)
+**Current focus:** Phase 02 — Admin Planos e Stripe
 
 ## Current Position
 
-Phase: 1 of 20 (Admin Layout e Navegação)
-Plan: 1 of TBD in current phase (01-01 complete)
-Status: Phase 1 in progress — Plan 01 done
-Last activity: 2026-03-29 — Plan 01-01 complete: AdminShell flat nav + Vitest + 3 placeholder routes
-
-Progress: [███████░░░] 67%
+Phase: 02 (Admin Planos e Stripe) — EXECUTING
+Plan: 1 of 3
 
 ## Performance Metrics
 
@@ -55,6 +49,7 @@ Progress: [███████░░░] 67%
 | Phase 01 P03 | 5 min | 2 tasks | 19 files |
 | Phase 01 P01 | 14 min | 3 tasks | 14 files |
 | Phase 01 P02 | 8 min | 3 tasks | 18 files |
+| Phase 02 P01 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -67,6 +62,7 @@ Recent decisions affecting current work:
 - pgvector no Supabase para RAG: evita serviço separado
 - Dois escopos de conhecimento (global + consultancy): metodologia Iris compartilhada; contexto do cliente isolado
 - [Phase 01]: Mutations delegated from modals to aggregators — modals receive onSubmit/onSave callbacks for pure UI separation
+- [Phase 02]: Stripe apiVersion 2026-01-28.clover; RLS stripe_products with service_role only; one_time billing creates non-recurring Stripe price
 
 ### Pending Todos
 
@@ -80,6 +76,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T03:01:41.460Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-03-29T03:32:18.860Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
