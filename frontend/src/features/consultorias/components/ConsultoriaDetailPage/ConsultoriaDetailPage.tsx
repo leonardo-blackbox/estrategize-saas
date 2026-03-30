@@ -10,13 +10,12 @@ import { ConsultoriaDetailTabs } from '../ConsultoriaDetailTabs';
 import { ConsultoriaDetailOverview } from '../ConsultoriaDetailOverview';
 import { ConsultoriaDetailDados } from '../ConsultoriaDetailDados';
 import { ConsultoriaDetailDiagnosis } from '../ConsultoriaDetailDiagnosis';
-import { ConsultoriaDetailJornada } from '../ConsultoriaDetailJornada';
 import { ConsultoriaDetailMeetings } from '../ConsultoriaDetailMeetings';
 import { ConsultoriaDetailActions } from '../ConsultoriaDetailActions';
 import { ConsultoriaDetailDeliverables } from '../ConsultoriaDetailDeliverables';
 import { ConsultoriaDetailChat } from '../ConsultoriaDetailChat';
-import { ConsultoriaDetailComingSoon } from '../ConsultoriaDetailComingSoon';
 import { ConsultoriaDocumentos } from '../ConsultoriaDocumentos';
+import { ConsultoriaDetailMemory } from '../ConsultoriaDetailMemory';
 
 export function ConsultoriaDetailPage() {
   const {
@@ -68,20 +67,14 @@ export function ConsultoriaDetailPage() {
           <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
             {activeTab === 'overview' && <ConsultoriaDetailOverview consultancy={consultancy} insights={insights} onTabChange={setActiveTab} />}
-            {activeTab === 'dados' && <ConsultoriaDetailDados />}
-            {activeTab === 'diagnosis' && id && <ConsultoriaDetailDiagnosis consultancyId={id} />}
-            {activeTab === 'jornada' && <ConsultoriaDetailJornada consultancy={consultancy} />}
+            {activeTab === 'ai' && id && <ConsultoriaDetailChat consultancyId={id} clientName={consultancy.client_name} />}
             {activeTab === 'meetings' && id && <ConsultoriaDetailMeetings consultancyId={id} />}
+            {activeTab === 'documentos' && id && <ConsultoriaDocumentos consultancyId={id} />}
+            {activeTab === 'diagnosis' && id && <ConsultoriaDetailDiagnosis consultancyId={id} />}
             {activeTab === 'actions' && id && <ConsultoriaDetailActions consultancyId={id} />}
             {activeTab === 'deliverables' && id && <ConsultoriaDetailDeliverables consultancyId={id} />}
-            {activeTab === 'ai' && id && <ConsultoriaDetailChat consultancyId={id} clientName={consultancy.client_name} />}
-            {activeTab === 'documentos' && id && <ConsultoriaDocumentos consultancyId={id} />}
-            {activeTab === 'mercado' && <ConsultoriaDetailComingSoon icon="📊" title="Inteligência de Mercado"
-              description="Análise de concorrência, benchmarks e tendências do setor integrados ao perfil da consultoria." />}
-            {activeTab === 'conteudo' && <ConsultoriaDetailComingSoon icon="✍️" title="Hub de Conteúdo"
-              description="Sugestões e banco de conteúdo estratégico gerado por IA com base no nicho e objetivos do cliente." />}
-            {activeTab === 'financeiro' && <ConsultoriaDetailComingSoon icon="💰" title="Painel Financeiro"
-              description="Projeções de receita, margens e marcos financeiros da consultoria em tempo real." />}
+            {activeTab === 'memory' && id && <ConsultoriaDetailMemory consultancyId={id} />}
+            {activeTab === 'dados' && <ConsultoriaDetailDados />}
           </motion.div>
         </AnimatePresence>
       </motion.div>
