@@ -243,8 +243,8 @@ Plans:
   4. Badge de status é visualmente distinto por estado
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 16-01-PLAN.md — Backend GET /api/meetings com filtro + frontend/src/api/meetings.ts (tipos + client functions)
+- [ ] 16-02-PLAN.md — useMeetings hook + NewMeetingModal + BotSessionCard + ConsultoriaDetailMeetings agregador
 ### Phase 17: Lista de Consultorias com KPIs
 **Goal**: Consultora enxerga status de todos os seus clientes de relance ao abrir a página
 **Depends on**: Nothing (melhoria sobre página existente)
