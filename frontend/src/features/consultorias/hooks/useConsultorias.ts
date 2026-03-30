@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchConsultancies,
@@ -8,16 +8,17 @@ import {
   type Consultancy,
   type ConsultancyStats,
 } from '../services/consultorias.api.ts';
-import { type SortOption, type PhaseFilter, PRIORITY_WEIGHT } from '../consultorias.helpers.ts';
+import { type SortOption, type PhaseFilter, type StatusFilter, PRIORITY_WEIGHT } from '../consultorias.helpers.ts';
+import { useDebounce } from '../../../hooks/useDebounce.ts';
 
 export function useConsultorias() {
   const [phaseFilter, setPhaseFilter] = useState<PhaseFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [archivedVisible, setArchivedVisible] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedSearch = useDebounce(search, 300);
 
   const qc = useQueryClient();
 
@@ -49,28 +50,14 @@ export function useConsultorias() {
   });
 
   const consultancies: Consultancy[] = data?.data ?? [];
-  const stats: ConsultancyStats = data?.stats ?? {
-    total: 0,
-    active: 0,
-    onboarding: 0,
-    meetings_this_week: 0,
-    at_risk: 0,
-  };
-
-  // Debounce search
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setDebouncedSearch(search), 300);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [search]);
+  const stats: ConsultancyStats = data?.stats ?? { total: 0, active: 0, onboarding: 0, meetings_this_week: 0, at_risk: 0 };
 
   const archived = consultancies.filter((c) => c.status === 'archived');
 
   const filtered = consultancies
     .filter((c) => c.status !== 'archived')
     .filter((c) => phaseFilter === 'all' || c.phase === phaseFilter)
+    .filter((c) => statusFilter === 'all' || c.priority === statusFilter)
     .filter((c) => {
       if (!debouncedSearch) return true;
       const q = debouncedSearch.toLowerCase();
@@ -94,20 +81,9 @@ export function useConsultorias() {
       return 0;
     });
 
-  const handleArchive = useCallback(
-    (id: string) => { archiveMutation.mutate(id); },
-    [archiveMutation],
-  );
-
-  const handleDelete = useCallback(
-    (id: string) => { deleteMutation.mutate(id); },
-    [deleteMutation],
-  );
-
-  const handleUnarchive = useCallback(
-    (id: string) => { unarchiveMutation.mutate(id); },
-    [unarchiveMutation],
-  );
+  const handleArchive = useCallback((id: string) => { archiveMutation.mutate(id); }, [archiveMutation]);
+  const handleDelete = useCallback((id: string) => { deleteMutation.mutate(id); }, [deleteMutation]);
+  const handleUnarchive = useCallback((id: string) => { unarchiveMutation.mutate(id); }, [unarchiveMutation]);
 
   return {
     // Data
@@ -120,6 +96,8 @@ export function useConsultorias() {
     // Filters
     phaseFilter,
     setPhaseFilter,
+    statusFilter,
+    setStatusFilter,
     sortBy,
     setSortBy,
     search,

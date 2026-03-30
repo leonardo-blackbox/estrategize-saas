@@ -27,6 +27,13 @@ export function relativeFuture(dateStr: string): string {
 
 export type SortOption = 'recent' | 'priority' | 'progress' | 'alpha';
 export type PhaseFilter = ConsultancyPhase | 'all';
+export type StatusFilter = 'all' | 'at_risk' | 'high';
+
+export const statusFilterLabels: { value: StatusFilter; label: string }[] = [
+  { value: 'all',     label: 'Todas'          },
+  { value: 'at_risk', label: 'Em risco'        },
+  { value: 'high',    label: 'Alta prioridade' },
+];
 
 export const PRIORITY_WEIGHT: Record<string, number> = {
   at_risk: 0,
