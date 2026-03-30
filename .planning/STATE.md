@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 17-02-PLAN.md
-last_updated: "2026-03-30T18:06:53.874Z"
+stopped_at: Completed 18-01-PLAN.md
+last_updated: "2026-03-30T18:20:58.775Z"
 progress:
   total_phases: 20
   completed_phases: 16
-  total_plans: 35
-  completed_plans: 33
+  total_plans: 37
+  completed_plans: 34
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 17 — Lista de Consultorias com KPIs
+**Current focus:** Phase 18 — Wizard de Criação
 
 ## Current Position
 
-Phase: 17 (Lista de Consultorias com KPIs) — EXECUTING
+Phase: 18 (Wizard de Criação) — EXECUTING
 Plan: 1 of 2
 
 ## Performance Metrics
@@ -79,6 +79,7 @@ Plan: 1 of 2
 | Phase 16-reunioes-ui P02 | 2 | 2 tasks | 5 files |
 | Phase 17-lista-de-consultorias-com-kpis P01 | 3 | 2 tasks | 6 files |
 | Phase 17-lista-de-consultorias-com-kpis P02 | 2 | 1 tasks | 1 files |
+| Phase 18-wizard-de-criacao P01 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -148,6 +149,8 @@ Recent decisions affecting current work:
 - [Phase 17-01]: useDebounce extracted to src/hooks/ anticipating reuse; removes inline debounce from useConsultorias to stay within 120-line limit
 - [Phase 17-01]: pillBase/pillActive/pillInactive module-level constants in ConsultoriasFilterBar DRY both pill rows without extra abstraction
 - [Phase 17-01]: hasSearch broadened to include statusFilter and phaseFilter so any active filter triggers the filtered-empty-state message
+- [Phase 18-01]: Backend template enum aligned to frontend ConsultancyTemplate values (repositioning|launch|scaling|restructuring|none) — previous enum was legacy mismatch
+- [Phase 18-01]: ticket stored as string in WizardState for UX — converted to number before API call in plan 18-02
 
 ### Pending Todos
 
@@ -161,6 +164,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T18:03:25.366Z
-Stopped at: Completed 17-02-PLAN.md
+Last session: 2026-03-30T18:20:58.771Z
+Stopped at: Completed 18-01-PLAN.md
 Resume file: None

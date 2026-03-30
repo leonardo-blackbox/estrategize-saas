@@ -46,7 +46,7 @@
 
 - [x] **CONS-01**: Página de lista mostra KPIs: ativas, em onboarding, reuniões da semana, em risco
 - [x] **CONS-02**: Card de consultoria mostra: nome, @instagram, nicho, etapa, próxima reunião, progresso %
-- [ ] **CONS-03**: Wizard de criação em 2 etapas (dados base + contexto estratégico)
+- [x] **CONS-03**: Wizard de criação em 2 etapas (dados base + contexto estratégico)
 - [ ] **CONS-04**: Central da Cliente tem tabs reorganizadas na ordem correta
 - [ ] **CONS-05**: Action items de reunião aparecem automaticamente na aba Action Items
 - [ ] **CONS-06**: Resumo de reunião aparece na timeline do Overview
@@ -116,7 +116,7 @@
 | MEET-06 | Phase 16 (Reuniões UI) | Complete |
 | CONS-01 | Phase 17 (Lista Consultorias KPIs) | Complete |
 | CONS-02 | Phase 17 (Lista Consultorias KPIs) | Complete |
-| CONS-03 | Phase 18 (Wizard Criação) | Pending |
+| CONS-03 | Phase 18 (Wizard Criação) | Complete |
 | CONS-04 | Phase 19 (Central da Cliente Tabs) | Pending |
 | CONS-05 | Phase 20 (Integração Reunião→Consultoria) | Pending |
 | CONS-06 | Phase 20 (Integração Reunião→Consultoria) | Pending |
