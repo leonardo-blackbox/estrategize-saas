@@ -37,9 +37,9 @@
 
 - [x] **MEET-01**: Consultora pode colar link do Meet e ativar bot com consentimento LGPD
 - [x] **MEET-02**: Bot Recall.ai entra na reunião como "Iris AI Notetaker"
-- [ ] **MEET-03**: Transcrição completa aparece na consultoria após fim da reunião
-- [ ] **MEET-04**: Resumo executivo gerado automaticamente por GPT-4
-- [ ] **MEET-05**: Action items extraídos automaticamente e adicionados à consultoria
+- [x] **MEET-03**: Transcrição completa aparece na consultoria após fim da reunião
+- [x] **MEET-04**: Resumo executivo gerado automaticamente por GPT-4
+- [x] **MEET-05**: Action items extraídos automaticamente e adicionados à consultoria
 - [ ] **MEET-06**: Status do bot em tempo real (aguardando / em reunião / processando / pronto)
 
 ### Consultorias v2
@@ -110,9 +110,9 @@
 | KNWL-06 | Phase 11 (API Docs Global) | Complete |
 | MEET-01 | Phase 14 (Recall.ai Backend) | Complete |
 | MEET-02 | Phase 14 (Recall.ai Backend) | Complete |
-| MEET-03 | Phase 15 (Pipeline Transcript) | Pending |
-| MEET-04 | Phase 15 (Pipeline Transcript) | Pending |
-| MEET-05 | Phase 15 (Pipeline Transcript) | Pending |
+| MEET-03 | Phase 15 (Pipeline Transcript) | Complete |
+| MEET-04 | Phase 15 (Pipeline Transcript) | Complete |
+| MEET-05 | Phase 15 (Pipeline Transcript) | Complete |
 | MEET-06 | Phase 16 (Reuniões UI) | Pending |
 | CONS-01 | Phase 17 (Lista Consultorias KPIs) | Pending |
 | CONS-02 | Phase 17 (Lista Consultorias KPIs) | Pending |

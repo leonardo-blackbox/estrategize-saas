@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 14-02-PLAN.md
-last_updated: "2026-03-30T03:20:14.015Z"
+stopped_at: Completed 15-01-PLAN.md
+last_updated: "2026-03-30T17:19:36.653Z"
 progress:
   total_phases: 20
   completed_phases: 13
-  total_plans: 29
-  completed_plans: 27
+  total_plans: 31
+  completed_plans: 28
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 14 — Integração Recall.ai Backend
+**Current focus:** Phase 15 — Pipeline Transcript → IA
 
 ## Current Position
 
-Phase: 14 (Integração Recall.ai Backend) — EXECUTING
+Phase: 15 (Pipeline Transcript → IA) — EXECUTING
 Plan: 1 of 2
 
 ## Performance Metrics
@@ -73,6 +73,7 @@ Plan: 1 of 2
 | Phase 13 P01 | 8 | 2 tasks | 2 files |
 | Phase 14 P01 | 2 | 2 tasks | 4 files |
 | Phase 14 P02 | 2 | 1 tasks | 2 files |
+| Phase 15 P01 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,9 @@ Recent decisions affecting current work:
 - [Phase 14]: POST /api/meetings returns 502 when Recall.ai API fails — distinguishes upstream failure from server error
 - [Phase 14]: Recall webhook mounted at /api/webhooks/recall BEFORE generic /:provider handler to prevent route capture
 - [Phase 14]: Terminal state guard: UPDATE WHERE status NOT IN (done, error) prevents status regression on Recall bot events
+- [Phase 15]: processTranscript runs as fire-and-forget; errors caught internally, session.status set to error on failure, never re-throws
+- [Phase 15]: Aggregated columns (formatted_transcript, summary, speakers) placed on meeting_sessions: meeting_transcripts holds raw Recall.ai segments; session owns processed output
+- [Phase 15]: No credit charge for transcript pipeline — triggered by webhook automatically, not by user action
 
 ### Pending Todos
 
@@ -144,6 +148,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T03:16:19.264Z
-Stopped at: Completed 14-02-PLAN.md
+Last session: 2026-03-30T17:19:36.647Z
+Stopped at: Completed 15-01-PLAN.md
 Resume file: None
