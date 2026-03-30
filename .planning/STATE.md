@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 19-02-PLAN.md
-last_updated: "2026-03-30T21:25:00.651Z"
+stopped_at: Completed 20-01-PLAN.md
+last_updated: "2026-03-30T21:52:17.800Z"
 progress:
   total_phases: 20
-  completed_phases: 19
-  total_plans: 39
-  completed_plans: 37
+  completed_phases: 18
+  total_plans: 41
+  completed_plans: 38
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 19 — central-da-cliente-tabs
+**Current focus:** Phase 20 — integracao-reuniao-consultoria
 
 ## Current Position
 
-Phase: 19 (central-da-cliente-tabs) — EXECUTING
+Phase: 20 (integracao-reuniao-consultoria) — EXECUTING
 Plan: 1 of 2
 
 ## Performance Metrics
@@ -83,6 +83,7 @@ Plan: 1 of 2
 | Phase 18-wizard-de-criacao P02 | 2 | 2 tasks | 3 files |
 | Phase 19-central-da-cliente-tabs P01 | 5 | 2 tasks | 3 files |
 | Phase 19 P02 | 3 | 2 tasks | 2 files |
+| Phase 20 P01 | 1 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -157,6 +158,8 @@ Recent decisions affecting current work:
 - [Phase 19-central-da-cliente-tabs]: TabKey reduced from 12 to 9 — removed jornada/mercado/conteudo/financeiro as no longer in roadmap
 - [Phase 19-central-da-cliente-tabs]: ConsultoriaDetailMemory sidebar sizing removed; grid-cols-1/2/3 used for full-width responsive tab layout
 - [Phase 19]: insights passed as prop from aggregator to Overview — not fetched independently; meetingDate derives from insights.next_meeting first, falls back to consultancy.next_meeting_at
+- [Phase 20]: RAG indexing in transcriptService uses direct supabase inserts (not processDocument) to avoid re-parsing already-formatted text
+- [Phase 20]: Step 5b in processTranscript wrapped in try/catch so RAG failure never breaks action item insertion in Step 6
 
 ### Pending Todos
 
@@ -170,6 +173,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T21:24:55.119Z
-Stopped at: Completed 19-02-PLAN.md
+Last session: 2026-03-30T21:52:17.797Z
+Stopped at: Completed 20-01-PLAN.md
 Resume file: None

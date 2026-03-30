@@ -21,7 +21,7 @@ export function ConsultoriaDetailPage() {
   const {
     id, navigate, activeTab, setActiveTab,
     consultancy, consultancyLoading, consultancyError,
-    insights, aiContextLoading, generateDiagnosis,
+    insights, aiContextLoading, recentMeetings, generateDiagnosis,
   } = useConsultoriaDetail();
 
   if (consultancyLoading) return <ConsultoriaDetailSkeleton />;
@@ -66,7 +66,7 @@ export function ConsultoriaDetailPage() {
         <AnimatePresence mode="wait">
           <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
-            {activeTab === 'overview' && <ConsultoriaDetailOverview consultancy={consultancy} insights={insights} onTabChange={setActiveTab} />}
+            {activeTab === 'overview' && <ConsultoriaDetailOverview consultancy={consultancy} insights={insights} recentMeetings={recentMeetings} onTabChange={setActiveTab} />}
             {activeTab === 'ai' && id && <ConsultoriaDetailChat consultancyId={id} clientName={consultancy.client_name} />}
             {activeTab === 'meetings' && id && <ConsultoriaDetailMeetings consultancyId={id} />}
             {activeTab === 'documentos' && id && <ConsultoriaDocumentos consultancyId={id} />}
