@@ -71,7 +71,11 @@ const createSchema = z.object({
   niche: z.string().max(150).optional(),
   start_date: z.string().optional(),
   end_date_estimated: z.string().optional(),
-  template: z.enum(['none','positioning','educational_product','local_business','full_restructure']).optional(),
+  template: z.enum(['repositioning', 'launch', 'scaling', 'restructuring', 'none']).optional(),
+  ticket: z.number().int().min(0).optional(),
+  has_team: z.boolean().optional(),
+  has_website: z.boolean().optional(),
+  current_stage: z.string().max(255).optional(),
 });
 
 const updateSchema = z.object({
@@ -83,12 +87,16 @@ const updateSchema = z.object({
   niche: z.string().max(150).optional(),
   start_date: z.string().nullable().optional(),
   end_date_estimated: z.string().nullable().optional(),
-  template: z.enum(['none','positioning','educational_product','local_business','full_restructure']).optional(),
+  template: z.enum(['repositioning', 'launch', 'scaling', 'restructuring', 'none']).optional(),
   implementation_score: z.number().min(0).max(100).optional(),
   strategic_summary: z.string().nullable().optional(),
   real_bottleneck: z.string().nullable().optional(),
   next_meeting_at: z.string().nullable().optional(),
   priority: z.enum(['low','normal','high','at_risk']).optional(),
+  ticket: z.number().int().min(0).nullable().optional(),
+  has_team: z.boolean().optional(),
+  has_website: z.boolean().optional(),
+  current_stage: z.string().max(255).nullable().optional(),
 });
 
 // GET /api/consultancies

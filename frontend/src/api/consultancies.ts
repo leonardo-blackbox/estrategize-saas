@@ -43,6 +43,10 @@ export interface Consultancy {
   real_bottleneck: string | null;
   next_meeting_at: string | null;
   priority: ConsultancyPriority | null;
+  ticket: number | null;
+  has_team: boolean;
+  has_website: boolean;
+  current_stage: string | null;
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
@@ -84,6 +88,11 @@ export interface CreateConsultancyPayload {
   instagram?: string;
   template?: ConsultancyTemplate;
   priority?: ConsultancyPriority;
+  start_date?: string;
+  ticket?: number;
+  has_team?: boolean;
+  has_website?: boolean;
+  current_stage?: string;
 }
 
 export interface UpdateConsultancyPayload {
