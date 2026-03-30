@@ -1,27 +1,37 @@
 import { ScoreCircle } from '../ConsultoriaDetailShared';
-import { formatDate } from '../../consultorias.detail.helpers.ts';
-import type { Consultancy } from '../../services/consultorias.api.ts';
+import { formatDate, formatDateTime } from '../../consultorias.detail.helpers.ts';
+import type { Consultancy, InsightCards } from '../../services/consultorias.api.ts';
 import type { TabKey } from '../../consultorias.detail.types.ts';
 
 interface ConsultoriaDetailOverviewProps {
   consultancy: Consultancy;
+  insights: InsightCards | null;
   onTabChange: (t: TabKey) => void;
 }
+const C = 'rounded-[var(--radius-md)] p-4 bg-[var(--bg-surface-1)] border border-[var(--border-hairline)]';
+const L = 'text-[10px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5';
+const Q: { key: TabKey; label: string }[] = [
+  { key: 'ai', label: 'Chat IA' }, { key: 'meetings', label: 'Reunioes' },
+  { key: 'diagnosis', label: 'Diagnostico' }, { key: 'actions', label: 'Plano de Acao' },
+  { key: 'documentos', label: 'Documentos' },
+];
 
-export function ConsultoriaDetailOverview({ consultancy, onTabChange }: ConsultoriaDetailOverviewProps) {
-  const score = consultancy.implementation_score;
+export function ConsultoriaDetailOverview({ consultancy, insights, onTabChange }: ConsultoriaDetailOverviewProps) {
+  const phase = consultancy.phase ? ` – ${consultancy.phase}` : '';
   const kfacts = [
-    { label: 'Status',       value: consultancy.status === 'active' ? 'Ativa' : 'Arquivada' },
-    { label: 'Criada em',    value: formatDate(consultancy.created_at) },
+    { label: 'Status',       value: consultancy.status === 'active' ? `Ativa${phase}` : 'Arquivada' },
+    { label: 'Progresso',    value: `${consultancy.implementation_score ?? 0}%` },
     { label: 'Início',       value: formatDate(consultancy.start_date) },
     { label: 'Previsão fim', value: formatDate(consultancy.end_date_estimated) },
   ];
-
+  const meetingDate = insights?.next_meeting?.scheduled_at
+    ? formatDateTime(insights.next_meeting.scheduled_at)
+    : consultancy.next_meeting_at ? formatDateTime(consultancy.next_meeting_at) : null;
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-5 items-start">
         <div className="rounded-[var(--radius-md)] p-5 bg-[var(--bg-surface-1)] border border-[var(--border-hairline)] flex flex-col items-center justify-center min-w-[140px]">
-          <div className="relative"><ScoreCircle score={score} /></div>
+          <ScoreCircle score={consultancy.implementation_score} />
         </div>
         <div className="grid grid-cols-2 gap-3">
           {kfacts.map((f) => (
@@ -32,25 +42,31 @@ export function ConsultoriaDetailOverview({ consultancy, onTabChange }: Consulto
           ))}
         </div>
       </div>
-
+      <div className={C} style={{ borderLeft: '4px solid #4A90E2' }}>
+        <div className={L}>📅 Proxima Reuniao</div>
+        {meetingDate ? (
+          <>
+            {insights?.next_meeting?.title && <p className="text-sm font-medium text-[var(--text-primary)]">{insights.next_meeting.title}</p>}
+            <p className="text-sm text-[var(--text-secondary)]">{meetingDate}</p>
+          </>
+        ) : <p className="text-sm text-[var(--text-tertiary)] italic">Nenhuma reuniao agendada</p>}
+      </div>
+      <div className={C} style={{ borderLeft: '4px solid #b04aff' }}>
+        <div className={L}>✦ Insight IA</div>
+        {insights?.ai_opportunity
+          ? <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{insights.ai_opportunity}</p>
+          : <p className="text-sm text-[var(--text-tertiary)] italic">Execute um diagnostico para ver insights</p>}
+      </div>
       {consultancy.real_bottleneck && (
-        <div className="rounded-[var(--radius-md)] p-4 bg-[var(--bg-surface-1)] border border-[var(--border-hairline)]"
-          style={{ borderLeft: '4px solid var(--insight-bottleneck-border, #ff6b35)' }}>
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">⚡ Gargalo Real</div>
+        <div className={C} style={{ borderLeft: '4px solid var(--insight-bottleneck-border, #ff6b35)' }}>
+          <div className={L}>⚡ Gargalo Real</div>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{consultancy.real_bottleneck}</p>
         </div>
       )}
-
-      <div className="rounded-[var(--radius-md)] p-4 bg-[var(--bg-surface-1)] border border-[var(--border-hairline)]">
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-3">Acesso Rápido</div>
+      <div className={C}>
+        <div className={L}>Acesso Rapido</div>
         <div className="flex flex-wrap gap-2">
-          {([
-            { key: 'diagnosis' as TabKey,    label: '🔍 Diagnóstico IA' },
-            { key: 'meetings' as TabKey,     label: '📅 Reuniões' },
-            { key: 'actions' as TabKey,      label: '✅ Plano de Ação' },
-            { key: 'ai' as TabKey,           label: '✦ IA da Consultoria' },
-            { key: 'deliverables' as TabKey, label: '📄 Entregáveis' },
-          ]).map((link) => (
+          {Q.map((link) => (
             <button key={link.key} onClick={() => onTabChange(link.key)}
               className="px-3 py-1.5 rounded-[var(--radius-md)] text-xs font-medium bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-2)] transition-colors border border-[var(--border-hairline)]">
               {link.label}
