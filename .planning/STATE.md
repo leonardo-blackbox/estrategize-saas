@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 12-02-PLAN.md
-last_updated: "2026-03-30T01:22:09.944Z"
+stopped_at: Completed 13-01-PLAN.md
+last_updated: "2026-03-30T02:49:43.526Z"
 progress:
   total_phases: 20
-  completed_phases: 11
-  total_plans: 26
-  completed_plans: 24
+  completed_phases: 12
+  total_plans: 27
+  completed_plans: 25
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 12 — API de Documentos por Consultoria
+**Current focus:** Phase 13 — Chat RAG
 
 ## Current Position
 
-Phase: 12 (API de Documentos por Consultoria) — EXECUTING
-Plan: 1 of 2
+Phase: 13 (Chat RAG) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -70,6 +70,7 @@ Plan: 1 of 2
 | Phase 11 P02 | 3 | 2 tasks | 5 files |
 | Phase 12-api-de-documentos-por-consultoria P01 | 2 | 2 tasks | 2 files |
 | Phase 12-api-de-documentos-por-consultoria P02 | 8 | 2 tasks | 6 files |
+| Phase 13 P01 | 8 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -122,6 +123,7 @@ Recent decisions affecting current work:
 - [Phase 12]: authLimit (not adminLimit) for consultancy document routes — these are member-facing endpoints
 - [Phase 12]: Replace 'arquivos' placeholder tab with 'documentos' functional tab in ConsultoriaDetailPage
 - [Phase 12]: Per-resource React Query hook with queryKey including consultancyId for cache isolation per consultancy
+- [Phase 13]: RAG chunks prepended before system prompt; threshold 0.5 for inclusive retrieval; graceful degradation on error
 
 ### Pending Todos
 
@@ -135,6 +137,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T01:17:46.685Z
-Stopped at: Completed 12-02-PLAN.md
+Last session: 2026-03-30T02:49:43.522Z
+Stopped at: Completed 13-01-PLAN.md
 Resume file: None

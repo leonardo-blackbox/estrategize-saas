@@ -23,7 +23,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 - [x] **Phase 10: Pipeline de Embeddings** - Backend processa PDF/txt e gera chunks indexados no pgvector (completed 2026-03-29)
 - [x] **Phase 11: API de Documentos Globais** - Admin gerencia base de conhecimento da metodologia Iris (completed 2026-03-29)
 - [x] **Phase 12: API de Documentos por Consultoria** - Consultora sobe documentos do cliente por consultoria (completed 2026-03-30)
-- [ ] **Phase 13: Chat RAG** - Chat IA usa documentos globais + da consultoria como contexto
+- [x] **Phase 13: Chat RAG** - Chat IA usa documentos globais + da consultoria como contexto (completed 2026-03-30)
 ### Milestone D — Reuniões com Transcrição
 - [ ] **Phase 14: Integração Recall.ai Backend** - Bot entra no Meet e webhook recebe transcrição
 - [ ] **Phase 15: Pipeline Transcript → IA** - GPT-4 gera resumo, action items e próximos passos
@@ -315,7 +315,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 10. Pipeline de Embeddings | 1/1 | Complete    | 2026-03-29 | - |
 | 11. API Docs Globais | 2/2 | Complete    | 2026-03-29 | - |
 | 12. API Docs por Consultoria | 2/2 | Complete    | 2026-03-30 | - |
-| 13. Chat RAG | C — IA Base de Conhecimento | 0/1 | Not started | - |
+| 13. Chat RAG | 1/1 | Complete   | 2026-03-30 | - |
 | 14. Integração Recall.ai Backend | D — Reuniões com Transcrição | 0/TBD | Not started | - |
 | 15. Pipeline Transcript → IA | D — Reuniões com Transcrição | 0/TBD | Not started | - |
 | 16. Reuniões UI | D — Reuniões com Transcrição | 0/TBD | Not started | - |
