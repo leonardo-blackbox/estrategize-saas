@@ -17,6 +17,7 @@ import adminOfertasRouter from './routes/admin/ofertas.js';
 import adminHomeRouter from './routes/admin/home.js';
 import adminStripeRouter from './routes/admin/stripe.js';
 import adminKnowledgeRouter from './routes/admin/knowledge.js';
+import consultancyDocumentsRouter from './routes/consultancyDocuments.js';
 import applicationsRouter from './routes/applications.js';
 import publicFormsRouter from './routes/public/forms.js';
 import publicPlansRouter from './routes/public/plans.js';
@@ -109,6 +110,7 @@ app.get('/health/db', async (_req, res) => {
 // ─── Routes ──────────────────────────────────────────────────────
 app.use('/auth', authLimit, authRouter);
 app.use('/api/consultancies', consultanciesRouter);
+app.use('/api/consultancies/:consultancyId/documents', authLimit, consultancyDocumentsRouter);
 app.use('/api/credits', creditsRouter);
 app.use('/api/courses', coursesRouter);
 app.use('/api/admin/courses', adminLimit, adminCoursesRouter);
