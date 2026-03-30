@@ -229,8 +229,9 @@ Plans:
   4. Pipeline completa em menos de 10 minutos após fim da reunião
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 15-01-PLAN.md — Migration 028 (summary columns) + transcriptService with processTranscript GPT-4 pipeline
+- [ ] 15-02-PLAN.md — Wire processTranscript into recall.ts webhook call_ended handler
+
 ### Phase 16: Reuniões UI
 **Goal**: Consultora ativa o bot em menos de 30 segundos e acompanha status em tempo real
 **Depends on**: Phase 14, Phase 15
