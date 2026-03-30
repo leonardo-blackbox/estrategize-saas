@@ -30,13 +30,13 @@
 - [x] **KNWL-02**: Admin pode adicionar/remover documentos globais (metodologia Iris)
 - [x] **KNWL-03**: Consultora pode fazer upload de documentos do cliente por consultoria
 - [x] **KNWL-04**: Consultora pode remover documentos da consultoria
-- [ ] **KNWL-05**: Chat IA da consultoria usa documentos globais + documentos da consultoria como contexto
+- [x] **KNWL-05**: Chat IA da consultoria usa documentos globais + documentos da consultoria como contexto
 - [x] **KNWL-06**: Interface de upload mostra status (processando / pronto / erro)
 
 ### Reuniões
 
-- [ ] **MEET-01**: Consultora pode colar link do Meet e ativar bot com consentimento LGPD
-- [ ] **MEET-02**: Bot Recall.ai entra na reunião como "Iris AI Notetaker"
+- [x] **MEET-01**: Consultora pode colar link do Meet e ativar bot com consentimento LGPD
+- [x] **MEET-02**: Bot Recall.ai entra na reunião como "Iris AI Notetaker"
 - [ ] **MEET-03**: Transcrição completa aparece na consultoria após fim da reunião
 - [ ] **MEET-04**: Resumo executivo gerado automaticamente por GPT-4
 - [ ] **MEET-05**: Action items extraídos automaticamente e adicionados à consultoria
@@ -106,10 +106,10 @@
 | KNWL-02 | Phase 11 (API Docs Global) | Complete |
 | KNWL-03 | Phase 12 (API Docs Consultoria) | Complete |
 | KNWL-04 | Phase 12 (API Docs Consultoria) | Complete |
-| KNWL-05 | Phase 13 (Chat RAG) | Pending |
+| KNWL-05 | Phase 13 (Chat RAG) | Complete |
 | KNWL-06 | Phase 11 (API Docs Global) | Complete |
-| MEET-01 | Phase 14 (Recall.ai Backend) | Pending |
-| MEET-02 | Phase 14 (Recall.ai Backend) | Pending |
+| MEET-01 | Phase 14 (Recall.ai Backend) | Complete |
+| MEET-02 | Phase 14 (Recall.ai Backend) | Complete |
 | MEET-03 | Phase 15 (Pipeline Transcript) | Pending |
 | MEET-04 | Phase 15 (Pipeline Transcript) | Pending |
 | MEET-05 | Phase 15 (Pipeline Transcript) | Pending |

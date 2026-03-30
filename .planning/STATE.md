@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 13-01-PLAN.md
-last_updated: "2026-03-30T02:49:43.526Z"
+stopped_at: Completed 14-01-PLAN.md
+last_updated: "2026-03-30T03:13:21.451Z"
 progress:
   total_phases: 20
   completed_phases: 12
-  total_plans: 27
-  completed_plans: 25
+  total_plans: 29
+  completed_plans: 26
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 13 — Chat RAG
+**Current focus:** Phase 14 — Integração Recall.ai Backend
 
 ## Current Position
 
-Phase: 13 (Chat RAG) — EXECUTING
-Plan: 1 of 1
+Phase: 14 (Integração Recall.ai Backend) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Plan: 1 of 1
 | Phase 12-api-de-documentos-por-consultoria P01 | 2 | 2 tasks | 2 files |
 | Phase 12-api-de-documentos-por-consultoria P02 | 8 | 2 tasks | 6 files |
 | Phase 13 P01 | 8 | 2 tasks | 2 files |
+| Phase 14 P01 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,9 @@ Recent decisions affecting current work:
 - [Phase 12]: Replace 'arquivos' placeholder tab with 'documentos' functional tab in ConsultoriaDetailPage
 - [Phase 12]: Per-resource React Query hook with queryKey including consultancyId for cache isolation per consultancy
 - [Phase 13]: RAG chunks prepended before system prompt; threshold 0.5 for inclusive retrieval; graceful degradation on error
+- [Phase 14]: authLimit (not adminLimit) for /api/meetings — member-facing endpoints
+- [Phase 14]: consultancy_id ON DELETE SET NULL — preserves session history when consultancy is deleted
+- [Phase 14]: POST /api/meetings returns 502 when Recall.ai API fails — distinguishes upstream failure from server error
 
 ### Pending Todos
 
@@ -137,6 +141,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T02:49:43.522Z
-Stopped at: Completed 13-01-PLAN.md
+Last session: 2026-03-30T03:13:16.234Z
+Stopped at: Completed 14-01-PLAN.md
 Resume file: None
