@@ -9,10 +9,10 @@ export type TabKey =
   | 'actions'
   | 'deliverables'
   | 'ai'
+  | 'documentos'
   | 'mercado'
   | 'conteudo'
-  | 'financeiro'
-  | 'arquivos';
+  | 'financeiro';
 
 export interface TabDef {
   key: TabKey;
@@ -28,10 +28,10 @@ export const TABS: TabDef[] = [
   { key: 'actions',      label: 'Plano de Ação' },
   { key: 'deliverables', label: 'Entregáveis' },
   { key: 'ai',           label: 'IA da Consultoria' },
+  { key: 'documentos',   label: 'Documentos' },
   { key: 'mercado',      label: 'Mercado' },
   { key: 'conteudo',     label: 'Conteúdo' },
   { key: 'financeiro',   label: 'Financeiro' },
-  { key: 'arquivos',     label: 'Arquivos' },
 ];
 
 export type AnyPriority = ConsultancyPriority | ActionPriority;
