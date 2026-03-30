@@ -71,7 +71,7 @@ export function ConsultoriaDetailPage() {
             {activeTab === 'dados' && <ConsultoriaDetailDados />}
             {activeTab === 'diagnosis' && id && <ConsultoriaDetailDiagnosis consultancyId={id} />}
             {activeTab === 'jornada' && <ConsultoriaDetailJornada consultancy={consultancy} />}
-            {activeTab === 'meetings' && id && <ConsultoriaDetailMeetings consultancyId={id} onNewMeeting={() => {/* modal future */}} />}
+            {activeTab === 'meetings' && id && <ConsultoriaDetailMeetings consultancyId={id} />}
             {activeTab === 'actions' && id && <ConsultoriaDetailActions consultancyId={id} />}
             {activeTab === 'deliverables' && id && <ConsultoriaDetailDeliverables consultancyId={id} />}
             {activeTab === 'ai' && id && <ConsultoriaDetailChat consultancyId={id} clientName={consultancy.client_name} />}
