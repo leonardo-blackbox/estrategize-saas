@@ -30,7 +30,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 - [x] **Phase 16: Reuniões UI** - Modal de ativação do bot e aba de reuniões com status em tempo real (completed 2026-03-30)
 ### Milestone E — Central da Cliente v2
 - [x] **Phase 17: Lista de Consultorias com KPIs** - Header com 4 KPIs e cards aprimorados (completed 2026-03-30)
-- [ ] **Phase 18: Wizard de Criação** - Wizard 2 etapas cria consultoria completa em < 3 min
+- [x] **Phase 18: Wizard de Criação** - Wizard 2 etapas cria consultoria completa em < 3 min (completed 2026-03-30)
 - [x] **Phase 19: Central da Cliente Tabs** - Tabs reorganizadas na ordem correta com UX refinada (completed 2026-03-30)
 - [ ] **Phase 20: Integração Reunião → Consultoria** - Action items e resumos aparecem automaticamente na Central
 ---
