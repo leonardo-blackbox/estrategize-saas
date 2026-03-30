@@ -17,6 +17,8 @@ export function ConsultoriasPage() {
     error,
     phaseFilter,
     setPhaseFilter,
+    statusFilter,
+    setStatusFilter,
     sortBy,
     setSortBy,
     search,
@@ -54,6 +56,8 @@ export function ConsultoriasPage() {
           onSortChange={setSortBy}
           phaseFilter={phaseFilter}
           onPhaseFilterChange={setPhaseFilter}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
         />
 
         {isError && (
@@ -71,7 +75,7 @@ export function ConsultoriasPage() {
           <ConsultoriasGrid
             consultancies={filtered}
             isLoading={isLoading}
-            hasSearch={!!debouncedSearch}
+            hasSearch={!!debouncedSearch || statusFilter !== 'all' || phaseFilter !== 'all'}
             onArchive={handleArchive}
             onDelete={handleDelete}
             onUnarchive={handleUnarchive}

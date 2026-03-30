@@ -49,6 +49,9 @@ export function ConsultoriaCard({ consultancy: c, onArchive, onDelete, onUnarchi
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="text-[13px] font-semibold text-[var(--text-primary)] truncate leading-tight">{c.client_name ?? '—'}</p>
+              {c.instagram && (
+                <p className="text-[11px] text-[var(--text-muted)] truncate leading-tight">@{c.instagram}</p>
+              )}
               <p className="text-[11px] text-[var(--text-tertiary)] truncate leading-tight mt-0.5">{c.title}</p>
             </div>
             <div className="flex flex-col items-end gap-1 shrink-0">
