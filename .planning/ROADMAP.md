@@ -315,7 +315,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 9. Conta e Assinatura | 2/2 | Complete   | 2026-03-29 | - |
 | 10. Pipeline de Embeddings | 1/1 | Complete    | 2026-03-29 | - |
 | 11. API Docs Globais | 2/2 | Complete    | 2026-03-29 | - |
-| 12. API Docs por Consultoria | C — IA Base de Conhecimento | 0/2 | Planned | - |
+| 12. API Docs por Consultoria | 1/2 | In Progress|  | - |
 | 13. Chat RAG | C — IA Base de Conhecimento | 0/TBD | Not started | - |
 | 14. Integração Recall.ai Backend | D — Reuniões com Transcrição | 0/TBD | Not started | - |
 | 15. Pipeline Transcript → IA | D — Reuniões com Transcrição | 0/TBD | Not started | - |

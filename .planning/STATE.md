@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 11-02-PLAN.md
-last_updated: "2026-03-29T23:38:55.502Z"
+stopped_at: Completed 12-01-PLAN.md
+last_updated: "2026-03-30T01:10:09.769Z"
 progress:
   total_phases: 20
   completed_phases: 10
-  total_plans: 24
-  completed_plans: 22
+  total_plans: 26
+  completed_plans: 23
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 11 — API de Documentos Globais
+**Current focus:** Phase 12 — API de Documentos por Consultoria
 
 ## Current Position
 
-Phase: 11 (API de Documentos Globais) — EXECUTING
+Phase: 12 (API de Documentos por Consultoria) — EXECUTING
 Plan: 1 of 2
 
 ## Performance Metrics
@@ -68,6 +68,7 @@ Plan: 1 of 2
 | Phase 10-pipeline-de-embeddings P01 | 3 | 2 tasks | 4 files |
 | Phase 11-api-de-documentos-globais P01 | 5 | 2 tasks | 3 files |
 | Phase 11 P02 | 3 | 2 tasks | 5 files |
+| Phase 12-api-de-documentos-por-consultoria P01 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -116,6 +117,8 @@ Recent decisions affecting current work:
 - [Phase 11-api-de-documentos-globais]: parseFile and chunkText exported from knowledgeService; POST returns 201 with status processing and fires background IIFE for parse/chunk/embed
 - [Phase 11]: Raw fetch with FormData used for knowledge upload to avoid JSON Content-Type header
 - [Phase 11]: STATUS_CONFIG lookup object in KnowledgeList colocates status label and badge className
+- [Phase 12]: mergeParams: true on Router so :consultancyId from app.ts mount is accessible in member document handlers
+- [Phase 12]: authLimit (not adminLimit) for consultancy document routes — these are member-facing endpoints
 
 ### Pending Todos
 
@@ -129,6 +132,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T23:34:32.985Z
-Stopped at: Completed 11-02-PLAN.md
+Last session: 2026-03-30T01:10:09.756Z
+Stopped at: Completed 12-01-PLAN.md
 Resume file: None

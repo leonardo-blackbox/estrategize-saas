@@ -28,10 +28,10 @@
 
 - [x] **KNWL-01**: Sistema processa PDF/txt/md e gera chunks com embeddings
 - [x] **KNWL-02**: Admin pode adicionar/remover documentos globais (metodologia Iris)
-- [ ] **KNWL-03**: Consultora pode fazer upload de documentos do cliente por consultoria
-- [ ] **KNWL-04**: Consultora pode remover documentos da consultoria
+- [x] **KNWL-03**: Consultora pode fazer upload de documentos do cliente por consultoria
+- [x] **KNWL-04**: Consultora pode remover documentos da consultoria
 - [ ] **KNWL-05**: Chat IA da consultoria usa documentos globais + documentos da consultoria como contexto
-- [ ] **KNWL-06**: Interface de upload mostra status (processando / pronto / erro)
+- [x] **KNWL-06**: Interface de upload mostra status (processando / pronto / erro)
 
 ### Reuniões
 
@@ -104,10 +104,10 @@
 | CHKT-06 | Phase 9 (Conta: Assinatura) | Complete |
 | KNWL-01 | Phase 10 (Pipeline Embeddings) | Complete |
 | KNWL-02 | Phase 11 (API Docs Global) | Complete |
-| KNWL-03 | Phase 12 (API Docs Consultoria) | Pending |
-| KNWL-04 | Phase 12 (API Docs Consultoria) | Pending |
+| KNWL-03 | Phase 12 (API Docs Consultoria) | Complete |
+| KNWL-04 | Phase 12 (API Docs Consultoria) | Complete |
 | KNWL-05 | Phase 13 (Chat RAG) | Pending |
-| KNWL-06 | Phase 11 (API Docs Global) | Pending |
+| KNWL-06 | Phase 11 (API Docs Global) | Complete |
 | MEET-01 | Phase 14 (Recall.ai Backend) | Pending |
 | MEET-02 | Phase 14 (Recall.ai Backend) | Pending |
 | MEET-03 | Phase 15 (Pipeline Transcript) | Pending |
