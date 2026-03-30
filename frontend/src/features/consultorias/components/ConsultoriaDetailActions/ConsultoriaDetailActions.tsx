@@ -21,7 +21,7 @@ export function ConsultoriaDetailActions({ consultancyId }: ConsultoriaDetailAct
 
   const actions = data?.data ?? [];
   const columns: { label: string; items: ActionItem[]; accent: string }[] = [
-    { label: 'A fazer',       items: actions.filter((a) => a.status === 'pending'),     accent: 'var(--text-tertiary)' },
+    { label: 'A fazer',       items: actions.filter((a) => a.status === 'todo'),        accent: 'var(--text-tertiary)' },
     { label: 'Em andamento',  items: actions.filter((a) => a.status === 'in_progress'), accent: 'var(--color-warning)' },
     { label: 'Concluído',     items: actions.filter((a) => a.status === 'done'),        accent: 'var(--color-success)' },
   ];

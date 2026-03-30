@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { chunkText, generateEmbeddings } from './knowledgeService.js';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -198,6 +199,63 @@ export async function processTranscript(sessionId: string): Promise<void> {
 
     if (updateError) {
       console.error(`[transcriptService] Failed to update session ${sessionId}:`, updateError.message);
+    }
+
+    // Step 5b — Index transcript as consultancy RAG document (fire-and-forget)
+    if (typedSession.consultancy_id && formattedTranscript.length > 100) {
+      try {
+        const db2 = ensureAdmin();
+        const docName = `Reuniao ${new Date().toISOString().slice(0, 10)} — Transcricao`;
+
+        // Insert document record
+        const { data: docData, error: docInsertError } = await db2
+          .from('knowledge_documents')
+          .insert({
+            user_id: typedSession.user_id,
+            scope: 'consultancy',
+            consultancy_id: typedSession.consultancy_id,
+            name: docName,
+            file_type: 'txt',
+            file_size_bytes: Buffer.byteLength(formattedTranscript, 'utf-8'),
+            status: 'processing',
+          })
+          .select('id')
+          .single();
+
+        if (docInsertError || !docData) {
+          console.error(`[transcriptService] Failed to create knowledge doc for ${sessionId}:`, docInsertError?.message);
+        } else {
+          const chunks = chunkText(formattedTranscript);
+          if (chunks.length > 0) {
+            const embeddings = await generateEmbeddings(chunks.map((c) => c.content));
+            const chunkRows = chunks.map((chunk, i) => ({
+              document_id: docData.id,
+              chunk_index: chunk.index,
+              content: chunk.content,
+              token_count: chunk.tokenCount,
+              embedding: `[${embeddings[i].join(',')}]`,
+              metadata: {
+                scope: 'consultancy',
+                consultancy_id: typedSession.consultancy_id,
+                document_name: docName,
+              },
+            }));
+
+            const { error: chunksError } = await db2.from('knowledge_chunks').insert(chunkRows);
+            if (chunksError) {
+              console.error(`[transcriptService] Failed to insert RAG chunks for ${sessionId}:`, chunksError.message);
+              await db2.from('knowledge_documents').update({ status: 'error', error_message: chunksError.message }).eq('id', docData.id);
+            } else {
+              await db2.from('knowledge_documents').update({ status: 'ready', chunk_count: chunks.length }).eq('id', docData.id);
+              console.log(`[transcriptService] Indexed ${chunks.length} RAG chunk(s) for session ${sessionId}`);
+            }
+          } else {
+            await db2.from('knowledge_documents').update({ status: 'ready', chunk_count: 0 }).eq('id', docData.id);
+          }
+        }
+      } catch (ragError) {
+        console.error(`[transcriptService] RAG indexing failed for ${sessionId} (non-fatal):`, ragError);
+      }
     }
 
     // Step 6 — Bulk insert action items (only if consultancy_id is set)

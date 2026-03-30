@@ -135,7 +135,7 @@ export interface ActionItem {
   user_id: string;
   title: string;
   description: string | null;
-  status: 'pending' | 'in_progress' | 'done' | 'cancelled';
+  status: 'todo' | 'in_progress' | 'done' | 'cancelled';
   priority: ActionPriority;
   responsible: string | null;
   due_date: string | null;
