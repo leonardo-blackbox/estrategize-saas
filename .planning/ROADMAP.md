@@ -256,8 +256,8 @@ Plans:
   4. Empty state tem value proposition clara e CTA para criar primeira consultoria
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 17-01-PLAN.md — @instagram no ConsultoriaCard + statusFilter no hook + status pills na FilterBar
+- [ ] 17-02-PLAN.md — ConsultoriasEmptyState com value proposition e CTA forte
 ### Phase 18: Wizard de Criação
 **Goal**: Nova consultoria criada em menos de 3 minutos com todas as informações base e contexto estratégico
 **Depends on**: Phase 17
