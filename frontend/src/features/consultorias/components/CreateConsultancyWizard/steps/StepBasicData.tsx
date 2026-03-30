@@ -28,6 +28,10 @@ export function StepBasicData({ form, onFormChange, titleError, onClearTitleErro
           onChange={(e) => onFormChange((f) => ({ ...f, niche: e.target.value }))} />
         <Input label="Instagram (opcional)" placeholder="@handle" value={form.instagram}
           onChange={(e) => onFormChange((f) => ({ ...f, instagram: e.target.value }))} />
+        <Input label="Ticket médio (R$)" placeholder="Ex: 3000" type="number" min="0" value={form.ticket}
+          onChange={(e) => onFormChange((f) => ({ ...f, ticket: e.target.value }))} />
+        <Input label="Data de início (opcional)" type="date" value={form.start_date}
+          onChange={(e) => onFormChange((f) => ({ ...f, start_date: e.target.value }))} />
       </div>
       <div className="flex justify-between">
         <Button variant="ghost" size="sm" onClick={onBack}>← Voltar</Button>

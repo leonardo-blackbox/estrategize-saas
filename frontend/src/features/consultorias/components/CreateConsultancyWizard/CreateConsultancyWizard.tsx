@@ -51,6 +51,13 @@ export function CreateConsultancyWizard({ open, onClose }: CreateConsultancyWiza
             ...(form.niche.trim() ? { niche: form.niche.trim() } : {}),
             ...(form.instagram.trim() ? { instagram: form.instagram.trim() } : {}),
             ...(form.template ? { template: form.template } : {}),
+            ...(form.ticket ? { ticket: parseInt(form.ticket, 10) } : {}),
+            ...(form.start_date ? { start_date: form.start_date } : {}),
+            ...(form.goal90.trim() ? { strategic_summary: form.goal90.trim() } : {}),
+            ...(form.problem.trim() ? { real_bottleneck: form.problem.trim() } : {}),
+            ...(form.current_stage.trim() ? { current_stage: form.current_stage.trim() } : {}),
+            has_team: form.has_team,
+            has_website: form.has_website,
             phase: 'onboarding',
           });
           onClose();

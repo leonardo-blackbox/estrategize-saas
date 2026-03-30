@@ -21,9 +21,14 @@ export function StepContext({ form, onFormChange, mutError, onBack, onNext }: St
       </div>
       <div className="space-y-3">
         <div>
-          <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1">Qual o principal problema do cliente?</label>
+          <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1">Dores relatadas</label>
           <textarea rows={3} placeholder="Descreva o problema central que ele enfrenta…" value={form.problem}
             onChange={(e) => onFormChange((f) => ({ ...f, problem: e.target.value }))} className={textareaClass} />
+        </div>
+        <div>
+          <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1">Objetivo principal</label>
+          <textarea rows={2} placeholder="Resultado concreto esperado ao final da consultoria…" value={form.goal90}
+            onChange={(e) => onFormChange((f) => ({ ...f, goal90: e.target.value }))} className={textareaClass} />
         </div>
         <div>
           <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1">O que ele já tentou?</label>
@@ -31,9 +36,23 @@ export function StepContext({ form, onFormChange, mutError, onBack, onNext }: St
             onChange={(e) => onFormChange((f) => ({ ...f, tried: e.target.value }))} className={textareaClass} />
         </div>
         <div>
-          <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1">Qual o objetivo em 90 dias?</label>
-          <textarea rows={2} placeholder="Resultado concreto esperado ao final da consultoria…" value={form.goal90}
-            onChange={(e) => onFormChange((f) => ({ ...f, goal90: e.target.value }))} className={textareaClass} />
+          <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1">Estágio atual do negócio</label>
+          <textarea rows={2} placeholder="Ex: fatura R$10k/mês, time de 2 pessoas, sem processo definido…" value={form.current_stage}
+            onChange={(e) => onFormChange((f) => ({ ...f, current_stage: e.target.value }))} className={textareaClass} />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="flex items-center gap-2 cursor-pointer text-[13px] text-[var(--text-secondary)]">
+            <input type="checkbox" checked={form.has_team}
+              onChange={(e) => onFormChange((f) => ({ ...f, has_team: e.target.checked }))}
+              className="rounded border-[var(--border-default)] accent-[var(--accent)]" />
+            Tem equipe?
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-[13px] text-[var(--text-secondary)]">
+            <input type="checkbox" checked={form.has_website}
+              onChange={(e) => onFormChange((f) => ({ ...f, has_website: e.target.checked }))}
+              className="rounded border-[var(--border-default)] accent-[var(--accent)]" />
+            Tem site ou loja online?
+          </label>
         </div>
       </div>
       <AnimatePresence>
