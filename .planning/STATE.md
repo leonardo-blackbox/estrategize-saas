@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 15-02-PLAN.md
-last_updated: "2026-03-30T17:22:48.957Z"
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-03-30T17:38:23.540Z"
 progress:
   total_phases: 20
   completed_phases: 14
-  total_plans: 31
-  completed_plans: 29
+  total_plans: 33
+  completed_plans: 30
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 15 — Pipeline Transcript → IA
+**Current focus:** Phase 16 — Reuniões UI
 
 ## Current Position
 
-Phase: 15 (Pipeline Transcript → IA) — EXECUTING
+Phase: 16 (Reuniões UI) — EXECUTING
 Plan: 1 of 2
 
 ## Performance Metrics
@@ -75,6 +75,7 @@ Plan: 1 of 2
 | Phase 14 P02 | 2 | 1 tasks | 2 files |
 | Phase 15 P01 | 2 | 2 tasks | 2 files |
 | Phase 15 P02 | 2 | 1 tasks | 1 files |
+| Phase 16-reunioes-ui P01 | 1 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -137,6 +138,8 @@ Recent decisions affecting current work:
 - [Phase 15]: Aggregated columns (formatted_transcript, summary, speakers) placed on meeting_sessions: meeting_transcripts holds raw Recall.ai segments; session owns processed output
 - [Phase 15]: No credit charge for transcript pipeline — triggered by webhook automatically, not by user action
 - [Phase 15]: processTranscript called fire-and-forget (no await) in recall webhook — webhook must respond to Recall.ai before GPT-4 pipeline completes
+- [Phase 16]: listQuerySchema with z.string().uuid().optional() validates consultancy_id before Supabase query — returns 400 on malformed UUID
+- [Phase 16]: meetingKeys.byConsultancy uses spread of meetingKeys.all for cache hierarchy consistency
 
 ### Pending Todos
 
@@ -150,6 +153,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T17:22:48.954Z
-Stopped at: Completed 15-02-PLAN.md
+Last session: 2026-03-30T17:38:23.536Z
+Stopped at: Completed 16-01-PLAN.md
 Resume file: None

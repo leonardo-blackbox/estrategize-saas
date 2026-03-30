@@ -40,7 +40,7 @@
 - [x] **MEET-03**: Transcrição completa aparece na consultoria após fim da reunião
 - [x] **MEET-04**: Resumo executivo gerado automaticamente por GPT-4
 - [x] **MEET-05**: Action items extraídos automaticamente e adicionados à consultoria
-- [ ] **MEET-06**: Status do bot em tempo real (aguardando / em reunião / processando / pronto)
+- [x] **MEET-06**: Status do bot em tempo real (aguardando / em reunião / processando / pronto)
 
 ### Consultorias v2
 
@@ -113,7 +113,7 @@
 | MEET-03 | Phase 15 (Pipeline Transcript) | Complete |
 | MEET-04 | Phase 15 (Pipeline Transcript) | Complete |
 | MEET-05 | Phase 15 (Pipeline Transcript) | Complete |
-| MEET-06 | Phase 16 (Reuniões UI) | Pending |
+| MEET-06 | Phase 16 (Reuniões UI) | Complete |
 | CONS-01 | Phase 17 (Lista Consultorias KPIs) | Pending |
 | CONS-02 | Phase 17 (Lista Consultorias KPIs) | Pending |
 | CONS-03 | Phase 18 (Wizard Criação) | Pending |
