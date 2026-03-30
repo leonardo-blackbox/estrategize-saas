@@ -269,8 +269,8 @@ Plans:
   4. Fluxo completo é concluível em menos de 3 minutos
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 18-01-PLAN.md — Migration 029 + Zod schemas + Consultancy types + WizardState
+- [ ] 18-02-PLAN.md — StepBasicData (ticket + start_date) + StepContext (current_stage + checkboxes) + wizard mutation
 ### Phase 19: Central da Cliente Tabs
 **Goal**: Consultora encontra qualquer informação da cliente em menos de 2 cliques
 **Depends on**: Phase 18
