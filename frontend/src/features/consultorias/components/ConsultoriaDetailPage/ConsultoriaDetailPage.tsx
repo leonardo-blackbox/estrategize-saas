@@ -67,7 +67,7 @@ export function ConsultoriaDetailPage() {
         <AnimatePresence mode="wait">
           <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
-            {activeTab === 'overview' && <ConsultoriaDetailOverview consultancy={consultancy} onTabChange={setActiveTab} />}
+            {activeTab === 'overview' && <ConsultoriaDetailOverview consultancy={consultancy} insights={insights} onTabChange={setActiveTab} />}
             {activeTab === 'dados' && <ConsultoriaDetailDados />}
             {activeTab === 'diagnosis' && id && <ConsultoriaDetailDiagnosis consultancyId={id} />}
             {activeTab === 'jornada' && <ConsultoriaDetailJornada consultancy={consultancy} />}
