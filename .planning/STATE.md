@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 14-01-PLAN.md
-last_updated: "2026-03-30T03:13:21.451Z"
+stopped_at: Completed 14-02-PLAN.md
+last_updated: "2026-03-30T03:16:19.267Z"
 progress:
   total_phases: 20
-  completed_phases: 12
+  completed_phases: 13
   total_plans: 29
-  completed_plans: 26
+  completed_plans: 27
 ---
 
 # Project State
@@ -72,6 +72,7 @@ Plan: 1 of 2
 | Phase 12-api-de-documentos-por-consultoria P02 | 8 | 2 tasks | 6 files |
 | Phase 13 P01 | 8 | 2 tasks | 2 files |
 | Phase 14 P01 | 2 | 2 tasks | 4 files |
+| Phase 14 P02 | 2 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -128,6 +129,8 @@ Recent decisions affecting current work:
 - [Phase 14]: authLimit (not adminLimit) for /api/meetings — member-facing endpoints
 - [Phase 14]: consultancy_id ON DELETE SET NULL — preserves session history when consultancy is deleted
 - [Phase 14]: POST /api/meetings returns 502 when Recall.ai API fails — distinguishes upstream failure from server error
+- [Phase 14]: Recall webhook mounted at /api/webhooks/recall BEFORE generic /:provider handler to prevent route capture
+- [Phase 14]: Terminal state guard: UPDATE WHERE status NOT IN (done, error) prevents status regression on Recall bot events
 
 ### Pending Todos
 
@@ -141,6 +144,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T03:13:16.234Z
-Stopped at: Completed 14-01-PLAN.md
+Last session: 2026-03-30T03:16:19.264Z
+Stopped at: Completed 14-02-PLAN.md
 Resume file: None
