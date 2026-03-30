@@ -26,7 +26,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 - [x] **Phase 13: Chat RAG** - Chat IA usa documentos globais + da consultoria como contexto (completed 2026-03-30)
 ### Milestone D — Reuniões com Transcrição
 - [x] **Phase 14: Integração Recall.ai Backend** - Bot entra no Meet e webhook recebe transcrição (completed 2026-03-30)
-- [ ] **Phase 15: Pipeline Transcript → IA** - GPT-4 gera resumo, action items e próximos passos
+- [x] **Phase 15: Pipeline Transcript → IA** - GPT-4 gera resumo, action items e próximos passos (completed 2026-03-30)
 - [ ] **Phase 16: Reuniões UI** - Modal de ativação do bot e aba de reuniões com status em tempo real
 ### Milestone E — Central da Cliente v2
 - [ ] **Phase 17: Lista de Consultorias com KPIs** - Header com 4 KPIs e cards aprimorados
@@ -318,7 +318,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 12. API Docs por Consultoria | 2/2 | Complete    | 2026-03-30 | - |
 | 13. Chat RAG | 1/1 | Complete   | 2026-03-30 | - |
 | 14. Integração Recall.ai Backend | 2/2 | Complete    | 2026-03-30 | - |
-| 15. Pipeline Transcript → IA | 1/2 | In Progress|  | - |
+| 15. Pipeline Transcript → IA | 2/2 | Complete   | 2026-03-30 | - |
 | 16. Reuniões UI | D — Reuniões com Transcrição | 0/TBD | Not started | - |
 | 17. Lista Consultorias KPIs | E — Central da Cliente v2 | 0/TBD | Not started | - |
 | 18. Wizard de Criação | E — Central da Cliente v2 | 0/TBD | Not started | - |
