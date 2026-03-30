@@ -1,0 +1,73 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
+import { createBot } from '../services/recallService.js';
+
+const router = Router();
+router.use(requireAuth);
+
+// ─── Schemas ─────────────────────────────────────────────────────
+
+const createBotSchema = z.object({
+  meeting_url: z.string().url(),
+  consultancy_id: z.string().uuid().optional(),
+});
+
+// ─── POST / — create Recall.ai bot and persist session ───────────
+
+router.post('/', async (req: AuthenticatedRequest, res) => {
+  const parsed = createBotSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const { meeting_url, consultancy_id } = parsed.data;
+  const userId = req.userId as string;
+
+  let bot;
+  try {
+    bot = await createBot({ meetingUrl: meeting_url, botName: 'Iris AI Notetaker' });
+  } catch {
+    return res.status(502).json({ error: 'Failed to create meeting bot' });
+  }
+
+  const { data: session, error } = await supabaseAdmin!
+    .from('meeting_sessions')
+    .insert({
+      user_id: userId,
+      consultancy_id: consultancy_id ?? null,
+      recall_bot_id: bot.id,
+      meeting_url,
+      bot_name: 'Iris AI Notetaker',
+      status: 'pending',
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  return res.status(201).json({ session });
+});
+
+// ─── GET / — list user meeting sessions ──────────────────────────
+
+router.get('/', async (req: AuthenticatedRequest, res) => {
+  const userId = req.userId as string;
+
+  const { data: sessions, error } = await supabaseAdmin!
+    .from('meeting_sessions')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  return res.json({ sessions });
+});
+
+export default router;
