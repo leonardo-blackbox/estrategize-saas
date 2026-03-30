@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 16-01-PLAN.md
-last_updated: "2026-03-30T17:38:23.540Z"
+stopped_at: Completed 16-02-PLAN.md
+last_updated: "2026-03-30T17:42:35.587Z"
 progress:
   total_phases: 20
-  completed_phases: 14
+  completed_phases: 15
   total_plans: 33
-  completed_plans: 30
+  completed_plans: 31
 ---
 
 # Project State
@@ -76,6 +76,7 @@ Plan: 1 of 2
 | Phase 15 P01 | 2 | 2 tasks | 2 files |
 | Phase 15 P02 | 2 | 1 tasks | 1 files |
 | Phase 16-reunioes-ui P01 | 1 | 2 tasks | 2 files |
+| Phase 16-reunioes-ui P02 | 2 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -140,6 +141,8 @@ Recent decisions affecting current work:
 - [Phase 15]: processTranscript called fire-and-forget (no await) in recall webhook — webhook must respond to Recall.ai before GPT-4 pipeline completes
 - [Phase 16]: listQuerySchema with z.string().uuid().optional() validates consultancy_id before Supabase query — returns 400 on malformed UUID
 - [Phase 16]: meetingKeys.byConsultancy uses spread of meetingKeys.all for cache hierarchy consistency
+- [Phase 16-reunioes-ui]: prevCreating ref to detect mutation success — avoids prop drilling onSuccess through aggregator
+- [Phase 16-reunioes-ui]: onNewMeeting prop made optional; modal fully internal to ConsultoriaDetailMeetings aggregator
 
 ### Pending Todos
 
@@ -153,6 +156,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T17:38:23.536Z
-Stopped at: Completed 16-01-PLAN.md
+Last session: 2026-03-30T17:42:35.582Z
+Stopped at: Completed 16-02-PLAN.md
 Resume file: None

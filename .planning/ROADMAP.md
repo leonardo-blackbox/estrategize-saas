@@ -27,7 +27,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 ### Milestone D — Reuniões com Transcrição
 - [x] **Phase 14: Integração Recall.ai Backend** - Bot entra no Meet e webhook recebe transcrição (completed 2026-03-30)
 - [x] **Phase 15: Pipeline Transcript → IA** - GPT-4 gera resumo, action items e próximos passos (completed 2026-03-30)
-- [ ] **Phase 16: Reuniões UI** - Modal de ativação do bot e aba de reuniões com status em tempo real
+- [x] **Phase 16: Reuniões UI** - Modal de ativação do bot e aba de reuniões com status em tempo real (completed 2026-03-30)
 ### Milestone E — Central da Cliente v2
 - [ ] **Phase 17: Lista de Consultorias com KPIs** - Header com 4 KPIs e cards aprimorados
 - [ ] **Phase 18: Wizard de Criação** - Wizard 2 etapas cria consultoria completa em < 3 min
@@ -319,7 +319,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 13. Chat RAG | 1/1 | Complete   | 2026-03-30 | - |
 | 14. Integração Recall.ai Backend | 2/2 | Complete    | 2026-03-30 | - |
 | 15. Pipeline Transcript → IA | 2/2 | Complete   | 2026-03-30 | - |
-| 16. Reuniões UI | 1/2 | In Progress|  | - |
+| 16. Reuniões UI | 2/2 | Complete   | 2026-03-30 | - |
 | 17. Lista Consultorias KPIs | E — Central da Cliente v2 | 0/TBD | Not started | - |
 | 18. Wizard de Criação | E — Central da Cliente v2 | 0/TBD | Not started | - |
 | 19. Central da Cliente Tabs | E — Central da Cliente v2 | 0/TBD | Not started | - |
