@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import crypto from 'crypto';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
+import { processTranscript } from '../../services/transcriptService.js';
 
 const router = Router();
 
@@ -150,6 +151,13 @@ router.post('/', async (req: Request, res: Response) => {
     if (updateError) {
       console.error('[recall-webhook] Failed to update session status:', updateError.message);
       return res.status(500).json({ error: 'Failed to update session' });
+    }
+
+    // Fire-and-forget: trigger GPT-4 pipeline when call ends
+    if (internalStatus === 'processing') {
+      processTranscript(session.id).catch((err) => {
+        console.error('[recall-webhook] processTranscript failed:', err);
+      });
     }
 
     return res.json({ ok: true });
