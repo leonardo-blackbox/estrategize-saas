@@ -31,7 +31,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 ### Milestone E — Central da Cliente v2
 - [x] **Phase 17: Lista de Consultorias com KPIs** - Header com 4 KPIs e cards aprimorados (completed 2026-03-30)
 - [ ] **Phase 18: Wizard de Criação** - Wizard 2 etapas cria consultoria completa em < 3 min
-- [ ] **Phase 19: Central da Cliente Tabs** - Tabs reorganizadas na ordem correta com UX refinada
+- [x] **Phase 19: Central da Cliente Tabs** - Tabs reorganizadas na ordem correta com UX refinada (completed 2026-03-30)
 - [ ] **Phase 20: Integração Reunião → Consultoria** - Action items e resumos aparecem automaticamente na Central
 ---
 ## Phase Details
@@ -325,5 +325,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 16. Reuniões UI | 2/2 | Complete    | 2026-03-30 | - |
 | 17. Lista Consultorias KPIs | 2/2 | Complete    | 2026-03-30 | - |
 | 18. Wizard de Criação | 1/2 | In Progress|  | - |
-| 19. Central da Cliente Tabs | E — Central da Cliente v2 | 0/2 | Not started | - |
+| 19. Central da Cliente Tabs | 2/2 | Complete   | 2026-03-30 | - |
 | 20. Integração Reunião → Consultoria | E — Central da Cliente v2 | 0/TBD | Not started | - |
