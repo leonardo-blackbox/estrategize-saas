@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 12-01-PLAN.md
-last_updated: "2026-03-30T01:10:09.769Z"
+stopped_at: Completed 12-02-PLAN.md
+last_updated: "2026-03-30T01:17:46.700Z"
 progress:
   total_phases: 20
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 26
-  completed_plans: 23
+  completed_plans: 24
 ---
 
 # Project State
@@ -69,6 +69,7 @@ Plan: 1 of 2
 | Phase 11-api-de-documentos-globais P01 | 5 | 2 tasks | 3 files |
 | Phase 11 P02 | 3 | 2 tasks | 5 files |
 | Phase 12-api-de-documentos-por-consultoria P01 | 2 | 2 tasks | 2 files |
+| Phase 12-api-de-documentos-por-consultoria P02 | 8 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -119,6 +120,8 @@ Recent decisions affecting current work:
 - [Phase 11]: STATUS_CONFIG lookup object in KnowledgeList colocates status label and badge className
 - [Phase 12]: mergeParams: true on Router so :consultancyId from app.ts mount is accessible in member document handlers
 - [Phase 12]: authLimit (not adminLimit) for consultancy document routes — these are member-facing endpoints
+- [Phase 12]: Replace 'arquivos' placeholder tab with 'documentos' functional tab in ConsultoriaDetailPage
+- [Phase 12]: Per-resource React Query hook with queryKey including consultancyId for cache isolation per consultancy
 
 ### Pending Todos
 
@@ -132,6 +135,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T01:10:09.756Z
-Stopped at: Completed 12-01-PLAN.md
+Last session: 2026-03-30T01:17:46.685Z
+Stopped at: Completed 12-02-PLAN.md
 Resume file: None
