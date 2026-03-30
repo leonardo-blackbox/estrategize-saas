@@ -202,10 +202,9 @@ Plans:
   2. Busca combina scope `global` + scope `consultancy` para a consultoria ativa
   3. Chunks injetados no system prompt como contexto adicional
   4. Resposta do chat referencia conteúdo dos documentos quando relevante
-**Plans**: 2 plans
+**Plans**: 1 plan
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 13-01-PLAN.md — RAG retrieval service + inject context into chatWithAI system prompt
 ### Phase 14: Integração Recall.ai Backend
 **Goal**: Bot entra em reunião real e webhook é recebido e processado pelo sistema
 **Depends on**: Nothing (independente, requer conta + API key do Recall.ai)
@@ -316,7 +315,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 10. Pipeline de Embeddings | 1/1 | Complete    | 2026-03-29 | - |
 | 11. API Docs Globais | 2/2 | Complete    | 2026-03-29 | - |
 | 12. API Docs por Consultoria | 2/2 | Complete    | 2026-03-30 | - |
-| 13. Chat RAG | C — IA Base de Conhecimento | 0/TBD | Not started | - |
+| 13. Chat RAG | C — IA Base de Conhecimento | 0/1 | Not started | - |
 | 14. Integração Recall.ai Backend | D — Reuniões com Transcrição | 0/TBD | Not started | - |
 | 15. Pipeline Transcript → IA | D — Reuniões com Transcrição | 0/TBD | Not started | - |
 | 16. Reuniões UI | D — Reuniões com Transcrição | 0/TBD | Not started | - |
