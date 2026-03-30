@@ -298,8 +298,8 @@ Plans:
   4. Nenhuma ação manual da consultora é necessária para que os dados apareçam
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 20-01-PLAN.md — Fix action item status mismatch + auto-index transcript as RAG document
+- [ ] 20-02-PLAN.md — Overview meeting summaries timeline + wire recentMeetings
 ---
 ## Progress
 **Execution Order:**
@@ -326,4 +326,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 17. Lista Consultorias KPIs | 2/2 | Complete    | 2026-03-30 | - |
 | 18. Wizard de Criação | 1/2 | In Progress|  | - |
 | 19. Central da Cliente Tabs | 2/2 | Complete   | 2026-03-30 | - |
-| 20. Integração Reunião → Consultoria | E — Central da Cliente v2 | 0/TBD | Not started | - |
+| 20. Integração Reunião → Consultoria | E — Central da Cliente v2 | 0/2 | Not started | - |
