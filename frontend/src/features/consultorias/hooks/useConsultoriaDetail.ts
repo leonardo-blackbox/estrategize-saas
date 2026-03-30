@@ -8,6 +8,7 @@ import {
   client,
   type Diagnosis,
 } from '../services/consultorias.api.ts';
+import { listMeetings, meetingKeys, type MeetingSession } from '../../../api/meetings.ts';
 import type { TabKey } from '../consultorias.detail.types.ts';
 
 export function useConsultoriaDetail() {
@@ -37,6 +38,13 @@ export function useConsultoriaDetail() {
     staleTime: 60_000,
   });
 
+  const { data: meetingsData } = useQuery({
+    queryKey: meetingKeys.byConsultancy(id!),
+    queryFn: () => listMeetings(id!),
+    enabled: !!id,
+    staleTime: 60_000,
+  });
+
   const generateDiagnosisMutation = useMutation({
     mutationFn: () =>
       client.post(`/api/consultancies/${id}/diagnose`).json<{ data: Diagnosis }>(),
@@ -48,6 +56,9 @@ export function useConsultoriaDetail() {
 
   const consultancy = consultancyData?.data ?? null;
   const insights = aiContextData?.insights ?? null;
+  const recentMeetings: MeetingSession[] = (meetingsData?.sessions ?? [])
+    .filter((s) => s.status === 'done' && s.summary)
+    .slice(0, 3);
 
   return {
     id,
@@ -59,6 +70,7 @@ export function useConsultoriaDetail() {
     consultancyError,
     insights,
     aiContextLoading,
+    recentMeetings,
     generateDiagnosis: () => generateDiagnosisMutation.mutate(),
   };
 }
