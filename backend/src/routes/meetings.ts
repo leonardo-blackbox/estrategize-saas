@@ -14,6 +14,10 @@ const createBotSchema = z.object({
   consultancy_id: z.string().uuid().optional(),
 });
 
+const listQuerySchema = z.object({
+  consultancy_id: z.string().uuid().optional(),
+});
+
 // ─── POST / — create Recall.ai bot and persist session ───────────
 
 router.post('/', async (req: AuthenticatedRequest, res) => {
@@ -55,13 +59,25 @@ router.post('/', async (req: AuthenticatedRequest, res) => {
 // ─── GET / — list user meeting sessions ──────────────────────────
 
 router.get('/', async (req: AuthenticatedRequest, res) => {
+  const parsed = listQuerySchema.safeParse(req.query);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const { consultancy_id } = parsed.data;
   const userId = req.userId as string;
 
-  const { data: sessions, error } = await supabaseAdmin!
+  let query = supabaseAdmin!
     .from('meeting_sessions')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
+
+  if (consultancy_id) {
+    query = query.eq('consultancy_id', consultancy_id);
+  }
+
+  const { data: sessions, error } = await query;
 
   if (error) {
     return res.status(500).json({ error: error.message });
