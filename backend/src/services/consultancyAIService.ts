@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { buildFullContext, type ConsultancyContextBlock } from './consultancyContextService.js';
+import { retrieveRAGContext, type RAGChunk } from './ragService.js';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -121,6 +122,25 @@ INSTRUÇÕES OPERACIONAIS:
 - Nunca invente dados sobre a cliente — use apenas o contexto fornecido`;
 }
 
+function buildRAGContextBlock(chunks: RAGChunk[]): string {
+  if (chunks.length === 0) return '';
+
+  const lines: string[] = [
+    'DOCUMENTOS DE REFERENCIA (Base de Conhecimento):',
+    'Os trechos abaixo foram recuperados da base de conhecimento e sao relevantes para a pergunta da consultora. Use-os como referencia para fundamentar sua resposta.',
+    '',
+  ];
+
+  chunks.forEach((chunk, index) => {
+    lines.push('---');
+    lines.push(`[Documento ${index + 1}] (relevancia: ${Math.round(chunk.similarity * 100)}%)`);
+    lines.push(chunk.content);
+    lines.push('');
+  });
+
+  return lines.join('\n');
+}
+
 async function getOrCreateConversation(
   userId: string,
   consultancyId: string,
@@ -176,12 +196,15 @@ export async function chatWithAI(
 ): Promise<ChatResponse> {
   if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY is not configured');
 
-  const [context, conversation] = await Promise.all([
+  const [context, conversation, ragChunks] = await Promise.all([
     buildFullContext(userId, consultancyId),
     getOrCreateConversation(userId, consultancyId),
+    retrieveRAGContext(userMessage, consultancyId),
   ]);
 
   const systemPrompt = buildSystemPrompt(context, consultancyTitle);
+  const ragBlock = buildRAGContextBlock(ragChunks);
+  const finalSystemPrompt = ragBlock ? ragBlock + '\n\n' + systemPrompt : systemPrompt;
 
   const newUserMsg: ChatMessage = {
     role: 'user',
@@ -190,7 +213,7 @@ export async function chatWithAI(
   };
 
   const messagesForAPI: OpenAI.Chat.ChatCompletionMessageParam[] = [
-    { role: 'system', content: systemPrompt },
+    { role: 'system', content: finalSystemPrompt },
     ...conversation.messages.slice(-20).map((m) => ({
       role: m.role as 'user' | 'assistant',
       content: m.content,
