@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: unknown
 stopped_at: Completed 19-02-PLAN.md
-last_updated: "2026-03-30T21:24:55.123Z"
+last_updated: "2026-03-30T21:25:00.651Z"
 progress:
   total_phases: 20
   completed_phases: 18
@@ -156,6 +156,7 @@ Recent decisions affecting current work:
 - [Phase 18-01]: ticket stored as string in WizardState for UX — converted to number before API call in plan 18-02
 - [Phase 19-central-da-cliente-tabs]: TabKey reduced from 12 to 9 — removed jornada/mercado/conteudo/financeiro as no longer in roadmap
 - [Phase 19-central-da-cliente-tabs]: ConsultoriaDetailMemory sidebar sizing removed; grid-cols-1/2/3 used for full-width responsive tab layout
+- [Phase 19]: insights passed as prop from aggregator to Overview — not fetched independently; meetingDate derives from insights.next_meeting first, falls back to consultancy.next_meeting_at
 
 ### Pending Todos
 
