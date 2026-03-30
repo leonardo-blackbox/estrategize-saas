@@ -210,14 +210,14 @@ Plans:
 **Depends on**: Nothing (independente, requer conta + API key do Recall.ai)
 **Requirements**: MEET-01, MEET-02
 **Success Criteria** (what must be TRUE):
-  1. Migration 024 cria tabelas `meeting_sessions` e `meeting_transcripts` com RLS correto
+  1. Migration 027 cria tabelas `meeting_sessions` e `meeting_transcripts` com RLS correto
   2. `POST /api/meetings/bot` cria bot Recall.ai, salva sessão com status `pending`
   3. Bot entra na reunião identificado como "Iris AI Notetaker"
   4. `POST /webhooks/recall` recebe transcrição raw e salva na sessão correspondente
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 14-01-PLAN.md — Migration 027 (meeting tables + RLS) + recallService + POST /api/meetings/bot
+- [ ] 14-02-PLAN.md — Recall.ai webhook receiver (HMAC + transcript storage + status updates)
 ### Phase 15: Pipeline Transcript → IA
 **Goal**: Após reunião, resumo executivo e action items aparecem automaticamente na consultoria sem ação manual
 **Depends on**: Phase 14
