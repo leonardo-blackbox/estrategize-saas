@@ -282,8 +282,11 @@ Plans:
   4. Navegação entre tabs é fluida e não perde estado
 **Plans**: 2 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend knowledge routes + frontend API client + types
-- [ ] 05-02-PLAN.md — AdminIAPage aggregator + micro-modules (upload, list, test query)
+- [ ] 19-01-PLAN.md — Reorder tabs (9 tabs), remove unused, add Memory tab, update routing
+- [ ] 19-02-PLAN.md — Enrich Overview with status, progresso, proxima reuniao, insight IA
+
+
+
 ### Phase 20: Integração Reunião → Consultoria
 **Goal**: Após reunião, a Central da Cliente reflete automaticamente o que foi discutido sem ação da consultora
 **Depends on**: Phase 15, Phase 16, Phase 19
@@ -322,5 +325,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 16. Reuniões UI | 2/2 | Complete    | 2026-03-30 | - |
 | 17. Lista Consultorias KPIs | 2/2 | Complete    | 2026-03-30 | - |
 | 18. Wizard de Criação | 1/2 | In Progress|  | - |
-| 19. Central da Cliente Tabs | E — Central da Cliente v2 | 0/TBD | Not started | - |
+| 19. Central da Cliente Tabs | E — Central da Cliente v2 | 0/2 | Not started | - |
 | 20. Integração Reunião → Consultoria | E — Central da Cliente v2 | 0/TBD | Not started | - |
