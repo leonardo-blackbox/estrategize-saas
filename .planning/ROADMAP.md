@@ -316,7 +316,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 11. API Docs Globais | 2/2 | Complete    | 2026-03-29 | - |
 | 12. API Docs por Consultoria | 2/2 | Complete    | 2026-03-30 | - |
 | 13. Chat RAG | 1/1 | Complete   | 2026-03-30 | - |
-| 14. Integração Recall.ai Backend | 2/2 | Complete   | 2026-03-30 | - |
+| 14. Integração Recall.ai Backend | 2/2 | Complete    | 2026-03-30 | - |
 | 15. Pipeline Transcript → IA | D — Reuniões com Transcrição | 0/TBD | Not started | - |
 | 16. Reuniões UI | D — Reuniões com Transcrição | 0/TBD | Not started | - |
 | 17. Lista Consultorias KPIs | E — Central da Cliente v2 | 0/TBD | Not started | - |
