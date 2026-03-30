@@ -39,7 +39,7 @@ export function ConsultoriaDetailMemory({ consultancyId }: ConsultoriaDetailMemo
   const memory = data?.data ?? [];
 
   return (
-    <div className="lg:w-80 shrink-0 rounded-[var(--radius-md)] bg-[var(--bg-surface-1)] border border-[var(--border-hairline)] flex flex-col overflow-hidden">
+    <div className="rounded-[var(--radius-md)] bg-[var(--bg-surface-1)] border border-[var(--border-hairline)] flex flex-col overflow-hidden">
       <div className="px-4 py-3 border-b border-[var(--border-hairline)] flex items-center justify-between">
         <div className="flex items-center gap-2"><span className="text-sm">🧠</span><span className="text-[13px] font-semibold text-[var(--text-primary)]">Memória da IA</span></div>
         <button onClick={() => setShowAdd((v) => !v)} className="text-xs text-[var(--consulting-iris,#7c5cfc)] hover:opacity-80 transition-opacity font-medium">+ Adicionar</button>
@@ -49,11 +49,11 @@ export function ConsultoriaDetailMemory({ consultancyId }: ConsultoriaDetailMemo
         {showAdd && <MemoryAddForm consultancyId={consultancyId} onClose={() => setShowAdd(false)} />}
       </AnimatePresence>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {isLoading ? (
-          <div className="space-y-2">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+          <>{[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}</>
         ) : memory.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-2 py-8 text-center">
+          <div className="col-span-full flex flex-col items-center justify-center gap-2 py-8 text-center">
             <span className="text-2xl opacity-40">🧠</span>
             <p className="text-[11px] text-[var(--text-muted)]">A IA aprende com cada interação</p>
           </div>
