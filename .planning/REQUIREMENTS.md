@@ -49,7 +49,7 @@
 - [x] **CONS-03**: Wizard de criação em 2 etapas (dados base + contexto estratégico)
 - [x] **CONS-04**: Central da Cliente tem tabs reorganizadas na ordem correta
 - [x] **CONS-05**: Action items de reunião aparecem automaticamente na aba Action Items
-- [ ] **CONS-06**: Resumo de reunião aparece na timeline do Overview
+- [x] **CONS-06**: Resumo de reunião aparece na timeline do Overview
 
 ## v2 Requirements
 
@@ -119,7 +119,7 @@
 | CONS-03 | Phase 18 (Wizard Criação) | Complete |
 | CONS-04 | Phase 19 (Central da Cliente Tabs) | Complete |
 | CONS-05 | Phase 20 (Integração Reunião→Consultoria) | Complete |
-| CONS-06 | Phase 20 (Integração Reunião→Consultoria) | Pending |
+| CONS-06 | Phase 20 (Integração Reunião→Consultoria) | Complete |
 
 **Coverage:**
 - v1 requirements: 30 total

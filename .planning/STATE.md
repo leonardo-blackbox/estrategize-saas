@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 20-01-PLAN.md
-last_updated: "2026-03-30T21:52:17.800Z"
+stopped_at: Completed 20-02-PLAN.md
+last_updated: "2026-03-30T21:53:23.694Z"
 progress:
   total_phases: 20
-  completed_phases: 18
+  completed_phases: 19
   total_plans: 41
-  completed_plans: 38
+  completed_plans: 39
 ---
 
 # Project State
@@ -84,6 +84,7 @@ Plan: 1 of 2
 | Phase 19-central-da-cliente-tabs P01 | 5 | 2 tasks | 3 files |
 | Phase 19 P02 | 3 | 2 tasks | 2 files |
 | Phase 20 P01 | 1 | 1 tasks | 3 files |
+| Phase 20 P02 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -160,6 +161,8 @@ Recent decisions affecting current work:
 - [Phase 19]: insights passed as prop from aggregator to Overview — not fetched independently; meetingDate derives from insights.next_meeting first, falls back to consultancy.next_meeting_at
 - [Phase 20]: RAG indexing in transcriptService uses direct supabase inserts (not processDocument) to avoid re-parsing already-formatted text
 - [Phase 20]: Step 5b in processTranscript wrapped in try/catch so RAG failure never breaks action item insertion in Step 6
+- [Phase 20]: recentMeetings derived in hook: filtering/slicing in useConsultoriaDetail keeps Overview component stateless
+- [Phase 20]: snip() module-level helper in ConsultoriaDetailOverview compresses JSX to stay within 80-line limit (77 lines)
 
 ### Pending Todos
 
@@ -173,6 +176,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T21:52:17.797Z
-Stopped at: Completed 20-01-PLAN.md
+Last session: 2026-03-30T21:53:23.689Z
+Stopped at: Completed 20-02-PLAN.md
 Resume file: None
