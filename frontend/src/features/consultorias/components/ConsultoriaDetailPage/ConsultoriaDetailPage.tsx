@@ -81,7 +81,7 @@ export function ConsultoriaDetailPage() {
             {activeTab === 'conteudo' && <ConsultoriaDetailComingSoon icon="✍️" title="Hub de Conteúdo"
               description="Sugestões e banco de conteúdo estratégico gerado por IA com base no nicho e objetivos do cliente." />}
             {activeTab === 'financeiro' && <ConsultoriaDetailComingSoon icon="💰" title="Painel Financeiro"
-              description="Projeções de receita, margens e marcos financeiros da consultoria em tempo real." />
+              description="Projeções de receita, margens e marcos financeiros da consultoria em tempo real." />}
           </motion.div>
         </AnimatePresence>
       </motion.div>
