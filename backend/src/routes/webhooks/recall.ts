@@ -16,17 +16,46 @@ function verifyRecallSignature(rawBody: string, signature: string, secret: strin
   }
 }
 
-// ─── Status mapping ───────────────────────────────────────────────
+// ─── Status mapping — Recall.ai event name → internal status ──────
+// Recall.ai sends individual events per status change (not a single bot.status_change).
+// Each event is named bot.<status_code>. We map the full event name to our internal status.
 
-const RECALL_STATUS_MAP: Record<string, string> = {
-  joining: 'joining',
-  in_call_not_recording: 'in_call',
-  in_call_recording: 'in_call',
-  call_ended: 'processing',
-  done: 'done',
-  error: 'error',
-  fatal: 'error',
+const RECALL_EVENT_STATUS_MAP: Record<string, string> = {
+  'bot.joining_call':                  'joining',
+  'bot.in_waiting_room':               'joining',
+  'bot.in_call_not_recording':         'in_call',
+  'bot.recording_permission_allowed':  'in_call',
+  'bot.recording_permission_denied':   'in_call',
+  'bot.in_call_recording':             'in_call',
+  'bot.call_ended':                    'processing',
+  'bot.done':                          'done',
+  'bot.fatal':                         'error',
 };
+
+// ─── Recall.ai webhook payload types ──────────────────────────────
+
+interface RecallWord {
+  text: string;
+  start_timestamp?: { relative?: number } | null;
+  end_timestamp?: { relative?: number } | null;
+}
+
+interface RecallParticipant {
+  id?: number;
+  name?: string | null;
+  is_host?: boolean;
+}
+
+interface RecallEventData {
+  bot?: { id?: string; metadata?: unknown };
+  data?: {
+    code?: string;
+    sub_code?: string | null;
+    updated_at?: string;
+    words?: RecallWord[];
+    participant?: RecallParticipant;
+  };
+}
 
 // ─── POST / — Recall.ai webhook receiver ─────────────────────────
 
@@ -48,16 +77,18 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   // Parse the raw body into the event payload
-  let parsedBody: { event?: string; data?: Record<string, unknown> };
+  let event: string | undefined;
+  let data: RecallEventData | undefined;
   try {
-    parsedBody = JSON.parse(rawBody) as { event?: string; data?: Record<string, unknown> };
+    const parsed = JSON.parse(rawBody) as { event?: string; data?: RecallEventData };
+    event = parsed.event;
+    data = parsed.data;
   } catch {
     return res.status(400).json({ error: 'Invalid JSON body' });
   }
 
-  const { event, data } = parsedBody;
-
-  console.log('[recall-webhook] Received event=%s data_keys=%s', event, Object.keys(data ?? {}).join(','));
+  const botId = data?.bot?.id;
+  console.log('[recall-webhook] event=%s bot_id=%s', event, botId ?? 'none');
 
   if (!event || !data) {
     return res.status(400).json({ error: 'Missing event or data' });
@@ -69,15 +100,12 @@ router.post('/', async (req: Request, res: Response) => {
 
   // ─── transcript.data ──────────────────────────────────────────
   if (event === 'transcript.data') {
-    const botId = data['bot_id'] as string | undefined;
-    const transcript = data['transcript'] as {
-      speaker?: string;
-      words?: Array<{ text: string; start_time: number; end_time: number }>;
-    } | undefined;
-
-    if (!botId || !transcript) {
-      return res.status(400).json({ error: 'Missing bot_id or transcript' });
+    if (!botId) {
+      return res.status(400).json({ error: 'Missing data.bot.id' });
     }
+
+    const words = data.data?.words ?? [];
+    const speaker = data.data?.participant?.name ?? null;
 
     const { data: session, error: sessionError } = await supabaseAdmin
       .from('meeting_sessions')
@@ -90,15 +118,21 @@ router.post('/', async (req: Request, res: Response) => {
       return res.json({ ok: true });
     }
 
-    const words = transcript.words ?? [];
     const rawText = words.map((w) => w.text).join(' ');
+
+    // Normalize timestamps to seconds (Recall.ai uses relative float seconds)
+    const normalizedWords = words.map((w) => ({
+      text: w.text,
+      start_time: w.start_timestamp?.relative ?? 0,
+      end_time: w.end_timestamp?.relative ?? null,
+    }));
 
     const { error: insertError } = await supabaseAdmin
       .from('meeting_transcripts')
       .insert({
         session_id: session.id,
-        speaker: transcript.speaker ?? null,
-        words,
+        speaker,
+        words: normalizedWords,
         raw_text: rawText,
         timestamp: new Date().toISOString(),
       });
@@ -111,18 +145,16 @@ router.post('/', async (req: Request, res: Response) => {
     return res.json({ ok: true });
   }
 
-  // ─── bot.status_change ────────────────────────────────────────
-  if (event === 'bot.status_change') {
-    const botId = data['bot_id'] as string | undefined;
-    const recallStatus = data['status'] as string | undefined;
-
-    if (!botId || !recallStatus) {
-      return res.status(400).json({ error: 'Missing bot_id or status' });
+  // ─── bot.* status events ──────────────────────────────────────
+  // Recall.ai sends one event per status transition, e.g. bot.joining_call, bot.done
+  if (event.startsWith('bot.')) {
+    if (!botId) {
+      return res.status(400).json({ error: 'Missing data.bot.id' });
     }
 
-    const internalStatus = RECALL_STATUS_MAP[recallStatus];
+    const internalStatus = RECALL_EVENT_STATUS_MAP[event];
     if (!internalStatus) {
-      console.warn(`[recall-webhook] Unknown Recall status: ${recallStatus} — ignoring`);
+      console.warn(`[recall-webhook] Unknown bot event: ${event} — ignoring`);
       return res.json({ ok: true, ignored: true });
     }
 
@@ -139,7 +171,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     const terminalStatuses = ['done', 'error'];
     if (terminalStatuses.includes(session.status as string)) {
-      console.log(`[recall-webhook] Session ${session.id} already in terminal state — ignoring`);
+      console.log(`[recall-webhook] Session ${session.id} already terminal — ignoring ${event}`);
       return res.json({ ok: true });
     }
 
@@ -164,7 +196,9 @@ router.post('/', async (req: Request, res: Response) => {
       return res.status(500).json({ error: 'Failed to update session' });
     }
 
-    // Fire-and-forget: trigger GPT-4 pipeline when call ends
+    console.log(`[recall-webhook] Session ${session.id} → ${internalStatus} (${event})`);
+
+    // Fire-and-forget: trigger AI pipeline when call ends and media is ready
     if (internalStatus === 'processing') {
       processTranscript(session.id).catch((err) => {
         console.error('[recall-webhook] processTranscript failed:', err);
@@ -175,6 +209,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   // ─── Unknown events — never return 4xx to avoid retries ──────
+  console.log(`[recall-webhook] Unhandled event: ${event} — ignoring`);
   return res.json({ ok: true, ignored: true });
 });
 
