@@ -26,6 +26,7 @@ A IA de cada consultoria responde com a metodologia real da Iris e com o context
 
 - [ ] Admin Robusto — Iris opera o sistema inteiro via UI (Stripe, cursos, usuárias, IA global)
 - [ ] Checkout Stripe — visitante compra plano → acesso liberado automaticamente
+- ✓ Admin IA Global — upload PDF/TXT/MD + indexação + teste de query IA — Validado em Phase 05
 - [ ] IA Base de Conhecimento — RAG com metodologia Iris (global) + docs do cliente (por consultoria)
 - ✓ Reuniões com Transcrição — bot Recall.ai entra no Meet → transcrição + resumo + action items — Validado em Phase 20
 - ✓ Central da Cliente v2 — consultorias refinadas com KPIs, wizard, tabs organizadas, integração IA/reunião — Validado em Phases 17-20
@@ -72,4 +73,4 @@ A IA de cada consultoria responde com a metodologia real da Iris e com o context
 | Skip research no GSD | Pesquisa de domínio já realizada via PRD PRO + NotebookLM (docs em Obsidian) | ✓ Good |
 
 ---
-*Last updated: 2026-03-30 — Phase 20 complete (último plano do roadmap MVP)*
+*Last updated: 2026-03-31 — Phase 05 complete (Admin IA Global — upload + indexação + teste de query)*
