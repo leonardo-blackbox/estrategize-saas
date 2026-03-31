@@ -1,4 +1,4 @@
-const RECALL_API_URL = 'https://us-east-1.recall.ai/api/v1';
+const RECALL_API_URL = 'https://us-west-2.recall.ai/api/v1';
 
 interface CreateBotParams {
   meetingUrl: string;
