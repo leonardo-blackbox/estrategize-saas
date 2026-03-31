@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   fetchConsultancies,
   updateConsultancy,
@@ -26,21 +27,27 @@ export function useConsultorias() {
     mutationFn: (id: string) => updateConsultancy(id, { status: 'archived' }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: consultancyKeys.all });
+      toast.success('Consultoria arquivada');
     },
+    onError: () => toast.error('Erro ao arquivar consultoria'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteConsultancy(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: consultancyKeys.all });
+      toast.success('Consultoria excluída');
     },
+    onError: () => toast.error('Erro ao excluir consultoria'),
   });
 
   const unarchiveMutation = useMutation({
     mutationFn: (id: string) => updateConsultancy(id, { status: 'active' }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: consultancyKeys.all });
+      toast.success('Consultoria reativada');
     },
+    onError: () => toast.error('Erro ao reativar consultoria'),
   });
 
   const { data, isLoading, isError, error } = useQuery({

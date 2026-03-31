@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { staggerItem } from '../../../../lib/motion.ts';
 import { cn } from '../../../../lib/cn.ts';
 import { type SortOption, type PhaseFilter, type StatusFilter, phaseFilterLabels, statusFilterLabels } from '../../consultorias.helpers.ts';
 
@@ -23,7 +22,7 @@ export function ConsultoriasFilterBar({
   phaseFilter, onPhaseFilterChange, statusFilter, onStatusFilterChange,
 }: ConsultoriasFilterBarProps) {
   return (
-    <motion.div variants={staggerItem} className="space-y-2">
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="space-y-2">
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1 max-w-xs">
           <svg className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

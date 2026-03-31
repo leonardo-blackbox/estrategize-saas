@@ -35,6 +35,11 @@ function makeRequest(
     });
 
     if (!res.ok) {
+      if (res.status === 401) {
+        useAuthStore.getState().signOut().catch(() => undefined);
+        window.location.href = '/login';
+        throw new Error('Sessão expirada. Faça login novamente.');
+      }
       const body = await res.json().catch(() => ({ error: res.statusText }));
       throw new Error((body as { error?: string }).error ?? `Request failed: ${res.status}`);
     }

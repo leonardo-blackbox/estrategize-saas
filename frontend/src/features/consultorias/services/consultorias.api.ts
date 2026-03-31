@@ -26,6 +26,7 @@ export {
   type InsightCards,
   type ActionPriority,
   type DeliverableType,
+  type Deliverable,
   phaseConfig,
   templateConfig,
   consultancyKeys,

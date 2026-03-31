@@ -46,7 +46,7 @@ export function DeliverableDropdown({ consultancyId }: DeliverableDropdownProps)
         {show && (
           <motion.div initial={{ opacity: 0, y: -4, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.97 }} transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full mt-1.5 z-50 min-w-[240px] rounded-[var(--radius-md)] bg-[var(--bg-surface-1)] border border-[var(--border-default)] shadow-[0_8px_24px_rgba(0,0,0,0.3)] overflow-hidden">
+            className="absolute right-0 top-full mt-1.5 z-50 w-[min(240px,calc(100vw-1rem))] rounded-[var(--radius-md)] bg-[var(--bg-surface-1)] border border-[var(--border-default)] shadow-[0_8px_24px_rgba(0,0,0,0.3)] overflow-hidden">
             {DELIVERABLE_TYPES.map((dt) => (
               <button key={dt.type} onClick={() => mutation.mutate(dt.type)} disabled={mutation.isPending}
                 className="w-full flex items-center justify-between px-3.5 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors text-left">

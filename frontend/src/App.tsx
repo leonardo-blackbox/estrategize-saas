@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { useAuthStore } from './stores/authStore.ts';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { AdminRoute } from './components/AdminRoute.tsx';
@@ -65,6 +66,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <Toaster position="top-right" richColors />
       <Routes>
         {/* ── Public routes ── */}
         <Route path="/login" element={<LoginPage />} />
