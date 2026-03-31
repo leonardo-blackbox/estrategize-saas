@@ -42,5 +42,5 @@ export function createMeeting(payload: CreateMeetingPayload): Promise<{ session:
 }
 
 export async function deleteMeeting(sessionId: string): Promise<void> {
-  await client.delete(`/api/meetings/${sessionId}`);
+  await client.delete(`/api/meetings/${sessionId}`).json();
 }
