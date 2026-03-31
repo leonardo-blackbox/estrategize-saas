@@ -1,8 +1,4 @@
 import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require('pdf-parse') as (buffer: Buffer) => Promise<{ text: string }>;
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { generateEmbeddings } from './embeddingService.js';
 export { generateEmbeddings };
@@ -73,6 +69,9 @@ function estimateTokens(text: string): number {
 
 export async function parseFile(fileType: 'pdf' | 'txt' | 'md', fileBuffer: Buffer): Promise<string> {
   if (fileType === 'pdf') {
+    const require = createRequire(import.meta.url);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const pdfParse = require('pdf-parse') as (buffer: Buffer) => Promise<{ text: string }>;
     const result = await pdfParse(fileBuffer);
     return result.text;
   }
