@@ -1,5 +1,3 @@
-import { motion } from 'framer-motion';
-import { staggerContainer, staggerItem } from '../../../../lib/motion.ts';
 import { useConsultorias } from '../../hooks/useConsultorias.ts';
 import { ConsultoriasHeader } from '../ConsultoriasHeader';
 import { ConsultoriasKpiRow } from '../ConsultoriasKpiRow';
@@ -35,12 +33,7 @@ export function ConsultoriasPage() {
 
   return (
     <>
-      <motion.div
-        variants={staggerContainer}
-        initial={false}
-        animate="animate"
-        className="space-y-5"
-      >
+      <div className="space-y-5">
         <ConsultoriasHeader
           isLoading={isLoading}
           activeCount={stats.active}
@@ -61,31 +54,26 @@ export function ConsultoriasPage() {
         />
 
         {isError && (
-          <motion.div
-            variants={staggerItem}
-            className="rounded-[var(--radius-md)] p-4 border border-[var(--border-hairline)] bg-[var(--bg-surface-1)]"
-          >
+          <div className="rounded-[var(--radius-md)] p-4 border border-[var(--border-hairline)] bg-[var(--bg-surface-1)]">
             <p className="text-sm text-[var(--color-error)]">
               {(error as Error)?.message || 'Erro ao carregar consultorias.'}
             </p>
-          </motion.div>
+          </div>
         )}
 
-        <motion.div variants={staggerItem}>
-          <ConsultoriasGrid
-            consultancies={filtered}
-            isLoading={isLoading}
-            hasSearch={!!debouncedSearch || statusFilter !== 'all' || phaseFilter !== 'all'}
-            onArchive={handleArchive}
-            onDelete={handleDelete}
-            onUnarchive={handleUnarchive}
-            archived={archived}
-            archivedVisible={archivedVisible}
-            onToggleArchived={() => setArchivedVisible((v) => !v)}
-            onCreateClick={() => setShowCreate(true)}
-          />
-        </motion.div>
-      </motion.div>
+        <ConsultoriasGrid
+          consultancies={filtered}
+          isLoading={isLoading}
+          hasSearch={!!debouncedSearch || statusFilter !== 'all' || phaseFilter !== 'all'}
+          onArchive={handleArchive}
+          onDelete={handleDelete}
+          onUnarchive={handleUnarchive}
+          archived={archived}
+          archivedVisible={archivedVisible}
+          onToggleArchived={() => setArchivedVisible((v) => !v)}
+          onCreateClick={() => setShowCreate(true)}
+        />
+      </div>
 
       <CreateConsultancyWizard open={showCreate} onClose={() => setShowCreate(false)} />
     </>

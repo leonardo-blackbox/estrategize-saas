@@ -1,5 +1,3 @@
-import { motion } from 'framer-motion';
-import { staggerItem } from '../../../../lib/motion.ts';
 import { KpiCard } from '../KpiCard';
 import type { ConsultancyStats } from '../../services/consultorias.api.ts';
 
@@ -9,7 +7,7 @@ interface ConsultoriasKpiRowProps {
 
 export function ConsultoriasKpiRow({ stats }: ConsultoriasKpiRowProps) {
   return (
-    <motion.div variants={staggerItem} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       <KpiCard
         label="Ativas"
         value={stats.active}

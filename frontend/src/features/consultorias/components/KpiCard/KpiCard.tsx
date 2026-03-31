@@ -1,6 +1,3 @@
-import { motion } from 'framer-motion';
-import { staggerItem } from '../../../../lib/motion.ts';
-
 interface KpiCardProps {
   label: string;
   value: number;
@@ -11,8 +8,7 @@ interface KpiCardProps {
 
 export function KpiCard({ label, value, icon, colorVar, bgVar }: KpiCardProps) {
   return (
-    <motion.div
-      variants={staggerItem}
+    <div
       className="flex items-center gap-3 rounded-[var(--radius-md)] p-4 border border-[var(--border-hairline)] bg-[var(--bg-surface-1)]"
       style={{ borderLeftColor: `var(${colorVar})`, borderLeftWidth: 2 }}
     >
@@ -28,6 +24,6 @@ export function KpiCard({ label, value, icon, colorVar, bgVar }: KpiCardProps) {
           {label}
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 }
