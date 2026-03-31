@@ -10,8 +10,8 @@
 - [x] **ADMN-01**: Admin pode criar/editar planos Stripe via interface sem terminal
 - [x] **ADMN-02**: Admin pode publicar/despublicar cursos e aulas via interface
 - [x] **ADMN-03**: Admin pode gerenciar usuárias (filtrar, buscar, editar entitlements)
-- [ ] **ADMN-04**: Admin pode fazer upload de documentos da metodologia Iris para base de conhecimento global
-- [ ] **ADMN-05**: Admin pode testar a IA global com uma pergunta antes de publicar
+- [x] **ADMN-04**: Admin pode fazer upload de documentos da metodologia Iris para base de conhecimento global
+- [x] **ADMN-05**: Admin pode testar a IA global com uma pergunta antes de publicar
 - [x] **ADMN-06**: Admin consegue navegar entre todas as seções em < 3 cliques
 - [x] **ADMN-07**: Admin visualiza eventos de webhook Stripe recentes
 
@@ -92,8 +92,8 @@
 | ADMN-01 | Phase 2 (Admin: Planos Stripe) | Complete |
 | ADMN-02 | Phase 3 (Admin: Cursos) | Complete |
 | ADMN-03 | Phase 4 (Admin: Usuárias) | Complete |
-| ADMN-04 | Phase 5 (Admin: IA Global) | Pending |
-| ADMN-05 | Phase 5 (Admin: IA Global) | Pending |
+| ADMN-04 | Phase 5 (Admin: IA Global) | Complete |
+| ADMN-05 | Phase 5 (Admin: IA Global) | Complete |
 | ADMN-06 | Phase 1 (Admin: Layout) | Complete |
 | ADMN-07 | Phase 2 (Admin: Planos Stripe) | Complete |
 | CHKT-01 | Phase 6 (Página de Planos) | Complete |

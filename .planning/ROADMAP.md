@@ -311,7 +311,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Admin Planos e Stripe | 3/3 | Complete   | 2026-03-29 | - |
 | 3. Admin Cursos | 2/3 | In Progress|  | - |
 | 4. Admin Usuários | 1/2 | In Progress|  | - |
-| 5. Admin IA Global | A — Admin Robusto | 0/TBD | Not started | - |
+| 5. Admin IA Global | 1/2 | In Progress|  | - |
 | 6. Página de Planos | 2/2 | Complete   | 2026-03-29 | - |
 | 7. Stripe Checkout Session | 2/2 | Complete   | 2026-03-29 | - |
 | 8. Retorno e Confirmação | 2/2 | Complete   | 2026-03-29 | - |
