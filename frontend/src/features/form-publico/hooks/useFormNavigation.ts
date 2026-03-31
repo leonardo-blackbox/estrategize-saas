@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import type { ApplicationField, Direction } from '../types';
 import { getFieldOptions, captureUTM, captureMetaClickData } from '../utils/form-publico.helpers';
 import { fireFormEvent } from '../services/form-publico.api';
@@ -22,6 +22,10 @@ export function useFormNavigation(params: UseFormNavigationParams) {
   const [direction, setDirection] = useState<Direction>('forward');
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  // Ref keeps latest answers so callbacks in setTimeout never read stale state
+  const answersRef = useRef(answers);
+  answersRef.current = answers;
+
   const currentField = fields[currentIndex] ?? null;
   const isLastQuestion = currentIndex === lastQuestionableIndex;
 
@@ -35,7 +39,7 @@ export function useFormNavigation(params: UseFormNavigationParams) {
       return;
     }
     if (currentField.required && currentField.type !== 'message' && currentField.type !== 'welcome') {
-      const v = answers[currentField.id];
+      const v = answersRef.current[currentField.id];
       const hasValue = Array.isArray(v) ? v.length > 0 : Boolean(v);
       if (!hasValue) { setValidationError('Este campo é obrigatório'); return; }
     }
@@ -65,7 +69,7 @@ export function useFormNavigation(params: UseFormNavigationParams) {
     }
     setDirection('forward');
     setCurrentIndex((prev) => Math.min(prev + 1, fields.length - 1));
-  }, [currentField, fields, answers, isLastQuestion, collectibleFields, slug, sessionToken, trackFormStart, onSubmit]);
+  }, [currentField, fields, isLastQuestion, collectibleFields, slug, sessionToken, trackFormStart, onSubmit]);
 
   const handleBack = useCallback(() => {
     if (currentIndex <= 0) return;

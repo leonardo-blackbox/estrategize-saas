@@ -92,7 +92,7 @@ export function useConsultorias() {
   const handleArchive = useCallback((id: string) => { archiveMutation.mutate(id); }, [archiveMutation]);
   const handleDelete = useCallback((id: string) => { deleteMutation.mutate(id); }, [deleteMutation]);
   const handleUnarchive = useCallback((id: string) => { unarchiveMutation.mutate(id); }, [unarchiveMutation]);
-  const handleSelect = useCallback((id: string) => { setSelectedId((prev) => (prev === id ? null : id)); }, []);
+  const handleSelect = useCallback((id: string) => { setSelectedId(id); }, []);
 
   const selected = (data?.data ?? []).find((c) => c.id === selectedId) ?? null;
 

@@ -22,22 +22,14 @@ export function ConsultoriaCard({ consultancy: c, onArchive, onDelete, onUnarchi
   const phaseCfg = phaseConfig[phase];
   const isArchived = c.status === 'archived';
 
-  function handleClick() {
-    if (onSelect) {
-      onSelect(c.id);
-    } else {
-      navigate('/consultorias/' + c.id);
-    }
-  }
-
   return (
     <motion.div layout
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={() => { setHovered(true); onSelect?.(c.id); }}
       onMouseLeave={() => setHovered(false)}
-      onClick={handleClick}
+      onClick={() => navigate('/consultorias/' + c.id)}
       className={cn('relative rounded-[var(--radius-md)] p-4 border cursor-pointer overflow-hidden transition-all duration-150',
         'border-[var(--border-hairline)] bg-[var(--bg-surface-1)] shadow-[var(--shadow-soft)]',
         'hover:border-[var(--border-default)] hover:bg-[var(--bg-hover)] hover:shadow-[var(--shadow-card-hover)]',
