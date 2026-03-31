@@ -10,11 +10,13 @@ export function useMeetings(consultancyId: string) {
   const { data, isLoading, error } = useQuery({
     queryKey: meetingKeys.byConsultancy(consultancyId),
     queryFn: () => listMeetings(consultancyId),
-    // Polling: ativa enquanto existir qualquer sessão não-terminal
+    // Poll a cada 5s se há sessões ativas (não-terminal)
+    // Poll a cada 10s se há sessões done mas sem transcrição (pipeline ainda processando)
     refetchInterval: (query) => {
       const sessions = query.state.data?.sessions ?? [];
-      const hasActive = sessions.some((s) => !TERMINAL.has(s.status));
-      return hasActive ? 5000 : false;
+      if (sessions.some((s) => !TERMINAL.has(s.status))) return 5000;
+      if (sessions.some((s) => s.status === 'done' && !s.formatted_transcript && !s.summary)) return 10000;
+      return false;
     },
   });
 

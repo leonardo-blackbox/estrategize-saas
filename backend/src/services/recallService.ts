@@ -1,4 +1,5 @@
 const RECALL_API_URL = 'https://us-west-2.recall.ai/api/v1';
+const RECALL_API_V2_URL = 'https://us-west-2.recall.ai/api/v2';
 
 interface CreateBotParams {
   meetingUrl: string;
@@ -80,7 +81,7 @@ export async function fetchBotTranscript(botId: string): Promise<NormalizedTrans
   const apiKey = process.env.RECALL_API_KEY;
   if (!apiKey) throw new Error('RECALL_API_KEY not configured');
 
-  const res = await fetch(`${RECALL_API_URL}/bot/${botId}/transcript/`, {
+  const res = await fetch(`${RECALL_API_V2_URL}/bot/${botId}/transcript/`, {
     headers: { 'Authorization': `Token ${apiKey}` },
   });
 
