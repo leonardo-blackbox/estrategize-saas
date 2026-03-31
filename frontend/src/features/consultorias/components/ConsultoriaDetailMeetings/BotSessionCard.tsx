@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { MeetingSession } from '../../../../api/meetings';
 import { Button } from '../../../../components/ui/Button';
+import { TranscriptModal } from './TranscriptModal';
 
 interface BotSessionCardProps {
   session: MeetingSession;
@@ -60,6 +61,7 @@ function calcDuration(startedAt: string | null, endedAt: string | null): string 
 export function BotSessionCard({ session, onDelete }: BotSessionCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(false);
   const cfg = STATUS_CONFIG[session.status];
   const duration = calcDuration(session.started_at, session.ended_at);
   const isTerminal = session.status === 'done' || session.status === 'error';
@@ -132,17 +134,29 @@ export function BotSessionCard({ session, onDelete }: BotSessionCardProps) {
         </div>
       </div>
 
-      {/* ─── Expanded: summary + transcript ─── */}
+      {/* ─── Expanded: summary + indicators + transcript ─── */}
       {expanded && session.status === 'done' && (
         <div
           className="px-4 pb-4 pt-0 border-t border-[var(--border-hairline)] space-y-4 mt-0"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="pt-4 space-y-4">
-            {session.speakers.length > 0 && (
-              <p className="text-xs text-[var(--text-secondary)]">
-                <span className="font-medium text-[var(--text-primary)]">Participantes: </span>
-                {session.speakers.join(', ')}
+            {/* Status indicators */}
+            <div className="flex flex-wrap gap-2">
+              <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${session.formatted_transcript ? 'bg-emerald-500/10 text-emerald-500' : 'bg-[var(--bg-surface-2)] text-[var(--text-tertiary)]'}`}>
+                {session.formatted_transcript ? '✓' : '✗'} Transcrição
+              </span>
+              <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${session.summary ? 'bg-emerald-500/10 text-emerald-500' : 'bg-[var(--bg-surface-2)] text-[var(--text-tertiary)]'}`}>
+                {session.summary ? '✓' : '✗'} Resumo IA
+              </span>
+              <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${session.formatted_transcript ? 'bg-blue-500/10 text-blue-400' : 'bg-[var(--bg-surface-2)] text-[var(--text-tertiary)]'}`}>
+                {session.formatted_transcript ? '✓' : '✗'} Indexado no RAG
+              </span>
+            </div>
+
+            {!session.formatted_transcript && (
+              <p className="text-xs text-[var(--text-tertiary)] bg-[var(--bg-surface-2)] rounded-[var(--radius-sm)] px-3 py-2">
+                Nenhuma transcrição foi capturada — a reunião pode ter sido muito curta ou o bot não conseguiu gravar áudio.
               </p>
             )}
 
@@ -156,20 +170,16 @@ export function BotSessionCard({ session, onDelete }: BotSessionCardProps) {
             )}
 
             {session.formatted_transcript && (
-              <details className="group">
-                <summary className="text-xs font-semibold text-[var(--text-primary)] cursor-pointer select-none list-none flex items-center gap-1">
-                  <svg className="w-3.5 h-3.5 group-open:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                  Ver transcrição completa
-                </summary>
-                <pre className="mt-2 text-xs font-mono text-[var(--text-secondary)] overflow-auto max-h-72 leading-relaxed whitespace-pre-wrap bg-[var(--bg-surface-0)] rounded p-3 border border-[var(--border-hairline)]">
-                  {session.formatted_transcript}
-                </pre>
-              </details>
+              <Button variant="secondary" size="sm" onClick={() => setShowTranscript(true)}>
+                Ver transcrição completa →
+              </Button>
             )}
           </div>
         </div>
+      )}
+
+      {showTranscript && session.formatted_transcript && (
+        <TranscriptModal session={session} onClose={() => setShowTranscript(false)} />
       )}
 
       {/* ─── Expanded: error detail ─── */}
