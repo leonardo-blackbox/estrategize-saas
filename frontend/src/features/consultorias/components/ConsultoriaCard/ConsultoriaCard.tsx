@@ -11,14 +11,24 @@ interface ConsultoriaCardProps {
   onArchive: (id: string) => void;
   onDelete: (id: string) => void;
   onUnarchive: (id: string) => void;
+  isSelected?: boolean;
+  onSelect?: (id: string) => void;
 }
 
-export function ConsultoriaCard({ consultancy: c, onArchive, onDelete, onUnarchive }: ConsultoriaCardProps) {
+export function ConsultoriaCard({ consultancy: c, onArchive, onDelete, onUnarchive, isSelected, onSelect }: ConsultoriaCardProps) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   const phase = c.phase ?? 'onboarding';
   const phaseCfg = phaseConfig[phase];
   const isArchived = c.status === 'archived';
+
+  function handleClick() {
+    if (onSelect) {
+      onSelect(c.id);
+    } else {
+      navigate('/consultorias/' + c.id);
+    }
+  }
 
   return (
     <motion.div layout
@@ -27,9 +37,11 @@ export function ConsultoriaCard({ consultancy: c, onArchive, onDelete, onUnarchi
       transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => navigate('/consultorias/' + c.id)}
-      className={cn('relative rounded-[var(--radius-md)] p-4 border cursor-pointer overflow-hidden transition-colors duration-150',
-        'border-[var(--border-hairline)] bg-[var(--bg-surface-1)] hover:border-[var(--border-default)] hover:bg-[var(--bg-hover)]',
+      onClick={handleClick}
+      className={cn('relative rounded-[var(--radius-md)] p-4 border cursor-pointer overflow-hidden transition-all duration-150',
+        'border-[var(--border-hairline)] bg-[var(--bg-surface-1)] shadow-[var(--shadow-soft)]',
+        'hover:border-[var(--border-default)] hover:bg-[var(--bg-hover)] hover:shadow-[var(--shadow-card-hover)]',
+        isSelected && 'border-[var(--accent)] ring-1 ring-[var(--accent)] ring-inset',
         isArchived && 'opacity-60')}>
       <AnimatePresence>
         {hovered && (

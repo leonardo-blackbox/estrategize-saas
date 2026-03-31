@@ -3,6 +3,7 @@ import { ConsultoriasHeader } from '../ConsultoriasHeader';
 import { ConsultoriasKpiRow } from '../ConsultoriasKpiRow';
 import { ConsultoriasFilterBar } from '../ConsultoriasFilterBar';
 import { ConsultoriasGrid } from '../ConsultoriasGrid';
+import { SmartSidebar } from '../SmartSidebar';
 import { CreateConsultancyWizard } from '../CreateConsultancyWizard';
 
 export function ConsultoriasPage() {
@@ -25,6 +26,9 @@ export function ConsultoriasPage() {
     handleArchive,
     handleDelete,
     handleUnarchive,
+    selectedId,
+    selected,
+    handleSelect,
     archivedVisible,
     setArchivedVisible,
     showCreate,
@@ -61,18 +65,28 @@ export function ConsultoriasPage() {
           </div>
         )}
 
-        <ConsultoriasGrid
-          consultancies={filtered}
-          isLoading={isLoading}
-          hasSearch={!!debouncedSearch || statusFilter !== 'all' || phaseFilter !== 'all'}
-          onArchive={handleArchive}
-          onDelete={handleDelete}
-          onUnarchive={handleUnarchive}
-          archived={archived}
-          archivedVisible={archivedVisible}
-          onToggleArchived={() => setArchivedVisible((v) => !v)}
-          onCreateClick={() => setShowCreate(true)}
-        />
+        <div className="flex flex-col lg:flex-row gap-4 items-start">
+          <div className="flex-1 min-w-0">
+            <ConsultoriasGrid
+              consultancies={filtered}
+              isLoading={isLoading}
+              hasSearch={!!debouncedSearch || statusFilter !== 'all' || phaseFilter !== 'all'}
+              onArchive={handleArchive}
+              onDelete={handleDelete}
+              onUnarchive={handleUnarchive}
+              archived={archived}
+              archivedVisible={archivedVisible}
+              onToggleArchived={() => setArchivedVisible((v) => !v)}
+              onCreateClick={() => setShowCreate(true)}
+              selectedId={selectedId}
+              onSelect={handleSelect}
+            />
+          </div>
+
+          <div className="hidden lg:block w-72 xl:w-80 shrink-0">
+            <SmartSidebar selected={selected} />
+          </div>
+        </div>
       </div>
 
       <CreateConsultancyWizard open={showCreate} onClose={() => setShowCreate(false)} />

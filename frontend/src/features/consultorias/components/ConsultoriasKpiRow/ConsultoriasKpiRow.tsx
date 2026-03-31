@@ -1,6 +1,7 @@
 import { KpiCard } from '../KpiCard';
 import type { ConsultancyStats } from '../../services/consultorias.api.ts';
 
+
 interface ConsultoriasKpiRowProps {
   stats: ConsultancyStats;
 }
@@ -52,6 +53,6 @@ export function ConsultoriasKpiRow({ stats }: ConsultoriasKpiRowProps) {
           </svg>
         }
       />
-    </motion.div>
+    </div>
   );
 }

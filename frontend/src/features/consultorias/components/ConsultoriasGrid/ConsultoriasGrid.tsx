@@ -15,6 +15,8 @@ interface ConsultoriasGridProps {
   archivedVisible: boolean;
   onToggleArchived: () => void;
   onCreateClick: () => void;
+  selectedId?: string | null;
+  onSelect?: (id: string) => void;
 }
 
 export function ConsultoriasGrid({
@@ -28,8 +30,10 @@ export function ConsultoriasGrid({
   archivedVisible,
   onToggleArchived,
   onCreateClick,
+  selectedId,
+  onSelect,
 }: ConsultoriasGridProps) {
-  const cardProps = { onArchive, onDelete, onUnarchive };
+  const cardProps = { onArchive, onDelete, onUnarchive, onSelect };
 
   return (
     <div className="flex-1 min-w-0 space-y-6">
@@ -44,7 +48,7 @@ export function ConsultoriasGrid({
       ) : (
         <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
           {consultancies.map((c) => (
-            <ConsultoriaCard key={c.id} consultancy={c} {...cardProps} />
+            <ConsultoriaCard key={c.id} consultancy={c} {...cardProps} isSelected={selectedId === c.id} />
           ))}
         </motion.div>
       )}

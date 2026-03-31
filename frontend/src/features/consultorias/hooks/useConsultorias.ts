@@ -19,6 +19,7 @@ export function useConsultorias() {
   const [search, setSearch] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [archivedVisible, setArchivedVisible] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const debouncedSearch = useDebounce(search, 300);
 
   const qc = useQueryClient();
@@ -91,6 +92,9 @@ export function useConsultorias() {
   const handleArchive = useCallback((id: string) => { archiveMutation.mutate(id); }, [archiveMutation]);
   const handleDelete = useCallback((id: string) => { deleteMutation.mutate(id); }, [deleteMutation]);
   const handleUnarchive = useCallback((id: string) => { unarchiveMutation.mutate(id); }, [unarchiveMutation]);
+  const handleSelect = useCallback((id: string) => { setSelectedId((prev) => (prev === id ? null : id)); }, []);
+
+  const selected = (data?.data ?? []).find((c) => c.id === selectedId) ?? null;
 
   return {
     // Data
@@ -114,6 +118,10 @@ export function useConsultorias() {
     handleArchive,
     handleDelete,
     handleUnarchive,
+    // Selection
+    selectedId,
+    selected,
+    handleSelect,
     // Archived visibility
     archivedVisible,
     setArchivedVisible,
