@@ -33,24 +33,23 @@ export async function createBot(params: CreateBotParams): Promise<RecallBot> {
   const apiKey = process.env.RECALL_API_KEY;
   if (!apiKey) throw new Error('RECALL_API_KEY not configured');
 
-  // Build realtime transcription config if webhook URL is configured.
-  // Set RECALL_WEBHOOK_URL in Railway to enable real-time transcript streaming.
-  // Example: https://your-backend.up.railway.app/api/webhooks/recall
+  // Always enable transcript generation so the API fallback (bot.done) can fetch it.
+  // If RECALL_WEBHOOK_URL is set, also stream real-time transcript.data events.
   const webhookUrl = process.env.RECALL_WEBHOOK_URL ?? null;
-  const recordingConfig = webhookUrl
-    ? {
-        transcript: {
-          provider: { recallai_streaming: {} },
-        },
-        realtime_endpoints: [
-          {
-            type: 'webhook',
-            url: webhookUrl,
-            events: ['transcript.data'],
-          },
-        ],
-      }
-    : undefined;
+  const recordingConfig: Record<string, unknown> = {
+    transcript: {
+      provider: { recallai_streaming: {} },
+    },
+  };
+  if (webhookUrl) {
+    recordingConfig['realtime_endpoints'] = [
+      {
+        type: 'webhook',
+        url: webhookUrl,
+        events: ['transcript.data'],
+      },
+    ];
+  }
 
   const res = await fetch(`${RECALL_API_URL}/bot`, {
     method: 'POST',
@@ -61,7 +60,7 @@ export async function createBot(params: CreateBotParams): Promise<RecallBot> {
     body: JSON.stringify({
       meeting_url: params.meetingUrl,
       bot_name: params.botName ?? 'Iris AI Notetaker',
-      ...(recordingConfig && { recording_config: recordingConfig }),
+      recording_config: recordingConfig,
     }),
   });
 
