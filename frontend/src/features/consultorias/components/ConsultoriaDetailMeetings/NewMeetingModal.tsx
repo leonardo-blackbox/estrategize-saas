@@ -8,6 +8,7 @@ interface NewMeetingModalProps {
   onClose: () => void;
   onSubmit: (url: string) => void;
   isLoading: boolean;
+  error?: string;
 }
 
 function isValidUrl(value: string): boolean {
@@ -19,7 +20,7 @@ function isValidUrl(value: string): boolean {
   }
 }
 
-export function NewMeetingModal({ open, onClose, onSubmit, isLoading }: NewMeetingModalProps) {
+export function NewMeetingModal({ open, onClose, onSubmit, isLoading, error }: NewMeetingModalProps) {
   const [url, setUrl] = useState('');
   const [lgpdConsent, setLgpdConsent] = useState(false);
 
@@ -68,6 +69,12 @@ export function NewMeetingModal({ open, onClose, onSubmit, isLoading }: NewMeeti
             Confirmo que todos os participantes foram informados sobre a gravação desta reunião, conforme exigido pela LGPD.
           </span>
         </label>
+
+        {error && (
+          <p className="text-xs text-red-500 bg-red-50 dark:bg-red-950/30 rounded px-3 py-2">
+            {error}
+          </p>
+        )}
 
         <div className="flex justify-end gap-2 pt-1">
           <Button variant="secondary" size="sm" onClick={onClose} disabled={isLoading}>

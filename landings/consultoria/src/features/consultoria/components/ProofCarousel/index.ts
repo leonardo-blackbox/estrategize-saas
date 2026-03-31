@@ -1,0 +1,1 @@
+export { ProofCarousel } from './ProofCarousel';

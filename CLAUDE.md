@@ -178,3 +178,82 @@ DATABASE_URL=...
 - Frontend home page load: <1s
 - API response time: <500ms
 - Dashboard first paint: <2s
+
+## Construção Modular — Regras Obrigatórias
+
+O projeto segue o método de **Componentização Extrema** (3 camadas). Estas regras são NON-NEGOTIABLE para todo código novo e refatorações.
+
+### Estrutura de Pastas (Feature-Based)
+
+```
+frontend/src/
+├── features/              ← CORAÇÃO DO PROJETO — todo código de domínio vai aqui
+│   └── [feature]/
+│       ├── components/
+│       │   ├── [Feature]Page/      ← Agregador
+│       │   ├── [Módulo]/           ← Micro-módulo
+│       │   └── index.ts            ← Barrel export
+│       ├── hooks/
+│       │   └── use[Feature].ts
+│       └── services/
+│           └── [feature].api.ts
+├── components/            ← SOMENTE primitivos globais (Button, Modal, Input)
+├── hooks/                 ← SOMENTE hooks usados por 2+ features
+├── lib/                   ← Wrappers de libs externas (supabase, queryClient)
+├── stores/                ← Zustand stores globais
+└── pages/                 ← SOMENTE rotas (~15 linhas cada — importa o agregador)
+```
+
+### As 3 Camadas — Limites de Tamanho
+
+| Camada | Máximo | Responsabilidade |
+|--------|--------|-----------------|
+| **Página** (src/pages/) | **20 linhas** | Apenas importa e renderiza o Agregador. Zero useState, zero useEffect, zero lógica. |
+| **Agregador** (features/*/components/[Feature]Page/) | **200 linhas** | Orquestra micro-módulos via props. Usa hooks para dados. NÃO implementa lógica visual. |
+| **Micro-módulo** (features/*/components/[Módulo]/) | **80 linhas** | UMA responsabilidade. Recebe props, emite callbacks. Zero imports de outros micro-módulos. |
+| **Hook** (features/*/hooks/) | **120 linhas** | Isola lógica de estado e data fetching. |
+| **Service** (features/*/services/) | **150 linhas** | Chamadas HTTP apenas. Sem lógica de UI. |
+
+### Proibições (BLOCK)
+
+- **Nunca** fazer fetch/chamada API dentro de componentes visuais — delegar para hooks
+- **Nunca** importar `supabase` fora de `lib/` ou `services/`
+- **Nunca** definir componente filho DENTRO de outro componente (causa re-render)
+- **Nunca** usar Context API para estado que muda frequentemente — usar Zustand
+- **Nunca** criar arquivo novo em `src/pages/` com mais de 20 linhas
+- **Nunca** importar micro-módulo de outro micro-módulo do mesmo feature (acoplamento horizontal)
+
+### Fluxo de Dados
+
+```
+Dados descem via PROPS
+Ações sobem via CALLBACKS (onX)
+Estado global → Zustand stores
+Estado do servidor → React Query (TanStack Query)
+```
+
+### Padrões Obrigatórios
+
+- **Barrel exports:** Cada pasta de componente tem `index.ts` que re-exporta o componente
+- **Colocation:** Teste fica ao lado do componente (`Component.spec.tsx`), não em `__tests__/`
+- **1 arquivo = 1 função** em `utils/` (nunca criar `utils/index.ts` com 40 funções)
+- **Regra dos 2 consumidores:** Hook usado por 1 feature → `features/[feature]/hooks/`. Usado por 2+ → `src/hooks/`
+
+### Backend — Modular Monolith
+
+```
+backend/src/modules/
+└── [feature]/
+    ├── [feature].routes.ts       ← Roteamento HTTP (max 200 linhas)
+    ├── [feature].controller.ts   ← Parse + validação (max 100 linhas)
+    ├── [feature].service.ts      ← Regras de negócio (max 200 linhas)
+    └── index.ts                  ← Re-exporta públicos
+```
+
+### Protocolo de Sessão com IA
+
+1. Abrir o arquivo alvo **antes** de pedir alteração
+2. Descrever **UMA** alteração por prompt
+3. Validar o resultado antes de avançar
+4. Nunca abrir dois módulos não relacionados ao mesmo tempo
+5. Ao encontrar bug: identificar o micro-módulo → abrir APENAS ele → descrever comportamento atual vs. esperado

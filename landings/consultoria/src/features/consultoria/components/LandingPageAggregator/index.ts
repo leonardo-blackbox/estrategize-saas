@@ -1,0 +1,1 @@
+export { LandingPageAggregator } from './LandingPageAggregator';
