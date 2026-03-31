@@ -120,7 +120,7 @@ app.get('/health/db', async (_req, res) => {
 // ─── Routes ──────────────────────────────────────────────────────
 app.use('/auth', authLimit, authRouter);
 app.use('/api/consultancies', consultanciesRouter);
-app.use('/api/consultancies/:consultancyId/documents', authLimit, consultancyDocumentsRouter);
+app.use('/api/consultancies/:consultancyId/documents', consultancyDocumentsRouter);
 app.use('/api/credits', creditsRouter);
 app.use('/api/courses', coursesRouter);
 app.use('/api/admin/courses', adminLimit, adminCoursesRouter);
@@ -131,7 +131,7 @@ app.use('/api/admin/ofertas', adminLimit, adminOfertasRouter);
 app.use('/api/admin/home', adminLimit, adminHomeRouter);
 app.use('/api/admin/stripe/products', adminLimit, adminStripeRouter);
 app.use('/api/admin/knowledge', adminLimit, adminKnowledgeRouter);
-app.use('/api/meetings', authLimit, meetingsRouter);
+app.use('/api/meetings', meetingsRouter); // general limit already applied globally; authLimit is too strict for polling
 // /api/webhooks/recall is registered above (before express.json) with raw body parser
 app.use('/api/webhooks', webhookLimit, webhooksRouter);
 app.use('/api/applications', applicationsRouter);
