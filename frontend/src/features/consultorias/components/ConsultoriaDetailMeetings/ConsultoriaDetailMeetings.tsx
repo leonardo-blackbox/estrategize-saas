@@ -11,7 +11,7 @@ interface ConsultoriaDetailMeetingsProps {
 
 export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMeetingsProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const { sessions, isLoading, createSession, isCreating, createError } = useMeetings(consultancyId);
+  const { sessions, isLoading, error, createSession, isCreating, createError } = useMeetings(consultancyId);
 
   // Fechar modal quando a mutation concluir sem erro
   const prevCreating = useRef(false);
@@ -35,6 +35,15 @@ export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMe
             className="h-16 animate-pulse bg-[var(--bg-surface-1)] rounded-[var(--radius-md)] border border-[var(--border-hairline)]"
           />
         ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-[var(--radius-md)] p-6 bg-red-500/5 border border-red-500/20 text-center space-y-2">
+        <p className="text-sm text-red-400">Erro ao carregar reuniões</p>
+        <p className="text-xs text-[var(--text-tertiary)]">{error.message}</p>
       </div>
     );
   }
@@ -74,6 +83,7 @@ export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMe
         onClose={() => setModalOpen(false)}
         onSubmit={handleCreate}
         isLoading={isCreating}
+        error={createError?.message}
       />
     </div>
   );

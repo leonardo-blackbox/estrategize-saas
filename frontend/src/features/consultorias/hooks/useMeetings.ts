@@ -29,7 +29,7 @@ export function useMeetings(consultancyId: string) {
   return {
     sessions,
     isLoading,
-    error,
+    error: error as Error | null,
     createSession: createMutation.mutate,
     isCreating: createMutation.isPending,
     createError: createMutation.error,
