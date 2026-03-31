@@ -3,7 +3,7 @@ import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { buildFullContext, type ConsultancyContextBlock } from './consultancyContextService.js';
 import { retrieveRAGContext, type RAGChunk } from './ragService.js';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? 'missing' });
 
 // ============================================================
 // Iris Methodology — injected into every system prompt

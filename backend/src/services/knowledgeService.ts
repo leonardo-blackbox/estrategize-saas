@@ -300,7 +300,7 @@ export async function getDocumentsByScope(params: {
 // testQuery
 // ============================================================================
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? 'missing' });
 
 /**
  * Run a RAG test query against the knowledge base.

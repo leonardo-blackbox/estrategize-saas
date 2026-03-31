@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { chunkText, generateEmbeddings } from './knowledgeService.js';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? 'missing' });
 
 // ============================================================
 // Types

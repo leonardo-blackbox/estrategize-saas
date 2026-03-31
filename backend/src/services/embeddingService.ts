@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? 'missing' });
 
 const EMBEDDING_MODEL = 'text-embedding-3-small';
 const MAX_BATCH_SIZE = 100; // OpenAI limit per request
