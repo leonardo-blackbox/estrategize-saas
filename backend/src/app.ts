@@ -89,6 +89,14 @@ app.use(cors({
 }));
 
 app.use(generalLimit);
+
+// ─── Recall webhook — raw body BEFORE express.json() ─────────────
+// Recall.ai signs the raw request body with HMAC-SHA256. We must capture the
+// raw bytes before express.json() re-serializes the object, otherwise the
+// signature comparison always fails. Using express.raw() here gives us the
+// original Buffer on req.body which the webhook handler passes to crypto.
+app.use('/api/webhooks/recall', webhookLimit, express.raw({ type: 'application/json' }), recallWebhookRouter);
+
 app.use(express.json());
 
 // ─── Health ──────────────────────────────────────────────────────
@@ -124,7 +132,7 @@ app.use('/api/admin/home', adminLimit, adminHomeRouter);
 app.use('/api/admin/stripe/products', adminLimit, adminStripeRouter);
 app.use('/api/admin/knowledge', adminLimit, adminKnowledgeRouter);
 app.use('/api/meetings', authLimit, meetingsRouter);
-app.use('/api/webhooks/recall', webhookLimit, recallWebhookRouter);
+// /api/webhooks/recall is registered above (before express.json) with raw body parser
 app.use('/api/webhooks', webhookLimit, webhooksRouter);
 app.use('/api/applications', applicationsRouter);
 app.use('/api/applications', assetsRouter);

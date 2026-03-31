@@ -31,7 +31,11 @@ const RECALL_STATUS_MAP: Record<string, string> = {
 // ─── POST / — Recall.ai webhook receiver ─────────────────────────
 
 router.post('/', async (req: Request, res: Response) => {
-  const rawBody = JSON.stringify(req.body);
+  // req.body is a raw Buffer here because this route is mounted with express.raw()
+  // before express.json() in app.ts — this ensures HMAC uses the original bytes.
+  const rawBodyBuffer = Buffer.isBuffer(req.body) ? req.body : Buffer.from(JSON.stringify(req.body));
+  const rawBody = rawBodyBuffer.toString('utf-8');
+
   const signature = req.headers['x-recall-signature'] as string ?? '';
   const secret = process.env.RECALL_WEBHOOK_SECRET ?? '';
 
@@ -43,10 +47,15 @@ router.post('/', async (req: Request, res: Response) => {
     return res.status(401).json({ error: 'Invalid signature' });
   }
 
-  const { event, data } = req.body as {
-    event?: string;
-    data?: Record<string, unknown>;
-  };
+  // Parse the raw body into the event payload
+  let parsedBody: { event?: string; data?: Record<string, unknown> };
+  try {
+    parsedBody = JSON.parse(rawBody) as { event?: string; data?: Record<string, unknown> };
+  } catch {
+    return res.status(400).json({ error: 'Invalid JSON body' });
+  }
+
+  const { event, data } = parsedBody;
 
   if (!event || !data) {
     return res.status(400).json({ error: 'Missing event or data' });

@@ -529,7 +529,12 @@ router.post('/:id/ai/chat', async (req: AuthenticatedRequest, res) => {
       { idempotencyKey: `ai-chat:${consultancyId}:${Date.now()}`, referenceId: consultancyId, description: `AI chat for "${consultancy.title}"` },
     );
 
-    res.json({ data: result });
+    // Shape matches frontend expectation: { reply, credits_used, conversation_id }
+    res.json({
+      reply: result.message,
+      credits_used: result.credits_spent,
+      conversation_id: result.conversation_id,
+    });
   } catch (err) {
     const error = err as Error & { statusCode?: number };
     if (error.statusCode === 402) { res.status(402).json({ error: 'Insufficient credits' }); return; }

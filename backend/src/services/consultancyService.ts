@@ -10,10 +10,10 @@ export type ConsultancyPhase =
 
 export type ConsultancyTemplate =
   | 'none'
-  | 'positioning'
-  | 'educational_product'
-  | 'local_business'
-  | 'full_restructure';
+  | 'repositioning'
+  | 'launch'
+  | 'scaling'
+  | 'restructuring';
 
 export type ConsultancyPriority = 'low' | 'normal' | 'high' | 'at_risk';
 
@@ -53,13 +53,17 @@ export interface CreateConsultancyInput {
   title: string;
   client_name?: string;
   status?: 'active' | 'archived';
-  // New fields
   phase?: ConsultancyPhase;
   instagram?: string;
   niche?: string;
   start_date?: string;
   end_date_estimated?: string;
   template?: ConsultancyTemplate;
+  ticket?: number;
+  has_team?: boolean;
+  has_website?: boolean;
+  current_stage?: string;
+  priority?: ConsultancyPriority;
 }
 
 export interface UpdateConsultancyInput {
@@ -77,6 +81,10 @@ export interface UpdateConsultancyInput {
   real_bottleneck?: string | null;
   next_meeting_at?: string | null;
   priority?: ConsultancyPriority;
+  ticket?: number | null;
+  has_team?: boolean;
+  has_website?: boolean;
+  current_stage?: string | null;
 }
 
 function ensureAdmin() {
@@ -182,6 +190,11 @@ export async function createConsultancy(
       start_date: input.start_date ?? null,
       end_date_estimated: input.end_date_estimated ?? null,
       template: input.template ?? 'none',
+      ticket: input.ticket ?? null,
+      has_team: input.has_team ?? false,
+      has_website: input.has_website ?? false,
+      current_stage: input.current_stage ?? null,
+      priority: input.priority ?? 'normal',
     })
     .select('*')
     .single();
