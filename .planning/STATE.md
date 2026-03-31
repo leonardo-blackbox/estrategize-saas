@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-31T01:22:42.781Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-31T01:28:30.575Z"
 progress:
   total_phases: 20
-  completed_phases: 19
+  completed_phases: 20
   total_plans: 41
-  completed_plans: 40
+  completed_plans: 41
 ---
 
 # Project State
@@ -86,6 +86,7 @@ Plan: 1 of 2
 | Phase 20 P01 | 1 | 1 tasks | 3 files |
 | Phase 20 P02 | 2 | 2 tasks | 3 files |
 | Phase 05 P01 | 3 | 2 tasks | 4 files |
+| Phase 05 P02 | 6 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -165,6 +166,8 @@ Recent decisions affecting current work:
 - [Phase 20]: recentMeetings derived in hook: filtering/slicing in useConsultoriaDetail keeps Overview component stateless
 - [Phase 20]: snip() module-level helper in ConsultoriaDetailOverview compresses JSX to stay within 80-line limit (77 lines)
 - [Phase 05]: testQuery implemented in knowledgeService using RAG + gpt-4o-mini; Zod UUID validation on DELETE /:id in knowledge routes
+- [Phase 05]: AdminIAPage rewritten as direct React Query aggregator — drops useKnowledge hook in favour of inline useQuery + useMutation to align with plan spec and expose queryKey admin-knowledge-documents
+- [Phase 05]: deletingId tracked in aggregator state for per-row isDeleting prop isolation so only the clicked document row shows loading
 
 ### Pending Todos
 
@@ -178,6 +181,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T01:22:42.776Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-03-31T01:28:30.572Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None

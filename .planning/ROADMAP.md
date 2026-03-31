@@ -13,7 +13,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 - [x] **Phase 2: Admin Planos e Stripe** - Interface para criar/editar planos no Stripe sem terminal (completed 2026-03-29)
 - [x] **Phase 3: Admin Cursos** - UX de publicação de cursos e aulas em 1 clique (completed 2026-03-29)
 - [x] **Phase 4: Admin Usuários** - Filtros, busca e gestão de entitlements por usuária
-- [ ] **Phase 5: Admin IA Global** - Upload de documentos da metodologia Iris e teste da IA
+- [x] **Phase 5: Admin IA Global** - Upload de documentos da metodologia Iris e teste da IA (completed 2026-03-31)
 ### Milestone B — Checkout Stripe
 - [x] **Phase 6: Página de Planos** - Visitante vê planos disponíveis sem estar logado (completed 2026-03-29)
 - [x] **Phase 7: Stripe Checkout Session** - Botão "Assinar" redireciona para Stripe real (completed 2026-03-29)
@@ -311,7 +311,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Admin Planos e Stripe | 3/3 | Complete   | 2026-03-29 | - |
 | 3. Admin Cursos | 2/3 | In Progress|  | - |
 | 4. Admin Usuários | 1/2 | In Progress|  | - |
-| 5. Admin IA Global | 1/2 | In Progress|  | - |
+| 5. Admin IA Global | 2/2 | Complete   | 2026-03-31 | - |
 | 6. Página de Planos | 2/2 | Complete   | 2026-03-29 | - |
 | 7. Stripe Checkout Session | 2/2 | Complete   | 2026-03-29 | - |
 | 8. Retorno e Confirmação | 2/2 | Complete   | 2026-03-29 | - |
