@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { listMeetings, createMeeting, meetingKeys, type CreateMeetingPayload } from '../../../api/meetings';
+import { listMeetings, createMeeting, deleteMeeting, meetingKeys, type CreateMeetingPayload } from '../../../api/meetings';
 
 const TERMINAL = new Set(['done', 'error']);
 
@@ -26,6 +26,13 @@ export function useMeetings(consultancyId: string) {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (sessionId: string) => deleteMeeting(sessionId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: meetingKeys.byConsultancy(consultancyId) });
+    },
+  });
+
   return {
     sessions,
     isLoading,
@@ -33,5 +40,7 @@ export function useMeetings(consultancyId: string) {
     createSession: createMutation.mutate,
     isCreating: createMutation.isPending,
     createError: createMutation.error,
+    deleteSession: deleteMutation.mutate,
+    isDeleting: deleteMutation.isPending,
   };
 }

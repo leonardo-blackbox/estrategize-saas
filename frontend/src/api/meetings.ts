@@ -40,3 +40,7 @@ export function listMeetings(consultancyId: string): Promise<{ sessions: Meeting
 export function createMeeting(payload: CreateMeetingPayload): Promise<{ session: MeetingSession }> {
   return client.post('/api/meetings', { json: payload }).json();
 }
+
+export function deleteMeeting(sessionId: string): Promise<void> {
+  return client.delete(`/api/meetings/${sessionId}`).then(() => undefined);
+}

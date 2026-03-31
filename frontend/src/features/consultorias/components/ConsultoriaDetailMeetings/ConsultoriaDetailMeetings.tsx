@@ -11,7 +11,7 @@ interface ConsultoriaDetailMeetingsProps {
 
 export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMeetingsProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const { sessions, isLoading, error, createSession, isCreating, createError } = useMeetings(consultancyId);
+  const { sessions, isLoading, error, createSession, isCreating, createError, deleteSession } = useMeetings(consultancyId);
 
   // Fechar modal quando a mutation concluir sem erro
   const prevCreating = useRef(false);
@@ -73,7 +73,7 @@ export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMe
       ) : (
         <div className="space-y-3">
           {sessions.map((s) => (
-            <BotSessionCard key={s.id} session={s} />
+            <BotSessionCard key={s.id} session={s} onDelete={() => deleteSession(s.id)} />
           ))}
         </div>
       )}
