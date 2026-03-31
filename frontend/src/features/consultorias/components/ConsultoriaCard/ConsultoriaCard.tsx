@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../../../lib/cn.ts';
-import { staggerItem } from '../../../../lib/motion.ts';
 import { phaseConfig, type Consultancy } from '../../services/consultorias.api.ts';
 import { initials, relativeFuture } from '../../consultorias.helpers.ts';
 import { PhaseBadge } from '../PhaseBadge';
@@ -22,7 +21,10 @@ export function ConsultoriaCard({ consultancy: c, onArchive, onDelete, onUnarchi
   const isArchived = c.status === 'archived';
 
   return (
-    <motion.div variants={staggerItem} layout
+    <motion.div layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => navigate('/consultorias/' + c.id)}
