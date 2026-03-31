@@ -171,33 +171,40 @@ router.post('/', async (req: Request, res: Response) => {
     }
 
     const terminalStatuses = ['done', 'error'];
-    if (terminalStatuses.includes(session.status as string)) {
+    // Allow bot.done to pass through even if status is already done
+    // so the API transcript fallback has a chance to run
+    const isAlreadyTerminal = terminalStatuses.includes(session.status as string);
+    if (isAlreadyTerminal && internalStatus !== 'done') {
       console.log(`[recall-webhook] Session ${session.id} already terminal — ignoring ${event}`);
       return res.json({ ok: true });
     }
 
-    const updates: Record<string, unknown> = { status: internalStatus };
+    if (!isAlreadyTerminal) {
+      const updates: Record<string, unknown> = { status: internalStatus };
 
-    if (internalStatus === 'in_call' && !session.started_at) {
-      updates['started_at'] = new Date().toISOString();
+      if (internalStatus === 'in_call' && !session.started_at) {
+        updates['started_at'] = new Date().toISOString();
+      }
+
+      if (internalStatus === 'done' || internalStatus === 'error') {
+        updates['ended_at'] = new Date().toISOString();
+      }
+
+      const { error: updateError } = await supabaseAdmin
+        .from('meeting_sessions')
+        .update(updates)
+        .eq('id', session.id)
+        .not('status', 'in', '("done","error")');
+
+      if (updateError) {
+        console.error('[recall-webhook] Failed to update session status:', updateError.message);
+        return res.status(500).json({ error: 'Failed to update session' });
+      }
+
+      console.log(`[recall-webhook] Session ${session.id} → ${internalStatus} (${event})`);
+    } else {
+      console.log(`[recall-webhook] Session ${session.id} already terminal, running bot.done pipeline anyway`);
     }
-
-    if (internalStatus === 'done' || internalStatus === 'error') {
-      updates['ended_at'] = new Date().toISOString();
-    }
-
-    const { error: updateError } = await supabaseAdmin
-      .from('meeting_sessions')
-      .update(updates)
-      .eq('id', session.id)
-      .not('status', 'in', '("done","error")');
-
-    if (updateError) {
-      console.error('[recall-webhook] Failed to update session status:', updateError.message);
-      return res.status(500).json({ error: 'Failed to update session' });
-    }
-
-    console.log(`[recall-webhook] Session ${session.id} → ${internalStatus} (${event})`);
 
     // On bot.call_ended → processing: trigger pipeline (will use real-time segments if they exist)
     if (internalStatus === 'processing') {

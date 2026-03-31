@@ -165,8 +165,7 @@ export async function processTranscript(sessionId: string): Promise<void> {
     }
 
     if (!segments || segments.length === 0) {
-      console.warn(`[transcriptService] No transcript segments for session ${sessionId} — marking done`);
-      await db.from('meeting_sessions').update({ status: 'done' }).eq('id', sessionId);
+      console.warn(`[transcriptService] No transcript segments for session ${sessionId} — leaving as processing for bot.done fallback`);
       return;
     }
 
