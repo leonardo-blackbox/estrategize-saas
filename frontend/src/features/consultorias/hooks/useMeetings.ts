@@ -42,5 +42,6 @@ export function useMeetings(consultancyId: string) {
     createError: createMutation.error,
     deleteSession: deleteMutation.mutate,
     isDeleting: deleteMutation.isPending,
+    deleteError: deleteMutation.error,
   };
 }

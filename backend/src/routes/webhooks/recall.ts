@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import crypto from 'crypto';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { processTranscript } from '../../services/transcriptService.js';
+import { fetchBotTranscript } from '../../services/recallService.js';
 
 const router = Router();
 
@@ -198,11 +199,56 @@ router.post('/', async (req: Request, res: Response) => {
 
     console.log(`[recall-webhook] Session ${session.id} → ${internalStatus} (${event})`);
 
-    // Fire-and-forget: trigger AI pipeline when call ends and media is ready
+    // On bot.call_ended → processing: trigger pipeline (will use real-time segments if they exist)
     if (internalStatus === 'processing') {
       processTranscript(session.id).catch((err) => {
         console.error('[recall-webhook] processTranscript failed:', err);
       });
+    }
+
+    // On bot.done: also trigger pipeline as fallback.
+    // If no real-time transcript.data events arrived (RECALL_WEBHOOK_URL not configured),
+    // fetchBotTranscript pulls the complete transcript from Recall.ai API and stores it
+    // before processTranscript runs.
+    if (internalStatus === 'done') {
+      const sessionId = session.id as string;
+      ;(async () => {
+        try {
+          const { count } = await supabaseAdmin
+            .from('meeting_transcripts')
+            .select('*', { count: 'exact', head: true })
+            .eq('session_id', sessionId);
+
+          if (!count || count === 0) {
+            console.log(`[recall-webhook] No real-time transcripts for ${sessionId} — fetching from API`);
+            const segments = await fetchBotTranscript(botId);
+
+            if (segments.length > 0) {
+              const rows = segments.map((seg) => ({
+                session_id: sessionId,
+                speaker: seg.speaker,
+                words: seg.words,
+                raw_text: seg.raw_text,
+                timestamp: new Date().toISOString(),
+              }));
+              const { error: insertErr } = await supabaseAdmin
+                .from('meeting_transcripts')
+                .insert(rows);
+              if (insertErr) {
+                console.error('[recall-webhook] Failed to insert API transcript:', insertErr.message);
+              } else {
+                console.log(`[recall-webhook] Stored ${rows.length} transcript segment(s) from API for ${sessionId}`);
+              }
+            } else {
+              console.warn(`[recall-webhook] Recall.ai API returned empty transcript for ${sessionId}`);
+            }
+          }
+
+          await processTranscript(sessionId);
+        } catch (err) {
+          console.error('[recall-webhook] bot.done pipeline failed:', err);
+        }
+      })();
     }
 
     return res.json({ ok: true });

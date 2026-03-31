@@ -94,27 +94,15 @@ router.delete('/:id', async (req: AuthenticatedRequest, res) => {
   const { id } = req.params;
   const userId = req.userId as string;
 
-  // Only allow deleting own sessions
-  const { data: session, error: fetchError } = await supabaseAdmin!
+  // Delete only own session — meeting_transcripts cascade automatically (FK ON DELETE CASCADE)
+  const { error: deleteError, count } = await supabaseAdmin!
     .from('meeting_sessions')
-    .select('id, user_id')
-    .eq('id', id)
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  if (fetchError) return res.status(500).json({ error: fetchError.message });
-  if (!session) return res.status(404).json({ error: 'Session not found' });
-
-  // Delete transcripts first (FK), then session
-  await supabaseAdmin!.from('meeting_transcripts').delete().eq('session_id', id);
-
-  const { error: deleteError } = await supabaseAdmin!
-    .from('meeting_sessions')
-    .delete()
+    .delete({ count: 'exact' })
     .eq('id', id)
     .eq('user_id', userId);
 
   if (deleteError) return res.status(500).json({ error: deleteError.message });
+  if (!count || count === 0) return res.status(404).json({ error: 'Session not found' });
 
   return res.status(204).send();
 });

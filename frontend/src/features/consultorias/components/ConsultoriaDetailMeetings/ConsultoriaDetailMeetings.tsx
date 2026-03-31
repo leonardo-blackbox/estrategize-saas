@@ -11,7 +11,7 @@ interface ConsultoriaDetailMeetingsProps {
 
 export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMeetingsProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const { sessions, isLoading, error, createSession, isCreating, createError, deleteSession } = useMeetings(consultancyId);
+  const { sessions, isLoading, error, createSession, isCreating, createError, deleteSession, deleteError } = useMeetings(consultancyId);
 
   // Fechar modal quando a mutation concluir sem erro
   const prevCreating = useRef(false);
@@ -76,6 +76,12 @@ export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMe
             <BotSessionCard key={s.id} session={s} onDelete={() => deleteSession(s.id)} />
           ))}
         </div>
+      )}
+
+      {deleteError && (
+        <p className="text-xs text-red-400 text-center">
+          Erro ao excluir: {(deleteError as Error).message}
+        </p>
       )}
 
       <NewMeetingModal
