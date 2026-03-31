@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { z } from 'zod';
 import multer from 'multer';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
@@ -9,6 +10,7 @@ import {
   generateEmbeddings,
   deleteDocument,
   getDocumentsByScope,
+  testQuery,
 } from '../../services/knowledgeService.js';
 
 // ─── Constants ───────────────────────────────────────────────────
@@ -157,12 +159,15 @@ router.post('/', (req, res, next) => {
 });
 
 // DELETE /:id — remove document and its chunks (CASCADE)
+const idSchema = z.object({ id: z.string().uuid() });
+
 router.delete('/:id', async (req: AuthenticatedRequest, res) => {
-  const id = req.params['id'];
-  if (!id || typeof id !== 'string') {
-    return res.status(400).json({ error: 'Document ID is required' });
+  const parsed = idSchema.safeParse(req.params);
+  if (!parsed.success) {
+    return res.status(400).json({ error: 'Invalid document ID — must be a valid UUID.' });
   }
 
+  const { id } = parsed.data;
   const userId = req.userId as string;
 
   try {
@@ -171,6 +176,26 @@ router.delete('/:id', async (req: AuthenticatedRequest, res) => {
       return res.status(404).json({ error: 'Document not found or access denied' });
     }
     res.status(204).send();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ error: message });
+  }
+});
+
+// POST /test — run a RAG test query against global knowledge
+const testQuerySchema = z.object({
+  query: z.string().min(1).max(500),
+});
+
+router.post('/test', async (req, res) => {
+  const parsed = testQuerySchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  try {
+    const result = await testQuery(parsed.data.query, 'global');
+    res.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     res.status(500).json({ error: message });

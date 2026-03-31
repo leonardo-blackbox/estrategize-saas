@@ -6,6 +6,7 @@ const pdfParse = require('pdf-parse') as (buffer: Buffer) => Promise<{ text: str
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { generateEmbeddings } from './embeddingService.js';
 export { generateEmbeddings };
+import OpenAI from 'openai';
 
 // ============================================================================
 // Constants
@@ -293,4 +294,74 @@ export async function getDocumentsByScope(params: {
   }
 
   return (data ?? []) as KnowledgeDocument[];
+}
+
+// ============================================================================
+// testQuery
+// ============================================================================
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+/**
+ * Run a RAG test query against the knowledge base.
+ * Retrieves relevant chunks for the given scope and generates an answer using GPT-4.
+ */
+export async function testQuery(
+  query: string,
+  scope: 'global' | 'consultancy',
+  consultancyId?: string,
+): Promise<{ answer: string; sources: string[] }> {
+  const db = ensureAdmin();
+
+  // 1. Embed the query
+  const embeddings = await generateEmbeddings([query]);
+  const vector = embeddings[0];
+  if (!vector || vector.length === 0) {
+    return { answer: 'Embedding generation failed.', sources: [] };
+  }
+  const vectorString = '[' + vector.join(',') + ']';
+
+  // 2. Retrieve matching chunks
+  const { data, error } = await db.rpc('match_knowledge_chunks', {
+    query_embedding: vectorString,
+    match_threshold: 0.5,
+    match_count: 5,
+    filter_scope: scope,
+    filter_consultancy_id: consultancyId ?? null,
+  });
+
+  if (error) {
+    throw new Error(`RAG retrieval failed: ${error.message}`);
+  }
+
+  const chunks = (data as Array<{ content: string; metadata: { document_name?: string } }>) ?? [];
+  const sources = Array.from(
+    new Set(chunks.map((c) => c.metadata?.document_name ?? 'unknown').filter(Boolean)),
+  );
+
+  if (chunks.length === 0) {
+    return { answer: 'Nenhum trecho relevante encontrado para esta consulta.', sources: [] };
+  }
+
+  // 3. Build context and generate answer
+  const context = chunks.map((c, i) => `[${i + 1}] ${c.content}`).join('\n\n');
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content:
+          'Você é um assistente especializado. Responda à pergunta usando APENAS o contexto fornecido. Se não encontrar a informação no contexto, diga isso claramente.',
+      },
+      {
+        role: 'user',
+        content: `Contexto:\n${context}\n\nPergunta: ${query}`,
+      },
+    ],
+    temperature: 0.2,
+    max_tokens: 500,
+  });
+
+  const answer = completion.choices[0]?.message?.content ?? 'Sem resposta gerada.';
+  return { answer, sources };
 }
