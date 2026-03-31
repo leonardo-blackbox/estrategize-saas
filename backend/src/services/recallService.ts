@@ -23,7 +23,6 @@ export async function createBot(params: CreateBotParams): Promise<RecallBot> {
     body: JSON.stringify({
       meeting_url: params.meetingUrl,
       bot_name: params.botName ?? 'Iris AI Notetaker',
-      transcription_options: { provider: 'assembly_ai' },
     }),
   });
 

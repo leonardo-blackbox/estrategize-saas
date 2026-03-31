@@ -32,8 +32,10 @@ router.post('/', async (req: AuthenticatedRequest, res) => {
   let bot;
   try {
     bot = await createBot({ meetingUrl: meeting_url, botName: 'Iris AI Notetaker' });
-  } catch {
-    return res.status(502).json({ error: 'Failed to create meeting bot' });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[meetings] createBot failed:', msg);
+    return res.status(502).json({ error: 'Failed to create meeting bot', detail: msg });
   }
 
   const { data: session, error } = await supabaseAdmin!
