@@ -9,7 +9,8 @@ import {
   type Diagnosis,
 } from '../services/consultorias.api.ts';
 import { listMeetings, meetingKeys, type MeetingSession } from '../../../api/meetings.ts';
-import type { TabKey } from '../consultorias.detail.types.ts';
+import { fetchConsultancyPlugins, pluginKeys } from '../../../api/plugins.ts';
+import { BASE_TABS, PLUGIN_TAB_MAP, type TabKey, type TabDef } from '../consultorias.detail.types.ts';
 
 export function useConsultoriaDetail() {
   const { id } = useParams<{ id: string }>();
@@ -45,6 +46,13 @@ export function useConsultoriaDetail() {
     staleTime: 60_000,
   });
 
+  const { data: pluginsData } = useQuery({
+    queryKey: pluginKeys.byConsultancy(id!),
+    queryFn: () => fetchConsultancyPlugins(id!),
+    enabled: !!id,
+    staleTime: 30_000,
+  });
+
   const generateDiagnosisMutation = useMutation({
     mutationFn: () =>
       client.post(`/api/consultancies/${id}/diagnose`).json<{ data: Diagnosis }>(),
@@ -60,6 +68,13 @@ export function useConsultoriaDetail() {
     .filter((s) => s.status === 'done' && s.summary)
     .slice(0, 3);
 
+  const installedPluginSlugs = (pluginsData ?? []).map((p) => p.plugin_slug);
+  const pluginTabs: TabDef[] = installedPluginSlugs
+    .map((slug) => PLUGIN_TAB_MAP[slug])
+    .filter((tab): tab is TabDef => !!tab);
+  const tabs: TabDef[] = [...BASE_TABS, ...pluginTabs];
+  const hasMeetingsPlugin = installedPluginSlugs.includes('transcricao-reuniao');
+
   return {
     id,
     navigate,
@@ -72,5 +87,7 @@ export function useConsultoriaDetail() {
     aiContextLoading,
     recentMeetings,
     generateDiagnosis: () => generateDiagnosisMutation.mutate(),
+    tabs,
+    hasMeetingsPlugin,
   };
 }

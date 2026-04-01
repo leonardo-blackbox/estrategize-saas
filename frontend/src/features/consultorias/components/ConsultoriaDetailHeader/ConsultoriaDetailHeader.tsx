@@ -11,9 +11,16 @@ interface ConsultoriaDetailHeaderProps {
   onEditClick: () => void;
   onGenerateDiagnosis: () => void;
   onNewMeeting: () => void;
+  hasMeetingsPlugin: boolean;
 }
 
-export function ConsultoriaDetailHeader({ consultancy, onEditClick, onGenerateDiagnosis, onNewMeeting }: ConsultoriaDetailHeaderProps) {
+export function ConsultoriaDetailHeader({
+  consultancy,
+  onEditClick,
+  onGenerateDiagnosis,
+  onNewMeeting,
+  hasMeetingsPlugin,
+}: ConsultoriaDetailHeaderProps) {
   const [summaryExpanded, setSummaryExpanded] = useState(false);
   const phase = consultancy.phase;
   const phaseCfg = phase ? phaseConfig[phase] : null;
@@ -71,7 +78,9 @@ export function ConsultoriaDetailHeader({ consultancy, onEditClick, onGenerateDi
           <Button variant="secondary" size="sm" onClick={onEditClick}>Editar Dados</Button>
           <Button variant="gradient" size="sm" onClick={onGenerateDiagnosis}
             style={{ background: 'var(--consulting-ai-gradient, linear-gradient(135deg, #7c5cfc, #b04aff))' }}>✦ Gerar Diagnóstico</Button>
-          <Button variant="secondary" size="sm" onClick={onNewMeeting}>+ Nova Reunião</Button>
+          <Button variant="secondary" size="sm" onClick={onNewMeeting}>
+            {hasMeetingsPlugin ? '+ Nova Reunião' : '🎙️ Reuniões'}
+          </Button>
         </div>
       </div>
     </div>

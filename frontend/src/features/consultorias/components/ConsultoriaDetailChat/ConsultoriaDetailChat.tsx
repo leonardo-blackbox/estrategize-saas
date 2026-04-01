@@ -70,7 +70,9 @@ export function ConsultoriaDetailChat({ consultancyId, clientName }: Consultoria
             style={{ background: 'var(--consulting-iris, #7c5cfc)' }}>↑</Button>
         </div>
       </div>
-      <ConsultoriaDetailMemory consultancyId={consultancyId} />
+      <div className="shrink-0 w-full lg:w-[280px]">
+        <ConsultoriaDetailMemory consultancyId={consultancyId} />
+      </div>
     </div>
   );
 }

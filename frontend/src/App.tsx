@@ -23,6 +23,7 @@ import { FerramentasPage } from './pages/member/FerramentasPage.tsx';
 import { ConsultoriasPage } from './pages/member/ConsultoriasPage.tsx';
 import { ConsultoriaDetailPage } from './pages/member/ConsultoriaDetailPage.tsx';
 import { ContaPage } from './pages/member/ContaPage.tsx';
+import { ReunioesPage } from './pages/member/ReunioesPage.tsx';
 import { CreditosPage } from './pages/member/CreditosPage.tsx';
 import { CoursePage } from './pages/member/CoursePage.tsx';
 import { LessonPage } from './pages/member/LessonPage.tsx';
@@ -89,6 +90,7 @@ export default function App() {
           <Route path="/formacao/aula/:lessonId" element={<LessonPage />} />
           <Route path="/ferramentas" element={<FerramentasPage />} />
           <Route path="/aplicacoes" element={<AplicacoesPage />} />
+          <Route path="/reunioes" element={<ReunioesPage />} />
           <Route path="/consultorias" element={<ConsultoriasPage />} />
           <Route path="/consultorias/:id" element={<ConsultoriaDetailPage />} />
           <Route path="/conta" element={<ContaPage />} />

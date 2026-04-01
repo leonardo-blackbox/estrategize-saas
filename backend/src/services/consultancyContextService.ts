@@ -62,6 +62,7 @@ export async function buildFullContext(
     profileRes,
     stagesRes,
     meetingsRes,
+    botSessionsRes,
     actionItemsRes,
     deliverablesRes,
     memoriesRes,
@@ -71,6 +72,7 @@ export async function buildFullContext(
     db.from('consultancy_profiles').select('*').eq('consultancy_id', consultancyId).eq('user_id', userId).single(),
     db.from('consultancy_stages').select('*').eq('consultancy_id', consultancyId).eq('user_id', userId).order('order_index', { ascending: true }),
     db.from('consultancy_meetings').select('title,summary,scheduled_at,status').eq('consultancy_id', consultancyId).eq('user_id', userId).eq('status', 'completed').order('scheduled_at', { ascending: false }).limit(5),
+    db.from('meeting_sessions').select('summary,formatted_transcript,started_at,created_at').eq('consultancy_id', consultancyId).eq('user_id', userId).eq('status', 'done').not('summary', 'is', null).order('created_at', { ascending: false }).limit(5),
     db.from('consultancy_action_items').select('title,priority').eq('consultancy_id', consultancyId).eq('user_id', userId).neq('status', 'done').neq('status', 'cancelled'),
     db.from('consultancy_deliverables').select('type,title,status').eq('consultancy_id', consultancyId).eq('user_id', userId).order('created_at', { ascending: false }),
     db.from('consultancy_ai_memory').select('memory_type,content,importance').eq('consultancy_id', consultancyId).eq('user_id', userId).eq('is_active', true).gte('importance', 4),
@@ -81,6 +83,7 @@ export async function buildFullContext(
   const p = profileRes.data as Record<string, unknown> | null;
   const stages = (stagesRes.data ?? []) as Array<{ name: string; status: string }>;
   const meetings = (meetingsRes.data ?? []) as Array<{ title: string; summary: string | null }>;
+  const botSessions = (botSessionsRes.data ?? []) as Array<{ summary: string | null; started_at: string | null; created_at: string }>;
   const actionItems = (actionItemsRes.data ?? []) as Array<{ title: string; priority: string }>;
   const deliverables = (deliverablesRes.data ?? []) as Array<{ type: string; title: string; status: string }>;
   const memories = (memoriesRes.data ?? []) as Array<{ memory_type: string; content: string; importance: number }>;
@@ -112,9 +115,13 @@ export async function buildFullContext(
     current_stage_name: currentStage?.name ?? null,
     implementation_score: (c?.implementation_score as number) ?? 0,
     open_action_items_count: actionItems.length,
-    recent_meeting_summaries: meetings
-      .filter((m) => m.summary)
-      .map((m) => `[${m.title}]: ${m.summary}`),
+    recent_meeting_summaries: [
+      ...meetings.filter((m) => m.summary).map((m) => `[${m.title}]: ${m.summary}`),
+      ...botSessions.filter((s) => s.summary).map((s) => {
+        const date = new Date(s.started_at ?? s.created_at).toLocaleDateString('pt-BR');
+        return `[Reunião transcrita em ${date}]: ${s.summary}`;
+      }),
+    ].slice(0, 5),
     deliverables_summary: deliverables.map((d) => `${d.title} (${d.type}, ${d.status})`),
     critical_memories: memories.map((m) => ({ type: m.memory_type, content: m.content })),
   };

@@ -27,14 +27,18 @@ export interface CreateMeetingPayload {
 // ─── React Query Keys ─────────────────────────────────────────────
 
 export const meetingKeys = {
-  all: ['meetings'] as const,
-  byConsultancy: (consultancyId: string) => [...meetingKeys.all, consultancyId] as const,
+  all: ['meetings', 'all'] as const,
+  byConsultancy: (consultancyId: string) => ['meetings', consultancyId] as const,
 };
 
 // ─── API Functions ────────────────────────────────────────────────
 
 export function listMeetings(consultancyId: string): Promise<{ sessions: MeetingSession[] }> {
   return client.get(`/api/meetings?consultancy_id=${consultancyId}`).json();
+}
+
+export async function listAllMeetings(): Promise<{ sessions: MeetingSession[] }> {
+  return client.get('/api/meetings').json<{ sessions: MeetingSession[] }>();
 }
 
 export function createMeeting(payload: CreateMeetingPayload): Promise<{ session: MeetingSession }> {
