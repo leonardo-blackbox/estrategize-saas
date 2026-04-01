@@ -336,7 +336,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 20. Integração Reunião → Consultoria | 2/2 | Complete    | 2026-03-30 | - |
 | 21. Plugin Config Infrastructure | 2/2 | Complete    | 2026-04-01 | - |
 | 22. Knowledge Base por Plugin | 2/2 | Complete    | 2026-04-01 | - |
-| 23. Helena Runtime | 0/0 | Planned    |  | - |
+| 23. Helena Runtime | 0/2 | Planned    |  | - |
 | 24. Helena Frontend | 0/0 | Planned    |  | - |
 | 25. Helena Knowledge | 0/0 | Planned    |  | - |
 
@@ -381,8 +381,11 @@ Plans:
   4. SSE endpoint `GET /api/meetings/:sessionId/helena` entrega eventos em tempo real
 **Plans**: 2 plans
 Plans:
-- [ ] 22-01-PLAN.md — Migration 032 (plugin_slug + match_knowledge_chunks) + knowledgeService plugin methods
-- [ ] 22-02-PLAN.md — Helena knowledge routes on adminPluginsRouter (GET/POST/DELETE)
+- [ ] 23-01-PLAN.md — liveTranscriptBuffer + helenaService + helenaSSE + migration 033
+- [ ] 23-02-PLAN.md — Webhook transcript.partial_data handler + SSE endpoint + app.ts wiring
+
+
+
 
 ### Phase 24: Helena Frontend
 **Goal**: Consultora vê painel Helena discreto durante reunião in_progress e admin configura a Helena em /admin/plugins/helena.
