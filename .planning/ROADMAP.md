@@ -361,7 +361,7 @@ Plans:
 **Depends on**: Phase 21
 **Requirements**: HELENA-B
 **Success Criteria** (what must be TRUE):
-  1. Migration 032 adiciona `plugin_slug` em `knowledge_documents` e `knowledge_chunks`
+  1. Migration 032 adiciona `plugin_slug` em `knowledge_documents`
   2. `match_knowledge_chunks` aceita `filter_plugin_slug` como parâmetro opcional
   3. Upload com `scope='plugin'` e `plugin_slug='helena'` indexa sem afetar scope global
   4. Query RAG com `filter_plugin_slug='helena'` retorna apenas chunks da Helena
