@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 21-02-PLAN.md
-last_updated: "2026-04-01T06:34:20.428Z"
+stopped_at: Completed 22-01-PLAN.md
+last_updated: "2026-04-01T06:46:31.727Z"
 progress:
   total_phases: 25
   completed_phases: 21
-  total_plans: 43
-  completed_plans: 43
+  total_plans: 45
+  completed_plans: 44
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** A IA de cada consultoria responde com a metodologia real da Iris e com o contexto específico do cliente
-**Current focus:** Phase 21 — plugin-config-infrastructure
+**Current focus:** Phase 22 — knowledge-base-por-plugin
 
 ## Current Position
 
-Phase: 21 (plugin-config-infrastructure) — EXECUTING
+Phase: 22 (knowledge-base-por-plugin) — EXECUTING
 Plan: 1 of 2
 
 ## Performance Metrics
@@ -89,6 +89,7 @@ Plan: 1 of 2
 | Phase 05 P02 | 6 | 2 tasks | 5 files |
 | Phase 21 P01 | 2 | 2 tasks | 4 files |
 | Phase 21 P02 | 3 | 2 tasks | 7 files |
+| Phase 22 P01 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -173,6 +174,8 @@ Recent decisions affecting current work:
 - [Phase 21]: plugin_configs scope column as part of unique key enables future per-consultancy config overrides without schema changes
 - [Phase 21]: listAllPlugins (admin) fetches all plugins including inactive; listPlugins (member) filters to active-only
 - [Phase 21]: PluginCard badge pattern: Tailwind /10 opacity variants (emerald/violet for free/premium, emerald/red for active/inactive) consistent with admin badge pattern from Phase 02
+- [Phase 22]: filter_plugin_slug DEFAULT NULL ensures plugin chunks never leak into consultancy/global RAG — ragService.ts needs zero changes
+- [Phase 22]: Three-branch chk_knowledge_scope replaces chk_consultancy_scope — enforces mutual exclusivity of consultancy_id and plugin_slug at DB level
 
 ### Pending Todos
 
@@ -186,6 +189,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T06:30:44.613Z
-Stopped at: Completed 21-02-PLAN.md
+Last session: 2026-04-01T06:46:31.723Z
+Stopped at: Completed 22-01-PLAN.md
 Resume file: None
