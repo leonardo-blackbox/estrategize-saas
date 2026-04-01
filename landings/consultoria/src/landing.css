@@ -909,12 +909,12 @@
     object-position: right bottom;
   }
 
-  /* Gradiente: sólido até 58% para cobrir a borda esquerda da foto (object-fit:contain)
-     em qualquer viewport desktop (769px–2560px). Blend suave de 58% a 85%. */
+  /* Gradiente: sólido até 43% (cobre o content de 48% com margem)
+     depois fade rápido para não cobrir o rosto da Iris. */
   .landing-hero-gradient {
     background:
       linear-gradient(to bottom, rgba(5,5,5,0.15) 0%, transparent 25%, rgba(5,5,5,0.45) 60%, #050505 100%),
-      linear-gradient(to right, #050505 0%, #050505 58%, rgba(5,5,5,0.92) 64%, rgba(5,5,5,0.55) 72%, rgba(5,5,5,0.12) 82%, transparent 90%);
+      linear-gradient(to right, #050505 0%, #050505 43%, rgba(5,5,5,0.75) 52%, rgba(5,5,5,0.28) 62%, rgba(5,5,5,0.05) 68%, transparent 74%);
   }
 
   .landing-hero-content {

@@ -1,29 +1,52 @@
+import { motion } from 'framer-motion';
+
 interface KpiCardProps {
   label: string;
   value: number;
   icon: React.ReactNode;
-  colorVar: string;
-  bgVar: string;
+  gradient: string;
+  glowColor: string;
+  accentColor: string;
 }
 
-export function KpiCard({ label, value, icon, colorVar, bgVar }: KpiCardProps) {
+export function KpiCard({ label, value, icon, gradient, glowColor, accentColor }: KpiCardProps) {
   return (
-    <div
-      className="flex items-center gap-3 rounded-[var(--radius-md)] p-4 border border-[var(--border-hairline)] bg-[var(--bg-surface-1)]"
-      style={{ borderLeftColor: `var(${colorVar})`, borderLeftWidth: 2 }}
+    <motion.div
+      whileHover={{ y: -2, scale: 1.01 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+      className="relative rounded-[var(--radius-md)] p-4 overflow-hidden cursor-default select-none"
+      style={{
+        background: gradient,
+        boxShadow: `0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 32px -4px ${glowColor}`,
+        border: '1px solid rgba(255,255,255,0.07)',
+      }}
     >
+      {/* Shine top edge */}
       <div
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-sm)]"
-        style={{ background: `var(${bgVar})`, color: `var(${colorVar})` }}
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: `linear-gradient(90deg, transparent, ${accentColor}60, transparent)` }}
+      />
+
+      {/* Icon orb */}
+      <div
+        className="absolute top-3 right-3 w-9 h-9 rounded-[var(--radius-sm)] flex items-center justify-center"
+        style={{ background: 'rgba(255,255,255,0.08)', color: accentColor }}
       >
         {icon}
       </div>
-      <div>
-        <p className="text-[22px] font-bold leading-none text-[var(--text-primary)]">{value}</p>
-        <p className="mt-0.5 text-[11px] font-medium text-[var(--text-tertiary)] uppercase tracking-wide">
-          {label}
-        </p>
-      </div>
-    </div>
+
+      {/* Value */}
+      <p
+        className="text-[36px] font-bold leading-none tracking-tight"
+        style={{ color: '#fff', textShadow: `0 0 24px ${accentColor}80` }}
+      >
+        {value}
+      </p>
+
+      {/* Label */}
+      <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.5)' }}>
+        {label}
+      </p>
+    </motion.div>
   );
 }

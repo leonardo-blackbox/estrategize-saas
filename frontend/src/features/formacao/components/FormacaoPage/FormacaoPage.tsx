@@ -4,8 +4,6 @@ import { useFormacao } from '../../hooks/useFormacao';
 import { FormacaoHero } from '../FormacaoHero';
 import { FormacaoSectionBlock } from '../FormacaoSectionBlock';
 import { FormacaoJourney } from '../FormacaoJourney';
-import { FormacaoMaterials } from '../FormacaoMaterials';
-import { FormacaoMaterialModal } from '../FormacaoMaterialModal';
 
 export function FormacaoPage() {
   const prefersReducedMotion = useReducedMotion();
@@ -17,10 +15,6 @@ export function FormacaoPage() {
     sectionsLoading,
     catalogLoading,
     continueLearning,
-    showAllMaterials,
-    setShowAllMaterials,
-    selectedMaterial,
-    setSelectedMaterial,
   } = useFormacao();
 
   const containerVariants = prefersReducedMotion
@@ -68,18 +62,7 @@ export function FormacaoPage() {
         )}
 
         <FormacaoJourney />
-
-        <FormacaoMaterials
-          showAll={showAllMaterials}
-          onToggleShowAll={() => setShowAllMaterials(!showAllMaterials)}
-          onSelectMaterial={setSelectedMaterial}
-        />
       </motion.div>
-
-      <FormacaoMaterialModal
-        material={selectedMaterial}
-        onClose={() => setSelectedMaterial(null)}
-      />
     </>
   );
 }
