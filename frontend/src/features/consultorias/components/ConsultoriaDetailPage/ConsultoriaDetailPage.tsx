@@ -18,6 +18,7 @@ import { ConsultoriaDetailChat } from '../ConsultoriaDetailChat';
 import { ConsultoriaDocumentos } from '../ConsultoriaDocumentos';
 import { ConsultoriaDetailMemory } from '../ConsultoriaDetailMemory';
 import { PluginInstallerModal } from '../PluginInstallerModal';
+import { ConsultoriaDetailHelena } from '../ConsultoriaDetailHelena/ConsultoriaDetailHelena';
 
 export function ConsultoriaDetailPage() {
   const [showPluginInstaller, setShowPluginInstaller] = useState(false);
@@ -95,6 +96,7 @@ export function ConsultoriaDetailPage() {
               {activeTab === 'deliverables' && id && <ConsultoriaDetailDeliverables consultancyId={id} />}
               {activeTab === 'memory' && id && <ConsultoriaDetailMemory consultancyId={id} />}
               {activeTab === 'dados' && <ConsultoriaDetailDados />}
+              {activeTab === 'helena' && id && <ConsultoriaDetailHelena consultancyId={id} />}
             </motion.div>
           </AnimatePresence>
         </motion.div>

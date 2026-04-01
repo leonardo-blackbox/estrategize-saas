@@ -10,7 +10,7 @@ export type BaseTabKey =
   | 'memory'
   | 'dados';
 
-export type PluginTabKey = 'meetings';
+export type PluginTabKey = 'meetings' | 'helena';
 
 export type TabKey = BaseTabKey | PluginTabKey;
 
@@ -34,6 +34,7 @@ export const BASE_TABS: TabDef[] = [
 // Tabs added by plugins (slug → tab definition)
 export const PLUGIN_TAB_MAP: Record<string, TabDef> = {
   'transcricao-reuniao': { key: 'meetings', label: 'Reuniões' },
+  'helena':              { key: 'helena',   label: 'Helena' },
 };
 
 // Legacy TABS export for backwards compat (used by old imports if any)
