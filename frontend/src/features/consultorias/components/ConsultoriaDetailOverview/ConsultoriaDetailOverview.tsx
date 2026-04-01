@@ -3,6 +3,7 @@ import { formatDate, formatDateTime } from '../../consultorias.detail.helpers.ts
 import type { Consultancy, InsightCards } from '../../services/consultorias.api.ts';
 import type { TabKey } from '../../consultorias.detail.types.ts';
 import type { MeetingSession } from '../../../../api/meetings.ts';
+import { ConsultoriaDetailInstagram } from '../ConsultoriaDetailInstagram/index.ts';
 
 interface ConsultoriaDetailOverviewProps {
   consultancy: Consultancy; insights: InsightCards | null;
@@ -65,6 +66,7 @@ export function ConsultoriaDetailOverview({ consultancy, insights, recentMeeting
           ))}
         </div>
       )}
+      <ConsultoriaDetailInstagram consultancyId={consultancy.id} instagram={consultancy.instagram ?? null} />
       {consultancy.real_bottleneck && (<div className={C} style={{ borderLeft: '4px solid var(--insight-bottleneck-border, #ff6b35)' }}><div className={L}>Gargalo Real</div><p className="text-sm text-[var(--text-secondary)] leading-relaxed">{consultancy.real_bottleneck}</p></div>)}
       <div className={C}>
         <div className={L}>Acesso Rapido</div>

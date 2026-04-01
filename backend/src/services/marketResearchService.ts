@@ -506,7 +506,14 @@ async function runPipeline(researchId: string): Promise<void> {
     // Step 5 — RAG indexing (optional)
     if (config.auto_index_rag && reportMarkdown) {
       try {
-        await indexReportInRAG(researchId, research.consultancy_id, research.user_id, reportMarkdown, config);
+        await indexReportInRAG(
+          researchId,
+          research.consultancy_id,
+          research.user_id,
+          reportMarkdown,
+          config,
+          { competitors: competitors as unknown[], instagramData: instagramResults.map((r) => r.data) },
+        );
       } catch (err) {
         console.error('[market-research] RAG indexing failed (non-fatal):', err instanceof Error ? err.message : err);
       }
@@ -528,6 +535,7 @@ async function indexReportInRAG(
   userId: string,
   reportMarkdown: string,
   config: PesquisaMercadoConfig,
+  rawData?: { competitors: unknown[] | null; instagramData: unknown[] | null },
 ): Promise<void> {
   console.log(`[market-research] Indexing report in RAG for consultancy ${consultancyId}...`);
 
@@ -536,7 +544,10 @@ async function indexReportInRAG(
 
   const date = new Date().toLocaleDateString('pt-BR');
   const fileName = `Pesquisa de Mercado — ${date}`;
-  const fileBuffer = Buffer.from(reportMarkdown, 'utf-8');
+
+  // Truncate to 50k chars to avoid chunk overload
+  const content = reportMarkdown.slice(0, 50_000);
+  const fileBuffer = Buffer.from(content, 'utf-8');
 
   await processDocument({
     userId,
@@ -548,12 +559,35 @@ async function indexReportInRAG(
     fileBuffer,
   });
 
+  // Optionally index raw competitor data as separate document
+  if (config.include_raw_data_in_rag && rawData) {
+    const rawContent = JSON.stringify({
+      competitors: rawData.competitors,
+      instagram: rawData.instagramData,
+    }, null, 2).slice(0, 50_000);
+
+    const rawBuffer = Buffer.from(rawContent, 'utf-8');
+    try {
+      await processDocument({
+        userId,
+        scope: 'consultancy',
+        consultancyId,
+        pluginSlug: 'pesquisa-mercado-raw',
+        fileName: `Dados Brutos — ${date}`,
+        fileType: 'md',
+        fileBuffer: rawBuffer,
+      });
+    } catch (err) {
+      console.warn('[market-research] Raw data RAG index failed (non-fatal):', err instanceof Error ? err.message : err);
+    }
+  }
+
   await ensureDb()
     .from('market_research')
     .update({ rag_indexed: true })
     .eq('id', researchId);
 
-  console.log(`[market-research] RAG indexed for research ${researchId}`);
+  console.log(`[market-research] RAG indexed: document consultancy=${consultancyId}`);
 }
 
 // ============================================================================

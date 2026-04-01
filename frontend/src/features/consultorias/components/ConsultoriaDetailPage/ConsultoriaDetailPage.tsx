@@ -19,6 +19,7 @@ import { ConsultoriaDocumentos } from '../ConsultoriaDocumentos';
 import { ConsultoriaDetailMemory } from '../ConsultoriaDetailMemory';
 import { PluginInstallerModal } from '../PluginInstallerModal';
 import { ConsultoriaDetailHelena } from '../ConsultoriaDetailHelena/ConsultoriaDetailHelena';
+import { ConsultoriaDetailPesquisa } from '../ConsultoriaDetailPesquisa/index.ts';
 
 export function ConsultoriaDetailPage() {
   const [showPluginInstaller, setShowPluginInstaller] = useState(false);
@@ -97,6 +98,7 @@ export function ConsultoriaDetailPage() {
               {activeTab === 'memory' && id && <ConsultoriaDetailMemory consultancyId={id} />}
               {activeTab === 'dados' && <ConsultoriaDetailDados />}
               {activeTab === 'helena' && id && <ConsultoriaDetailHelena consultancyId={id} />}
+              {activeTab === 'pesquisa' && id && <ConsultoriaDetailPesquisa consultancyId={id} />}
             </motion.div>
           </AnimatePresence>
         </motion.div>
