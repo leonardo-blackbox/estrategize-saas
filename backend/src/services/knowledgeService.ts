@@ -20,8 +20,9 @@ const AVG_CHARS_PER_TOKEN = 4;     // rough approximation for splitting
 
 export interface ProcessDocumentParams {
   userId: string;
-  scope: 'global' | 'consultancy';
+  scope: 'global' | 'consultancy' | 'plugin';
   consultancyId?: string;
+  pluginSlug?: string;
   fileName: string;
   fileType: 'pdf' | 'txt' | 'md';
   fileBuffer: Buffer;
@@ -38,6 +39,7 @@ interface KnowledgeDocument {
   user_id: string;
   scope: string;
   consultancy_id: string | null;
+  plugin_slug: string | null;
   name: string;
   file_type: string;
   file_size_bytes: number;
@@ -150,6 +152,7 @@ export async function processDocument(
       user_id: params.userId,
       scope: params.scope,
       consultancy_id: params.consultancyId ?? null,
+      plugin_slug: params.pluginSlug ?? null,
       name: params.fileName,
       file_type: params.fileType,
       file_size_bytes: params.fileBuffer.length,
@@ -188,6 +191,7 @@ export async function processDocument(
       metadata: {
         scope: params.scope,
         consultancy_id: params.consultancyId ?? null,
+        plugin_slug: params.pluginSlug ?? null,
         document_name: params.fileName,
       },
     }));
@@ -266,8 +270,9 @@ export async function deleteDocument(
 // ============================================================================
 
 export async function getDocumentsByScope(params: {
-  scope: 'global' | 'consultancy';
+  scope: 'global' | 'consultancy' | 'plugin';
   consultancyId?: string;
+  pluginSlug?: string;
   userId?: string;
 }): Promise<KnowledgeDocument[]> {
   const db = ensureAdmin();
@@ -280,6 +285,10 @@ export async function getDocumentsByScope(params: {
 
   if (params.consultancyId) {
     query = query.eq('consultancy_id', params.consultancyId);
+  }
+
+  if (params.pluginSlug) {
+    query = query.eq('plugin_slug', params.pluginSlug);
   }
 
   if (params.userId) {
@@ -307,7 +316,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? 'missing' });
  */
 export async function testQuery(
   query: string,
-  scope: 'global' | 'consultancy',
+  scope: 'global' | 'consultancy' | 'plugin',
   consultancyId?: string,
 ): Promise<{ answer: string; sources: string[] }> {
   const db = ensureAdmin();
@@ -351,6 +360,111 @@ export async function testQuery(
         role: 'system',
         content:
           'Você é um assistente especializado. Responda à pergunta usando APENAS o contexto fornecido. Se não encontrar a informação no contexto, diga isso claramente.',
+      },
+      {
+        role: 'user',
+        content: `Contexto:\n${context}\n\nPergunta: ${query}`,
+      },
+    ],
+    temperature: 0.2,
+    max_tokens: 500,
+  });
+
+  const answer = completion.choices[0]?.message?.content ?? 'Sem resposta gerada.';
+  return { answer, sources };
+}
+
+// ============================================================================
+// listPluginDocuments
+// ============================================================================
+
+export async function listPluginDocuments(pluginSlug: string): Promise<KnowledgeDocument[]> {
+  const db = ensureAdmin();
+  const { data, error } = await db
+    .from('knowledge_documents')
+    .select('*')
+    .eq('scope', 'plugin')
+    .eq('plugin_slug', pluginSlug)
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(`Failed to list plugin documents: ${error.message}`);
+  return (data ?? []) as KnowledgeDocument[];
+}
+
+// ============================================================================
+// deletePluginDocument
+// ============================================================================
+
+export async function deletePluginDocument(
+  documentId: string,
+  pluginSlug: string,
+): Promise<boolean> {
+  const db = ensureAdmin();
+
+  const { data: doc, error: fetchError } = await db
+    .from('knowledge_documents')
+    .select('id')
+    .eq('id', documentId)
+    .eq('scope', 'plugin')
+    .eq('plugin_slug', pluginSlug)
+    .single();
+
+  if (fetchError || !doc) return false;
+
+  const { error: deleteError } = await db
+    .from('knowledge_documents')
+    .delete()
+    .eq('id', documentId);
+
+  if (deleteError) throw new Error(`Failed to delete plugin document: ${deleteError.message}`);
+  return true;
+}
+
+// ============================================================================
+// queryPluginKnowledge
+// ============================================================================
+
+export async function queryPluginKnowledge(
+  query: string,
+  pluginSlug: string,
+): Promise<{ answer: string; sources: string[] }> {
+  const db = ensureAdmin();
+
+  const embeddings = await generateEmbeddings([query]);
+  const vector = embeddings[0];
+  if (!vector || vector.length === 0) {
+    return { answer: 'Embedding generation failed.', sources: [] };
+  }
+  const vectorString = '[' + vector.join(',') + ']';
+
+  const { data, error } = await db.rpc('match_knowledge_chunks', {
+    query_embedding: vectorString,
+    match_threshold: 0.5,
+    match_count: 5,
+    filter_scope: 'plugin',
+    filter_plugin_slug: pluginSlug,
+  });
+
+  if (error) throw new Error(`Plugin RAG retrieval failed: ${error.message}`);
+
+  const chunks =
+    (data as Array<{ content: string; metadata: { document_name?: string } }>) ?? [];
+  const sources = Array.from(
+    new Set(chunks.map((c) => c.metadata?.document_name ?? 'unknown').filter(Boolean)),
+  );
+
+  if (chunks.length === 0) {
+    return { answer: 'Nenhum trecho relevante encontrado para esta consulta.', sources: [] };
+  }
+
+  const context = chunks.map((c, i) => `[${i + 1}] ${c.content}`).join('\n\n');
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content:
+          'Voce e um assistente especializado. Responda a pergunta usando APENAS o contexto fornecido. Se nao encontrar a informacao no contexto, diga isso claramente.',
       },
       {
         role: 'user',
