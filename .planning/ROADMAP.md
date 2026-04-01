@@ -398,8 +398,8 @@ Plans:
   4. Página `/admin/plugins/helena` permite upload de conhecimento da Helena, configuração de janelas e teste
 **Plans**: 2 plans
 Plans:
-- [ ] 22-01-PLAN.md — Migration 032 (plugin_slug + match_knowledge_chunks) + knowledgeService plugin methods
-- [ ] 22-02-PLAN.md — Helena knowledge routes on adminPluginsRouter (GET/POST/DELETE)
+- [ ] 24-01-PLAN.md — useHelenaSSE hook + HelenaCard + HelenaObjecaoCard + HelenaPanel aggregator
+- [ ] 24-02-PLAN.md — AdminHelenaPage (4 sections) + adminHelena API client + App.tsx route wiring
 
 ### Phase 25: Helena Knowledge
 **Goal**: Base de conhecimento comercial da Helena indexada — 6 documentos cobrindo objeções, perfis, técnicas de fechamento e linguagem de compra/fuga.
