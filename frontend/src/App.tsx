@@ -56,6 +56,7 @@ import { AdminHomePage } from './pages/admin/AdminHomePage.tsx';
 import { AdminPlanosPage } from './pages/admin/AdminPlanosPage.tsx';
 import { AdminIAPage } from './pages/admin/AdminIAPage.tsx';
 import { AdminConfigPage } from './pages/admin/AdminConfigPage.tsx';
+import { AdminPluginsPage } from './pages/admin/AdminPluginsPage.tsx';
 
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
@@ -136,6 +137,7 @@ export default function App() {
           <Route path="/admin/home" element={<AdminHomePage />} />
           <Route path="/admin/planos" element={<AdminPlanosPage />} />
           <Route path="/admin/ia" element={<AdminIAPage />} />
+          <Route path="/admin/plugins" element={<AdminPluginsPage />} />
           <Route path="/admin/config" element={<AdminConfigPage />} />
         </Route>
 

@@ -82,6 +82,14 @@ function IconSparkles() {
   );
 }
 
+function IconPuzzle() {
+  return (
+    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l5.654-4.654m5.598-2.22 3.03-2.498a2.652 2.652 0 0 0 0-3.75l-1.875-1.875a2.652 2.652 0 0 0-3.75 0l-2.498 3.03" />
+    </svg>
+  );
+}
+
 // ─── Nav structure ────────────────────────────────────────────────
 const NAV_ITEMS: NavItem[] = [
   { to: '/admin',          label: 'Dashboard',       icon: <IconGrid />,       end: true },
@@ -90,6 +98,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/admin/planos',   label: 'Planos',          icon: <IconCreditCard />, activePaths: ['/admin/ofertas', '/admin/turmas'] },
   { to: '/admin/stripe',   label: 'Stripe',          icon: <IconBolt /> },
   { to: '/admin/ia',       label: 'IA Global',       icon: <IconSparkles /> },
+  { to: '/admin/plugins',  label: 'Plugins',         icon: <IconPuzzle /> },
   { to: '/admin/config',   label: 'Configuracoes',   icon: <IconSettings />,   disabled: true },
 ];
 
