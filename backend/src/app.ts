@@ -18,6 +18,7 @@ import adminOfertasRouter from './routes/admin/ofertas.js';
 import adminHomeRouter from './routes/admin/home.js';
 import adminStripeRouter from './routes/admin/stripe.js';
 import adminKnowledgeRouter from './routes/admin/knowledge.js';
+import adminPluginsRouter from './routes/admin/plugins.js';
 import consultancyDocumentsRouter from './routes/consultancyDocuments.js';
 import meetingsRouter from './routes/meetings.js';
 import { pluginsRouter } from './routes/plugins.js';
@@ -132,6 +133,7 @@ app.use('/api/admin/ofertas', adminLimit, adminOfertasRouter);
 app.use('/api/admin/home', adminLimit, adminHomeRouter);
 app.use('/api/admin/stripe/products', adminLimit, adminStripeRouter);
 app.use('/api/admin/knowledge', adminLimit, adminKnowledgeRouter);
+app.use('/api/admin/plugins', adminLimit, adminPluginsRouter);
 app.use('/api/meetings', meetingsRouter); // general limit already applied globally; authLimit is too strict for polling
 app.use('/api/plugins', pluginsRouter);
 // /api/webhooks/recall is registered above (before express.json) with raw body parser
