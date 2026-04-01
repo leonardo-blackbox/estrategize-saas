@@ -305,7 +305,7 @@ Plans:
 - [x] **Phase 21: Plugin Config Infrastructure** - Infra de configuração por plugin (tabela plugin_configs + rotas admin) (completed 2026-04-01)
 - [x] **Phase 22: Knowledge Base por Plugin** - Scope 'plugin' no RAG (migration 032 + métodos knowledgeService) (completed 2026-04-01)
 - [x] **Phase 23: Helena Runtime** - Webhook partial_data + buffer + motor de janelas + SSE endpoint (completed 2026-04-01)
-- [ ] **Phase 24: Helena Frontend** - HelenaPanel na tela da reunião + página admin config /admin/plugins/helena
+- [x] **Phase 24: Helena Frontend** - HelenaPanel na tela da reunião + página admin config /admin/plugins/helena (completed 2026-04-01)
 - [ ] **Phase 25: Helena Knowledge** - Curadoria e indexação dos 6 documentos de conhecimento comercial
 ---
 ## Progress
@@ -337,7 +337,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 21. Plugin Config Infrastructure | 2/2 | Complete    | 2026-04-01 | - |
 | 22. Knowledge Base por Plugin | 2/2 | Complete    | 2026-04-01 | - |
 | 23. Helena Runtime | 2/2 | Complete   | 2026-04-01 | - |
-| 24. Helena Frontend | 1/2 | In Progress|  | - |
+| 24. Helena Frontend | 2/2 | Complete   | 2026-04-01 | - |
 | 25. Helena Knowledge | 0/0 | Planned    |  | - |
 
 ---
