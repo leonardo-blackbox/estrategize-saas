@@ -149,9 +149,6 @@ export function BotSessionCard({ session, onDelete }: BotSessionCardProps) {
               <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${session.summary ? 'bg-emerald-500/10 text-emerald-500' : 'bg-[var(--bg-surface-2)] text-[var(--text-tertiary)]'}`}>
                 {session.summary ? '✓' : '✗'} Resumo IA
               </span>
-              <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${session.formatted_transcript ? 'bg-blue-500/10 text-blue-400' : 'bg-[var(--bg-surface-2)] text-[var(--text-tertiary)]'}`}>
-                {session.formatted_transcript ? '✓' : '✗'} Indexado no RAG
-              </span>
             </div>
 
             {!session.formatted_transcript && (
