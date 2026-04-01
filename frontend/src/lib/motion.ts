@@ -33,28 +33,24 @@ export const transitionSlow: Transition = {
   ease: easeOutExpo,
 };
 
-// ── Page Transition (depth crossfade) ──
+// ── Page Transition (crossfade — filter:blur removed for mobile GPU stability) ──
 export const pageVariants: Variants = {
   initial: {
     opacity: 0,
-    scale: 0.98,
-    filter: 'blur(4px)',
+    scale: 0.99,
   },
   animate: {
     opacity: 1,
     scale: 1,
-    filter: 'blur(0px)',
     transition: {
-      duration: 0.3,
+      duration: 0.2,
       ease: easeOutExpo,
     },
   },
   exit: {
     opacity: 0,
-    scale: 0.98,
-    filter: 'blur(4px)',
     transition: {
-      duration: 0.2,
+      duration: 0.12,
       ease: easeOutQuart,
     },
   },
