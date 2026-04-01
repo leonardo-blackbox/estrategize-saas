@@ -365,10 +365,9 @@ Plans:
   2. `match_knowledge_chunks` aceita `filter_plugin_slug` como parâmetro opcional
   3. Upload com `scope='plugin'` e `plugin_slug='helena'` indexa sem afetar scope global
   4. Query RAG com `filter_plugin_slug='helena'` retorna apenas chunks da Helena
-**Plans**: 2 plans
+**Plans**: 1 plan
 Plans:
-- [ ] 22-01-PLAN.md — Migration 032 (plugin_slug + match_knowledge_chunks) + knowledgeService plugin methods
-- [ ] 22-02-PLAN.md — Helena knowledge routes on adminPluginsRouter (GET/POST/DELETE)
+- [ ] 25-01-PLAN.md — Curar 6 documentos MD de conhecimento comercial + script de upload programático
 
 ### Phase 23: Helena Runtime
 **Goal**: Recall.ai envia segmentos parciais → backend acumula → motor de janelas dispara → SSE entrega sugestão ao frontend em < 5s.
