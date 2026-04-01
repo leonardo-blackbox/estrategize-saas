@@ -12,6 +12,9 @@ interface Props {
 export function ConsultoriaDetailPesquisa({ consultancyId }: Props) {
   const { research, isLoading, startResearch, isStarting, manualRagIndex, isIndexing } = useMarketResearch(consultancyId);
 
+  const handleStart = () => { void startResearch(); };
+  const handleRagIndex = () => { void manualRagIndex(); };
+
   if (isLoading) {
     return (
       <div className="py-16 flex justify-center">
@@ -25,7 +28,7 @@ export function ConsultoriaDetailPesquisa({ consultancyId }: Props) {
   if (status === 'not_started') {
     return (
       <PesquisaEmptyState
-        onStart={startResearch}
+        onStart={handleStart}
         isStarting={isStarting}
         creditsCost={5}
       />
@@ -40,7 +43,7 @@ export function ConsultoriaDetailPesquisa({ consultancyId }: Props) {
     return (
       <div className="py-12 text-center space-y-3">
         <p className="text-sm text-red-400">Pesquisa falhou: {research?.error_message ?? 'Erro desconhecido'}</p>
-        <button type="button" onClick={startResearch} disabled={isStarting}
+        <button type="button" onClick={handleStart} disabled={isStarting}
           className="text-xs px-4 py-2 rounded-lg bg-[var(--accent)] text-white disabled:opacity-50">
           Tentar Novamente
         </button>
@@ -55,8 +58,8 @@ export function ConsultoriaDetailPesquisa({ consultancyId }: Props) {
         <PesquisaCompetitors competitors={competitors} />
         <PesquisaReport
           research={research}
-          onRestart={startResearch}
-          onRagIndex={manualRagIndex}
+          onRestart={handleStart}
+          onRagIndex={handleRagIndex}
           isIndexing={isIndexing}
         />
       </div>

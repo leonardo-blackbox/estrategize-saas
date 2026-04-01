@@ -4,8 +4,8 @@ import type { MarketResearchResponse } from '../../../../types/market-intelligen
 
 interface Props {
   research: MarketResearchResponse;
-  onRestart: () => Promise<void>;
-  onRagIndex: () => Promise<void>;
+  onRestart: () => void;
+  onRagIndex: () => void;
   isIndexing: boolean;
 }
 

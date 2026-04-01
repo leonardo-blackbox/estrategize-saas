@@ -1,5 +1,5 @@
 interface Props {
-  onStart: () => Promise<void>;
+  onStart: () => void;
   isStarting: boolean;
   creditsCost: number;
 }
