@@ -7,6 +7,7 @@ Projeto brownfield com infraestrutura robusta já construída (auth, área de me
 - 📋 **Milestone C — IA Base de Conhecimento** - Phases 10-13 (planejado)
 - 📋 **Milestone D — Reuniões com Transcrição** - Phases 14-16 (planejado)
 - 📋 **Milestone E — Central da Cliente v2** - Phases 17-20 (planejado)
+- 📋 **Milestone F — Helena: Copiloto de Reuniões** - Phases 21-25 (planejado)
 ## Phases
 ### Milestone A — Admin Robusto
 - [x] **Phase 1: Admin Layout e Navegação** - Redesign do shell do admin com sidebar clara e navegação < 3 cliques (completed 2026-03-29)
@@ -300,6 +301,12 @@ Plans:
 Plans:
 - [ ] 20-01-PLAN.md — Fix action item status mismatch + auto-index transcript as RAG document
 - [ ] 20-02-PLAN.md — Overview meeting summaries timeline + wire recentMeetings
+### Milestone F — Helena: Copiloto de Reuniões
+- [ ] **Phase 21: Plugin Config Infrastructure** - Infra de configuração por plugin (tabela plugin_configs + rotas admin)
+- [ ] **Phase 22: Knowledge Base por Plugin** - Scope 'plugin' no RAG (migration 032 + métodos knowledgeService)
+- [ ] **Phase 23: Helena Runtime** - Webhook partial_data + buffer + motor de janelas + SSE endpoint
+- [ ] **Phase 24: Helena Frontend** - HelenaPanel na tela da reunião + página admin config /admin/plugins/helena
+- [ ] **Phase 25: Helena Knowledge** - Curadoria e indexação dos 6 documentos de conhecimento comercial
 ---
 ## Progress
 **Execution Order:**
@@ -327,3 +334,68 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 18. Wizard de Criação | 1/2 | In Progress|  | - |
 | 19. Central da Cliente Tabs | 2/2 | Complete   | 2026-03-30 | - |
 | 20. Integração Reunião → Consultoria | 2/2 | Complete    | 2026-03-30 | - |
+| 21. Plugin Config Infrastructure | 0/2 | In Progress|  | - |
+| 22. Knowledge Base por Plugin | 0/0 | Planned    |  | - |
+| 23. Helena Runtime | 0/0 | Planned    |  | - |
+| 24. Helena Frontend | 0/0 | Planned    |  | - |
+| 25. Helena Knowledge | 0/0 | Planned    |  | - |
+
+---
+
+### Phase 21: Plugin Config Infrastructure
+**Goal**: Qualquer plugin pode ter configurações próprias gerenciadas pelo admin. Primeira implementação: base para Helena.
+**Depends on**: Phase 20 (plugin system existente — migration 030)
+**Requirements**: HELENA-A
+**Success Criteria** (what must be TRUE):
+  1. Migration 031 cria tabela `plugin_configs` com RLS admin-only
+  2. `GET /api/admin/plugins/:slug/config` retorna config atual do plugin
+  3. `PUT /api/admin/plugins/:slug/config` salva config via upsert
+  4. Página `/admin/plugins` lista todos os plugins do catálogo com status e link de config
+**Plans**: 2 plans
+Plans:
+- [ ] 21-01-PLAN.md — Migration 031 (plugin_configs + helena seed) + pluginConfigService + admin routes
+- [ ] 21-02-PLAN.md — Frontend AdminPluginsPage (3-layer) + API client + route + sidebar nav
+
+### Phase 22: Knowledge Base por Plugin
+**Goal**: `knowledge_documents` aceita `scope='plugin'` com `plugin_slug`. RAG da Helena não contamina chat de consultoria.
+**Depends on**: Phase 21
+**Requirements**: HELENA-B
+**Success Criteria** (what must be TRUE):
+  1. Migration 032 adiciona `plugin_slug` em `knowledge_documents` e `knowledge_chunks`
+  2. `match_knowledge_chunks` aceita `filter_plugin_slug` como parâmetro opcional
+  3. Upload com `scope='plugin'` e `plugin_slug='helena'` indexa sem afetar scope global
+  4. Query RAG com `filter_plugin_slug='helena'` retorna apenas chunks da Helena
+**Plans**: 0 plans
+
+### Phase 23: Helena Runtime
+**Goal**: Recall.ai envia segmentos parciais → backend acumula → motor de janelas dispara → SSE entrega sugestão ao frontend em < 5s.
+**Depends on**: Phase 22
+**Requirements**: HELENA-C
+**Success Criteria** (what must be TRUE):
+  1. Webhook `transcript.partial_data` é recebido e segmentos acumulados em buffer de memória por botId
+  2. `helenaService.maybeProcess()` dispara janela correta (opening/mid/closing/objection) com base em elapsed time e detecção de linguagem
+  3. GPT-4o-mini retorna JSON estruturado com tipo, sugestao_principal, frase_sugerida, ponto_atencao, urgencia
+  4. SSE endpoint `GET /api/meetings/:sessionId/helena` entrega eventos em tempo real
+**Plans**: 0 plans
+
+### Phase 24: Helena Frontend
+**Goal**: Consultora vê painel Helena discreto durante reunião in_progress e admin configura a Helena em /admin/plugins/helena.
+**Depends on**: Phase 23
+**Requirements**: HELENA-D
+**Success Criteria** (what must be TRUE):
+  1. `HelenaPanel` aparece quando reunião está `in_progress` E plugin Helena instalado na consultoria
+  2. Cards visuais diferenciados por tipo: abertura=roxo, meio=azul, fechamento=verde, objeção=âmbar
+  3. Painel é minimizável com 1 clique e não obstrui conteúdo da reunião
+  4. Página `/admin/plugins/helena` permite upload de conhecimento da Helena, configuração de janelas e teste
+**Plans**: 0 plans
+
+### Phase 25: Helena Knowledge
+**Goal**: Base de conhecimento comercial da Helena indexada — 6 documentos cobrindo objeções, perfis, técnicas de fechamento e linguagem de compra/fuga.
+**Depends on**: Phase 24
+**Requirements**: HELENA-E
+**Success Criteria** (what must be TRUE):
+  1. 6 documentos MD criados: objeções, perfis psicológicos, técnicas de fechamento, rapport/abertura, linguagem de compra, linguagem de fuga
+  2. Todos indexados como `scope='plugin'`, `plugin_slug='helena'` via `/admin/plugins/helena`
+  3. Todos com status `ready` no painel admin
+  4. Teste de qualidade: pergunta sobre objeção de preço retorna sugestão relevante dentro de 5s
+**Plans**: 0 plans
