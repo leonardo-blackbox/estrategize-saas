@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '../../../../components/ui/Button';
 import { useMeetings } from '../../hooks/useMeetings';
+import { useConsultoriaPlugins } from '../../hooks/useConsultoriaPlugins';
 import { NewMeetingModal } from './NewMeetingModal';
 import { BotSessionCard } from './BotSessionCard';
+import { HelenaPanel } from '../../../helena/components/HelenaPanel/HelenaPanel';
 
 interface ConsultoriaDetailMeetingsProps {
   consultancyId: string;
@@ -12,6 +14,9 @@ interface ConsultoriaDetailMeetingsProps {
 export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMeetingsProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const { sessions, isLoading, error, createSession, isCreating, createError, deleteSession, deleteError } = useMeetings(consultancyId);
+  const { installedSlugs } = useConsultoriaPlugins(consultancyId);
+  const helenaInstalled = installedSlugs.has('helena');
+  const activeSession = sessions.find((s) => s.status === 'in_call');
 
   // Fechar modal quando a mutation concluir sem erro
   const prevCreating = useRef(false);
@@ -49,6 +54,10 @@ export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMe
   }
 
   return (
+    <>
+    {helenaInstalled && activeSession && (
+      <HelenaPanel sessionId={activeSession.id} />
+    )}
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-[var(--text-primary)]">
@@ -92,5 +101,6 @@ export function ConsultoriaDetailMeetings({ consultancyId }: ConsultoriaDetailMe
         error={createError?.message}
       />
     </div>
+    </>
   );
 }
