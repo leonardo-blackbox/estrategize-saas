@@ -242,7 +242,7 @@ function ReunioesCard() {
 function HelenaCard() {
   return (
     <motion.div variants={staggerItem}>
-      <Link to="/admin/plugins/helena" className="block group">
+      <Link to="/ferramentas/helena" className="block group">
         <motion.div
           whileHover={{ translateY: -2 }}
           whileTap={{ scale: 0.98 }}

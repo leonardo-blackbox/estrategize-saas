@@ -20,6 +20,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage.tsx';
 // New member pages
 import { FormacaoPage } from './pages/member/FormacaoPage.tsx';
 import { FerramentasPage } from './pages/member/FerramentasPage.tsx';
+import { HelenaPage } from './pages/member/HelenaPage.tsx';
 import { ConsultoriasPage } from './pages/member/ConsultoriasPage.tsx';
 import { ConsultoriaDetailPage } from './pages/member/ConsultoriaDetailPage.tsx';
 import { ContaPage } from './pages/member/ContaPage.tsx';
@@ -91,6 +92,7 @@ export default function App() {
           <Route path="/formacao/curso/:id" element={<CoursePage />} />
           <Route path="/formacao/aula/:lessonId" element={<LessonPage />} />
           <Route path="/ferramentas" element={<FerramentasPage />} />
+          <Route path="/ferramentas/helena" element={<HelenaPage />} />
           <Route path="/aplicacoes" element={<AplicacoesPage />} />
           <Route path="/reunioes" element={<ReunioesPage />} />
           <Route path="/consultorias" element={<ConsultoriasPage />} />
