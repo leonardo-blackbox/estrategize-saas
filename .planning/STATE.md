@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 23-02-PLAN.md
-last_updated: "2026-04-01T07:11:01.056Z"
+stopped_at: Completed 24-01-PLAN.md
+last_updated: "2026-04-01T07:20:51.149Z"
 progress:
   total_phases: 25
   completed_phases: 23
-  total_plans: 47
-  completed_plans: 47
+  total_plans: 49
+  completed_plans: 48
 ---
 
 # Project State
@@ -92,6 +92,7 @@ Plan: 1 of 2
 | Phase 22 P01 | 2 | 2 tasks | 2 files |
 | Phase 22 P02 | 5 | 1 tasks | 1 files |
 | Phase 23-helena-runtime P02 | 15 | 2 tasks | 3 files |
+| Phase 24-helena-frontend P01 | 5 | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -180,6 +181,8 @@ Recent decisions affecting current work:
 - [Phase 22]: Three-branch chk_knowledge_scope replaces chk_consultancy_scope — enforces mutual exclusivity of consultancy_id and plugin_slug at DB level
 - [Phase 22]: Helena routes placed before /:slug/config routes in adminPluginsRouter — Express would capture /helena/knowledge as slug=helena otherwise
 - [Phase 23-helena-runtime]: transcript.partial_data handler placed before transcript.data; maybeProcess called fire-and-forget (not awaited); buffer lazy-init on first partial_data; SSE returns 204 for terminal sessions
+- [Phase 24-helena-frontend]: useCallback on connect() stabilizes useEffect dep array and prevents reconnect loops
+- [Phase 24-helena-frontend]: HelenaPanel uses full-height edge panel (right-0, h-full) instead of floating card for cleaner sidebar UX
 
 ### Pending Todos
 
@@ -193,6 +196,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T07:11:01.050Z
-Stopped at: Completed 23-02-PLAN.md
+Last session: 2026-04-01T07:20:51.143Z
+Stopped at: Completed 24-01-PLAN.md
 Resume file: None
