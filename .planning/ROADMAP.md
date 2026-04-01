@@ -334,7 +334,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 18. Wizard de Criação | 1/2 | In Progress|  | - |
 | 19. Central da Cliente Tabs | 2/2 | Complete   | 2026-03-30 | - |
 | 20. Integração Reunião → Consultoria | 2/2 | Complete    | 2026-03-30 | - |
-| 21. Plugin Config Infrastructure | 2/2 | Complete   | 2026-04-01 | - |
+| 21. Plugin Config Infrastructure | 2/2 | Complete    | 2026-04-01 | - |
 | 22. Knowledge Base por Plugin | 0/0 | Planned    |  | - |
 | 23. Helena Runtime | 0/0 | Planned    |  | - |
 | 24. Helena Frontend | 0/0 | Planned    |  | - |
