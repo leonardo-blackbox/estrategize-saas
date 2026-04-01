@@ -335,7 +335,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 19. Central da Cliente Tabs | 2/2 | Complete   | 2026-03-30 | - |
 | 20. Integração Reunião → Consultoria | 2/2 | Complete    | 2026-03-30 | - |
 | 21. Plugin Config Infrastructure | 2/2 | Complete    | 2026-04-01 | - |
-| 22. Knowledge Base por Plugin | 0/0 | Planned    |  | - |
+| 22. Knowledge Base por Plugin | 0/2 | Planned    |  | - |
 | 23. Helena Runtime | 0/0 | Planned    |  | - |
 | 24. Helena Frontend | 0/0 | Planned    |  | - |
 | 25. Helena Knowledge | 0/0 | Planned    |  | - |
@@ -365,7 +365,10 @@ Plans:
   2. `match_knowledge_chunks` aceita `filter_plugin_slug` como parâmetro opcional
   3. Upload com `scope='plugin'` e `plugin_slug='helena'` indexa sem afetar scope global
   4. Query RAG com `filter_plugin_slug='helena'` retorna apenas chunks da Helena
-**Plans**: 0 plans
+**Plans**: 2 plans
+Plans:
+- [ ] 22-01-PLAN.md — Migration 032 (plugin_slug + match_knowledge_chunks) + knowledgeService plugin methods
+- [ ] 22-02-PLAN.md — Helena knowledge routes on adminPluginsRouter (GET/POST/DELETE)
 
 ### Phase 23: Helena Runtime
 **Goal**: Recall.ai envia segmentos parciais → backend acumula → motor de janelas dispara → SSE entrega sugestão ao frontend em < 5s.
@@ -376,7 +379,10 @@ Plans:
   2. `helenaService.maybeProcess()` dispara janela correta (opening/mid/closing/objection) com base em elapsed time e detecção de linguagem
   3. GPT-4o-mini retorna JSON estruturado com tipo, sugestao_principal, frase_sugerida, ponto_atencao, urgencia
   4. SSE endpoint `GET /api/meetings/:sessionId/helena` entrega eventos em tempo real
-**Plans**: 0 plans
+**Plans**: 2 plans
+Plans:
+- [ ] 22-01-PLAN.md — Migration 032 (plugin_slug + match_knowledge_chunks) + knowledgeService plugin methods
+- [ ] 22-02-PLAN.md — Helena knowledge routes on adminPluginsRouter (GET/POST/DELETE)
 
 ### Phase 24: Helena Frontend
 **Goal**: Consultora vê painel Helena discreto durante reunião in_progress e admin configura a Helena em /admin/plugins/helena.
@@ -387,7 +393,10 @@ Plans:
   2. Cards visuais diferenciados por tipo: abertura=roxo, meio=azul, fechamento=verde, objeção=âmbar
   3. Painel é minimizável com 1 clique e não obstrui conteúdo da reunião
   4. Página `/admin/plugins/helena` permite upload de conhecimento da Helena, configuração de janelas e teste
-**Plans**: 0 plans
+**Plans**: 2 plans
+Plans:
+- [ ] 22-01-PLAN.md — Migration 032 (plugin_slug + match_knowledge_chunks) + knowledgeService plugin methods
+- [ ] 22-02-PLAN.md — Helena knowledge routes on adminPluginsRouter (GET/POST/DELETE)
 
 ### Phase 25: Helena Knowledge
 **Goal**: Base de conhecimento comercial da Helena indexada — 6 documentos cobrindo objeções, perfis, técnicas de fechamento e linguagem de compra/fuga.
@@ -398,4 +407,7 @@ Plans:
   2. Todos indexados como `scope='plugin'`, `plugin_slug='helena'` via `/admin/plugins/helena`
   3. Todos com status `ready` no painel admin
   4. Teste de qualidade: pergunta sobre objeção de preço retorna sugestão relevante dentro de 5s
-**Plans**: 0 plans
+**Plans**: 2 plans
+Plans:
+- [ ] 22-01-PLAN.md — Migration 032 (plugin_slug + match_knowledge_chunks) + knowledgeService plugin methods
+- [ ] 22-02-PLAN.md — Helena knowledge routes on adminPluginsRouter (GET/POST/DELETE)
