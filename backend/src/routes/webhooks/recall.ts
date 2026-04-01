@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { processTranscript } from '../../services/transcriptService.js';
 import { fetchBotTranscript } from '../../services/recallService.js';
+import { initBuffer, append, removeBuffer, getBuffer } from '../../services/liveTranscriptBuffer.js';
+import { maybeProcess } from '../../services/helenaService.js';
 
 const router = Router();
 
@@ -99,6 +101,53 @@ router.post('/', async (req: Request, res: Response) => {
     return res.status(503).json({ error: 'DB unavailable' });
   }
 
+  // ─── transcript.partial_data — Helena live buffer ─────────────
+  if (event === 'transcript.partial_data') {
+    if (!botId) {
+      return res.status(400).json({ error: 'Missing data.bot.id' });
+    }
+
+    const words = data.data?.words ?? [];
+    const speakerName = data.data?.participant?.name ?? 'unknown';
+
+    // Normalize words for buffer
+    const normalized = words.map((w) => ({
+      text: w.text,
+      start_time: w.start_timestamp?.relative ?? 0,
+      end_time: w.end_timestamp?.relative ?? null,
+      speaker: speakerName,
+    }));
+
+    // Initialize buffer if not yet created (lazy init on first partial_data)
+    if (!getBuffer(botId)) {
+      // Look up session to get consultancyId, userId, sessionId
+      const { data: session } = await supabaseAdmin
+        .from('meeting_sessions')
+        .select('id, user_id, consultancy_id')
+        .eq('recall_bot_id', botId)
+        .single();
+
+      if (session && session.consultancy_id) {
+        initBuffer(botId, {
+          consultancyId: session.consultancy_id as string,
+          userId: session.user_id as string,
+          meetingSessionId: session.id as string,
+        });
+      } else {
+        // No consultancy linked — Helena cannot operate without context
+        console.log(`[recall-webhook] partial_data: no consultancy for bot ${botId} — skipping Helena`);
+        return res.json({ ok: true });
+      }
+    }
+
+    append(botId, normalized);
+
+    // Fire-and-forget — maybeProcess is sync, generateAndEmit runs async internally
+    maybeProcess(botId);
+
+    return res.json({ ok: true });
+  }
+
   // ─── transcript.data ──────────────────────────────────────────
   if (event === 'transcript.data') {
     if (!botId) {
@@ -161,7 +210,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     const { data: session, error: sessionError } = await supabaseAdmin
       .from('meeting_sessions')
-      .select('id, status, started_at')
+      .select('id, status, started_at, user_id, consultancy_id')
       .eq('recall_bot_id', botId)
       .single();
 
@@ -184,10 +233,20 @@ router.post('/', async (req: Request, res: Response) => {
 
       if (internalStatus === 'in_call' && !session.started_at) {
         updates['started_at'] = new Date().toISOString();
+        // Initialize Helena buffer when bot enters call
+        if (session.consultancy_id) {
+          initBuffer(botId, {
+            consultancyId: session.consultancy_id as string,
+            userId: session.user_id as string,
+            meetingSessionId: session.id as string,
+          });
+        }
       }
 
       if (internalStatus === 'done' || internalStatus === 'error') {
         updates['ended_at'] = new Date().toISOString();
+        // Cleanup Helena buffer on terminal state
+        removeBuffer(botId);
       }
 
       const { error: updateError } = await supabaseAdmin
@@ -218,6 +277,7 @@ router.post('/', async (req: Request, res: Response) => {
     // fetchBotTranscript pulls the complete transcript from Recall.ai API and stores it
     // before processTranscript runs.
     if (internalStatus === 'done') {
+      removeBuffer(botId); // Ensure Helena buffer is cleaned up
       const sessionId = session.id as string;
       ;(async () => {
         try {
