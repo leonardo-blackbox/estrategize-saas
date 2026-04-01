@@ -595,8 +595,7 @@ router.get('/:id/responses', async (req: AuthenticatedRequest, res) => {
         { count: 'exact' },
       )
       .eq('application_id', id)
-      .eq('status', 'complete')
-      .order('submitted_at', { ascending: false })
+      .order('created_at', { ascending: false })
       .range(from, to);
 
     if (error) {

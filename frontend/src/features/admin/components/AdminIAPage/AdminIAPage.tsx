@@ -10,7 +10,7 @@ import {
 } from '../../../../api/knowledge.ts';
 import type { KnowledgeTestResult } from '../../../../types/knowledge.ts';
 import { DocumentUploadArea } from './DocumentUploadArea.tsx';
-import { DocumentList } from './DocumentList.tsx';
+import { DocumentRow } from './DocumentRow.tsx';
 import { TestQueryPanel } from './TestQueryPanel.tsx';
 
 export function AdminIAPage() {
@@ -102,13 +102,17 @@ export function AdminIAPage() {
               {(listError as Error).message}
             </p>
           </div>
-        ) : (
-          <DocumentList
-            documents={documents}
-            onDelete={handleDelete}
-            deletingId={deletingId}
-          />
-        )}
+        ) : documents.length === 0 ? (
+            <div className="rounded-[var(--radius-md)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-10 text-center">
+              <p className="text-sm text-[var(--text-tertiary)]">Nenhum documento adicionado ainda.</p>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {documents.map((doc) => (
+                <DocumentRow key={doc.id} document={doc} onDelete={handleDelete} isDeleting={deletingId === doc.id} />
+              ))}
+            </div>
+          )}
       </motion.div>
 
       <motion.div variants={staggerItem} className="border-t border-[var(--border-hairline)] pt-6">

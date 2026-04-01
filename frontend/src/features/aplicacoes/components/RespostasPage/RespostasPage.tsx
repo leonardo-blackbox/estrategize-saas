@@ -18,11 +18,13 @@ export function RespostasPage() {
     responses,
     fields,
     filteredResponses,
+    completedResponseIds,
     selectedResponse,
     selectedIndex,
     navDirection,
     viewMode,
     dateFilter,
+    completionFilter,
     showUTMColumns,
     isLoading,
     isExporting,
@@ -31,6 +33,7 @@ export function RespostasPage() {
     mobileShowDetail,
     setViewMode,
     setDateFilter,
+    setCompletionFilter,
     setShowUTMColumns,
     setMobileShowDetail,
     setSelectedIndex,
@@ -57,12 +60,17 @@ export function RespostasPage() {
         filteredCount={filteredResponses.length}
         totalCount={responses.length}
         dateFilter={dateFilter}
+        completionFilter={completionFilter}
         showUTMColumns={showUTMColumns}
         hasUTMData={hasUTMData}
         viewMode={viewMode}
         isExporting={isExporting}
         onDateFilterChange={(f) => {
           setDateFilter(f);
+          setSelectedIndex(0);
+        }}
+        onCompletionFilterChange={(f) => {
+          setCompletionFilter(f);
           setSelectedIndex(0);
         }}
         onToggleUTM={() => setShowUTMColumns((v) => !v)}
@@ -73,6 +81,7 @@ export function RespostasPage() {
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
         <RespostasSidebar
           responses={filteredResponses}
+          completedResponseIds={completedResponseIds}
           selectedIndex={selectedIndex}
           viewMode={viewMode}
           isLoading={isLoading}

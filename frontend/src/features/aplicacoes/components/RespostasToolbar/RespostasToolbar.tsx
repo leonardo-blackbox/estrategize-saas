@@ -1,16 +1,18 @@
 import { cn } from '../../../../lib/cn';
-import type { ViewMode, DateFilter } from '../../utils/respostas.helpers';
+import type { ViewMode, DateFilter, CompletionFilter } from '../../utils/respostas.helpers';
 
 interface RespostasToolbarProps {
   isLoading: boolean;
   filteredCount: number;
   totalCount: number;
   dateFilter: DateFilter;
+  completionFilter: CompletionFilter;
   showUTMColumns: boolean;
   hasUTMData: boolean;
   viewMode: ViewMode;
   isExporting: boolean;
   onDateFilterChange: (filter: DateFilter) => void;
+  onCompletionFilterChange: (filter: CompletionFilter) => void;
   onToggleUTM: () => void;
   onViewModeChange: (mode: ViewMode) => void;
   onExport: () => void;
@@ -21,10 +23,12 @@ export function RespostasToolbar({
   filteredCount,
   totalCount,
   dateFilter,
+  completionFilter,
   showUTMColumns,
   viewMode,
   isExporting,
   onDateFilterChange,
+  onCompletionFilterChange,
   onToggleUTM,
   onViewModeChange,
   onExport,
@@ -43,20 +47,63 @@ export function RespostasToolbar({
         flexWrap: 'wrap',
       }}
     >
-      <span
-        style={{
-          fontSize: 12,
-          fontWeight: 600,
-          color: 'var(--text-tertiary)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.06em',
-        }}
-      >
-        {isLoading
-          ? '...'
-          : `${filteredCount} resposta${filteredCount !== 1 ? 's' : ''}`}
-      </span>
+      {/* LEFT: count + completion filters */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--text-tertiary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {isLoading ? '...' : `${filteredCount} resposta${filteredCount !== 1 ? 's' : ''}`}
+        </span>
 
+        <div style={{ width: 1, height: 16, background: 'var(--border-hairline)' }} />
+
+        {/* Completion filter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {([
+            { value: 'all', label: 'Todas', dot: null },
+            { value: 'complete', label: 'Completas', dot: '#10b981' },
+            { value: 'incomplete', label: 'Incompletas', dot: '#f59e0b' },
+          ] as const).map(({ value, label, dot }) => (
+            <button
+              key={value}
+              onClick={() => onCompletionFilterChange(value)}
+              className={cn(
+                'px-2.5 py-1 rounded text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1',
+                completionFilter === value
+                  ? value === 'complete'
+                    ? 'bg-[rgba(16,185,129,0.15)] text-[#10b981]'
+                    : value === 'incomplete'
+                      ? 'bg-[rgba(245,158,11,0.15)] text-[#f59e0b]'
+                      : 'bg-[var(--accent)] text-white'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+              )}
+            >
+              {dot && (
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: dot,
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* RIGHT: date filters + UTM + view toggle + export */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
         {/* Period filters */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginRight: 4 }}>
@@ -71,7 +118,7 @@ export function RespostasToolbar({
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
               )}
             >
-              {f === 'all' ? 'Todas' : f === 'today' ? 'Hoje' : f === '7d' ? '7d' : '30d'}
+              {f === 'all' ? 'Tudo' : f === 'today' ? 'Hoje' : f === '7d' ? '7d' : '30d'}
             </button>
           ))}
         </div>

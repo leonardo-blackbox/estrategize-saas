@@ -82,6 +82,28 @@ export const ICON_BTN_STYLE: React.CSSProperties = {
 
 export type ViewMode = 'individual' | 'tabela';
 export type DateFilter = 'all' | 'today' | '7d' | '30d';
+export type CompletionFilter = 'all' | 'complete' | 'incomplete';
+
+/**
+ * A response is complete when EVERY collectible field has a non-empty answer.
+ * This is more reliable than the DB `status` field, which is set when the
+ * respondent reaches the thank_you screen — not when all fields are filled.
+ */
+export function isResponseComplete(
+  response: ResponseWithAnswers,
+  collectibleFields: ApplicationField[],
+): boolean {
+  if (collectibleFields.length === 0) return true;
+  return collectibleFields.every((field) => {
+    const answer = response.answers.find((a) => a.field_id === field.id);
+    if (!answer) return false;
+    const v = answer.value;
+    if (v === null || v === undefined) return false;
+    if (typeof v === 'string' && v.trim() === '') return false;
+    if (Array.isArray(v) && v.length === 0) return false;
+    return true;
+  });
+}
 
 /** Filters collectible fields (excludes welcome, thank_you, message). */
 export function getCollectibleFields(fields: ApplicationField[]): ApplicationField[] {

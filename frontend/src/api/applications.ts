@@ -90,8 +90,8 @@ export interface Application {
 export interface ResponseWithAnswers {
   id: string;
   application_id: string;
-  status: string;
-  submitted_at: string;
+  status: 'partial' | 'complete';
+  submitted_at: string | null;
   metadata: Record<string, string>;
   created_at: string;
   answers: Array<{

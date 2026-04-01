@@ -7,10 +7,11 @@ interface SidebarItemProps {
   response: ResponseWithAnswers;
   index: number;
   isSelected: boolean;
+  isComplete: boolean;
   onClick: () => void;
 }
 
-function SidebarItem({ response, index, isSelected, onClick }: SidebarItemProps) {
+function SidebarItem({ response, index, isSelected, isComplete, onClick }: SidebarItemProps) {
   const preview = getFirstAnswerPreview(response);
   return (
     <button
@@ -41,9 +42,28 @@ function SidebarItem({ response, index, isSelected, onClick }: SidebarItemProps)
             fontSize: 13,
             fontWeight: 500,
             color: isSelected ? '#7c5cfc' : 'var(--text-primary)',
+            minWidth: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
           {index + 1}. {preview}
+        </span>
+        <span
+          style={{
+            flexShrink: 0,
+            fontSize: 9,
+            fontWeight: 600,
+            padding: '2px 5px',
+            borderRadius: 4,
+            background: isComplete ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
+            color: isComplete ? '#10b981' : '#f59e0b',
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+          }}
+        >
+          {isComplete ? '✓' : '…'}
         </span>
       </div>
       <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
@@ -55,6 +75,7 @@ function SidebarItem({ response, index, isSelected, onClick }: SidebarItemProps)
 
 interface RespostasSidebarProps {
   responses: ResponseWithAnswers[];
+  completedResponseIds: Set<string>;
   selectedIndex: number;
   viewMode: string;
   isLoading: boolean;
@@ -66,6 +87,7 @@ interface RespostasSidebarProps {
 
 export function RespostasSidebar({
   responses,
+  completedResponseIds,
   selectedIndex,
   viewMode,
   isLoading,
@@ -138,6 +160,7 @@ export function RespostasSidebar({
               response={response}
               index={idx}
               isSelected={selectedIndex === idx && viewMode === 'individual'}
+              isComplete={completedResponseIds.has(response.id)}
               onClick={() => onSelect(idx)}
             />
           ))

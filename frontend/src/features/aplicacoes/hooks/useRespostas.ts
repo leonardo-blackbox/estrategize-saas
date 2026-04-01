@@ -14,8 +14,10 @@ import {
   formatDate,
   resolveValue,
   getCollectibleFields,
+  isResponseComplete,
   type ViewMode,
   type DateFilter,
+  type CompletionFilter,
 } from '../utils/respostas.helpers';
 
 export function useRespostas() {
@@ -27,6 +29,7 @@ export function useRespostas() {
   const [navDirection, setNavDirection] = useState<'forward' | 'back'>('forward');
   const [isExporting, setIsExporting] = useState(false);
   const [dateFilter, setDateFilter] = useState<DateFilter>('all');
+  const [completionFilter, setCompletionFilter] = useState<CompletionFilter>('all');
   const [showUTMColumns, setShowUTMColumns] = useState(false);
   const [mobileShowDetail, setMobileShowDetail] = useState(false);
 
@@ -55,16 +58,31 @@ export function useRespostas() {
   const fields: ApplicationField[] = application?.fields ?? [];
   const collectibleFields = getCollectibleFields(fields);
 
+  // Compute which responses are truly complete (all collectible fields answered)
+  // More reliable than DB `status`, which is set on reaching thank_you — not on all fields filled.
+  const completedResponseIds = useMemo(() => {
+    const ids = new Set<string>();
+    responses.forEach((r) => {
+      if (isResponseComplete(r, collectibleFields)) ids.add(r.id);
+    });
+    return ids;
+  }, [responses, collectibleFields]);
+
   const filteredResponses = useMemo(() => {
     if (!responses) return [];
-    if (dateFilter === 'all') return responses;
-    const now = new Date();
-    const since = new Date();
-    if (dateFilter === 'today') since.setHours(0, 0, 0, 0);
-    else if (dateFilter === '7d') since.setDate(now.getDate() - 7);
-    else if (dateFilter === '30d') since.setDate(now.getDate() - 30);
-    return responses.filter((r) => new Date(r.created_at) >= since);
-  }, [responses, dateFilter]);
+    let result = responses;
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      const since = new Date();
+      if (dateFilter === 'today') since.setHours(0, 0, 0, 0);
+      else if (dateFilter === '7d') since.setDate(now.getDate() - 7);
+      else if (dateFilter === '30d') since.setDate(now.getDate() - 30);
+      result = result.filter((r) => new Date(r.created_at) >= since);
+    }
+    if (completionFilter === 'complete') result = result.filter((r) => completedResponseIds.has(r.id));
+    else if (completionFilter === 'incomplete') result = result.filter((r) => !completedResponseIds.has(r.id));
+    return result;
+  }, [responses, dateFilter, completionFilter, completedResponseIds]);
 
   const selectedResponse = filteredResponses[selectedIndex] ?? null;
   const isLoading = appLoading || responsesLoading;
@@ -136,11 +154,13 @@ export function useRespostas() {
     fields,
     collectibleFields,
     filteredResponses,
+    completedResponseIds,
     selectedResponse,
     selectedIndex,
     navDirection,
     viewMode,
     dateFilter,
+    completionFilter,
     showUTMColumns,
     isLoading,
     isExporting,
@@ -149,6 +169,7 @@ export function useRespostas() {
     mobileShowDetail,
     setViewMode,
     setDateFilter,
+    setCompletionFilter,
     setShowUTMColumns,
     setMobileShowDetail,
     setSelectedIndex,
