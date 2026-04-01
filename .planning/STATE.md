@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 23-01-PLAN.md
-last_updated: "2026-04-01T07:20:00.000Z"
+stopped_at: Completed 23-02-PLAN.md
+last_updated: "2026-04-01T07:11:01.056Z"
 progress:
   total_phases: 25
-  completed_phases: 22
-  total_plans: 45
-  completed_plans: 45
+  completed_phases: 23
+  total_plans: 47
+  completed_plans: 47
 ---
 
 # Project State
@@ -91,6 +91,7 @@ Plan: 1 of 2
 | Phase 21 P02 | 3 | 2 tasks | 7 files |
 | Phase 22 P01 | 2 | 2 tasks | 2 files |
 | Phase 22 P02 | 5 | 1 tasks | 1 files |
+| Phase 23-helena-runtime P02 | 15 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -178,6 +179,7 @@ Recent decisions affecting current work:
 - [Phase 22]: filter_plugin_slug DEFAULT NULL ensures plugin chunks never leak into consultancy/global RAG — ragService.ts needs zero changes
 - [Phase 22]: Three-branch chk_knowledge_scope replaces chk_consultancy_scope — enforces mutual exclusivity of consultancy_id and plugin_slug at DB level
 - [Phase 22]: Helena routes placed before /:slug/config routes in adminPluginsRouter — Express would capture /helena/knowledge as slug=helena otherwise
+- [Phase 23-helena-runtime]: transcript.partial_data handler placed before transcript.data; maybeProcess called fire-and-forget (not awaited); buffer lazy-init on first partial_data; SSE returns 204 for terminal sessions
 
 ### Pending Todos
 
@@ -191,6 +193,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T06:50:06.327Z
-Stopped at: Completed 22-02-PLAN.md
+Last session: 2026-04-01T07:11:01.050Z
+Stopped at: Completed 23-02-PLAN.md
 Resume file: None
