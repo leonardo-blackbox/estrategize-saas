@@ -303,7 +303,7 @@ Plans:
 - [ ] 20-02-PLAN.md — Overview meeting summaries timeline + wire recentMeetings
 ### Milestone F — Helena: Copiloto de Reuniões
 - [x] **Phase 21: Plugin Config Infrastructure** - Infra de configuração por plugin (tabela plugin_configs + rotas admin) (completed 2026-04-01)
-- [ ] **Phase 22: Knowledge Base por Plugin** - Scope 'plugin' no RAG (migration 032 + métodos knowledgeService)
+- [x] **Phase 22: Knowledge Base por Plugin** - Scope 'plugin' no RAG (migration 032 + métodos knowledgeService) (completed 2026-04-01)
 - [ ] **Phase 23: Helena Runtime** - Webhook partial_data + buffer + motor de janelas + SSE endpoint
 - [ ] **Phase 24: Helena Frontend** - HelenaPanel na tela da reunião + página admin config /admin/plugins/helena
 - [ ] **Phase 25: Helena Knowledge** - Curadoria e indexação dos 6 documentos de conhecimento comercial
@@ -335,7 +335,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 19. Central da Cliente Tabs | 2/2 | Complete   | 2026-03-30 | - |
 | 20. Integração Reunião → Consultoria | 2/2 | Complete    | 2026-03-30 | - |
 | 21. Plugin Config Infrastructure | 2/2 | Complete    | 2026-04-01 | - |
-| 22. Knowledge Base por Plugin | 1/2 | In Progress|  | - |
+| 22. Knowledge Base por Plugin | 2/2 | Complete   | 2026-04-01 | - |
 | 23. Helena Runtime | 0/0 | Planned    |  | - |
 | 24. Helena Frontend | 0/0 | Planned    |  | - |
 | 25. Helena Knowledge | 0/0 | Planned    |  | - |
