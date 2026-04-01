@@ -49,6 +49,7 @@ import {
 } from '../services/consultancyAIService.js';
 import { getInsightCards } from '../services/consultancyContextService.js';
 import { withCreditCharge } from '../services/creditService.js';
+import { triggerScan } from '../services/instagramScanService.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -126,6 +127,14 @@ router.post('/', async (req: AuthenticatedRequest, res) => {
   if (!parsed.success) { res.status(400).json({ error: parsed.error.issues[0].message }); return; }
   try {
     const consultancy = await createConsultancy(req.userId!, parsed.data);
+    // Fire-and-forget: auto-scan Instagram if handle provided
+    if (parsed.data.instagram && consultancy.id) {
+      try {
+        triggerScan(consultancy.id, req.userId!, parsed.data.instagram);
+      } catch {
+        // Never block consultancy creation due to scan trigger errors
+      }
+    }
     res.status(201).json({ data: consultancy });
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : 'Unknown error' });

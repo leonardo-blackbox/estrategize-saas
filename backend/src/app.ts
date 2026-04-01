@@ -31,6 +31,7 @@ import accountRouter from './routes/account.js';
 import assetsRouter from './routes/assets.js';
 import analyticsRouter from './routes/analytics.js';
 import templatesRouter from './routes/templates.js';
+import marketResearchRouter from './routes/marketResearch.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
 export const app = express();
@@ -148,6 +149,7 @@ app.use('/api/forms', publicFormsRouter);
 app.use('/api/plans', publicPlansRouter);
 app.use('/api/stripe', stripeCheckoutRouter);
 app.use('/api/account', accountRouter);
+app.use('/api/market-research', marketResearchRouter);
 
 app.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
   res.json({ user_id: req.userId });

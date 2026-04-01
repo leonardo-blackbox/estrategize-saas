@@ -6,6 +6,11 @@ import { requireAdmin } from '../../middleware/admin.js';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { listAllPlugins, getAllConfig, setConfig } from '../../services/pluginConfigService.js';
 import {
+  getConfig as getMktConfig,
+  updateConfig as updateMktConfig,
+  pesquisaMercadoConfigSchema,
+} from '../../services/marketPluginConfigService.js';
+import {
   listPluginDocuments,
   deletePluginDocument,
   parseFile,
@@ -180,6 +185,35 @@ router.delete('/helena/knowledge/:id', async (req, res) => {
     const deleted = await deletePluginDocument(parsed.data.id, 'helena');
     if (!deleted) return res.status(404).json({ error: 'Document not found' });
     res.status(204).send();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ error: message });
+  }
+});
+
+// ─── Market Intelligence config routes (pesquisa-mercado) ──────────
+// Must be defined BEFORE generic /:slug/config routes to avoid capture.
+
+// GET /pesquisa-mercado/config
+router.get('/pesquisa-mercado/config', async (_req, res) => {
+  try {
+    const config = await getMktConfig('pesquisa-mercado');
+    res.json({ config });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ error: message });
+  }
+});
+
+// PUT /pesquisa-mercado/config
+router.put('/pesquisa-mercado/config', async (req, res) => {
+  const parsed = pesquisaMercadoConfigSchema.partial().safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Validation failed' });
+  }
+  try {
+    const config = await updateMktConfig('pesquisa-mercado', parsed.data);
+    res.json({ config });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     res.status(500).json({ error: message });
