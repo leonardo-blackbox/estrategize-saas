@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
+import { logger } from '../lib/logger.js';
 import {
   getUserCoursesCatalog,
   resolveCourseAccess,
@@ -16,7 +17,7 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res) => {
     const catalog = await getUserCoursesCatalog(req.userId!);
     res.json(catalog);
   } catch (err) {
-    console.error('GET /api/courses error:', err);
+    logger.error('GET /api/courses error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -54,8 +55,9 @@ router.get('/sections', requireAuth, async (req: AuthenticatedRequest, res) => {
       .select('course_id, module_id, lesson_id, access, expires_at')
       .eq('user_id', userId);
 
-    const entMap = new Map<string, any>();
-    for (const e of entitlements ?? []) {
+    interface EntitlementRow { course_id: string | null; module_id: string | null; lesson_id: string | null; access: string; expires_at: string | null }
+    const entMap = new Map<string, EntitlementRow>();
+    for (const e of (entitlements ?? []) as EntitlementRow[]) {
       if (e.course_id && !e.module_id) entMap.set(e.course_id, e);
     }
 
@@ -84,7 +86,7 @@ router.get('/sections', requireAuth, async (req: AuthenticatedRequest, res) => {
           .eq('plan_id', sub.plan_id)
       : { data: [] };
 
-    const planCourseIds = new Set((planEnts ?? []).map((p: any) => p.course_id));
+    const planCourseIds = new Set((planEnts ?? []).map((p) => p.course_id));
 
     function checkAccess(courseId: string): { allowed: boolean; reason: string; expiresAt?: string } {
       if (isAdmin) return { allowed: true, reason: 'admin' };
@@ -95,24 +97,36 @@ router.get('/sections', requireAuth, async (req: AuthenticatedRequest, res) => {
           return { allowed: false, reason: 'expired' };
         }
         if (ent.access === 'full_access' || ent.access === 'allow') {
-          return { allowed: true, reason: 'entitlement', expiresAt: ent.expires_at };
+          return { allowed: true, reason: 'entitlement', expiresAt: ent.expires_at ?? undefined };
         }
       }
       if (planCourseIds.has(courseId)) return { allowed: true, reason: 'plan' };
       return { allowed: false, reason: 'no_access' };
     }
 
-    const result = (sections as any[]).map((section) => ({
+    interface SectionCourseModule { lessons?: unknown[] }
+    interface SectionCourse {
+      id: string; title: string; cover_url: string; status: string;
+      sales_url?: string; offer_badge_enabled?: boolean; offer_badge_text?: string;
+      modules?: SectionCourseModule[];
+    }
+    interface SectionCourseJoin { sort_order: number; courses: SectionCourse | null }
+    interface FormationSection {
+      id: string; title: string; sort_order: number;
+      formation_section_courses?: SectionCourseJoin[];
+    }
+
+    const result = (sections as unknown as FormationSection[]).map((section) => ({
       id: section.id,
       title: section.title,
       sort_order: section.sort_order,
-      courses: ((section.formation_section_courses ?? []) as any[])
-        .sort((a: any, b: any) => a.sort_order - b.sort_order)
-        .map((sc: any) => {
+      courses: ((section.formation_section_courses ?? []) as SectionCourseJoin[])
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((sc) => {
           const c = sc.courses;
           if (!c || c.status !== 'published') return null;
           const totalLessons = (c.modules ?? []).reduce(
-            (sum: number, m: any) => sum + (m.lessons?.length ?? 0), 0,
+            (sum: number, m) => sum + (m.lessons?.length ?? 0), 0,
           );
           const access = checkAccess(c.id);
           return {
@@ -128,11 +142,11 @@ router.get('/sections', requireAuth, async (req: AuthenticatedRequest, res) => {
           };
         })
         .filter(Boolean),
-    })).filter((s: any) => s.courses.length > 0);
+    })).filter((s) => s.courses.length > 0);
 
     res.json(result);
   } catch (err) {
-    console.error('GET /api/courses/sections error:', err);
+    logger.error('GET /api/courses/sections error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -150,7 +164,7 @@ router.get('/home-settings', requireAuth, async (_req, res) => {
 
     res.json(data ?? { title: 'Formação', subtitle: null });
   } catch (err) {
-    console.error('GET /api/courses/home-settings error:', err);
+    logger.error('GET /api/courses/home-settings error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -197,7 +211,7 @@ router.get('/:id', requireAuth, async (req: AuthenticatedRequest, res) => {
 
     res.json({ course, access, progress: progressMap });
   } catch (err) {
-    console.error('GET /api/courses/:id error:', err);
+    logger.error('GET /api/courses/:id error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -232,18 +246,21 @@ router.get('/lessons/:lessonId', requireAuth, async (req: AuthenticatedRequest, 
     if (error || !lesson) return res.status(404).json({ error: 'Lesson not found' });
 
     // Computar aulas anterior e próxima
-    const courseId = (lesson.modules as any).courses.id;
+    interface LessonModuleJoin { id: string; courses: { id: string } }
+    const lessonModule = lesson.modules as unknown as LessonModuleJoin;
+    const courseId = lessonModule.courses.id;
     const { data: allModules } = await supabaseAdmin
       .from('modules')
       .select('id, sort_order, lessons(id, title, sort_order)')
       .eq('course_id', courseId)
       .order('sort_order');
 
-    const allLessons = (allModules ?? [])
-      .sort((a: any, b: any) => a.sort_order - b.sort_order)
-      .flatMap((m: any) => ((m.lessons as any[]) ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order));
+    interface ModuleWithLessons { sort_order: number; lessons: Array<{ id: string; title: string; sort_order: number }> | null }
+    const allLessons = ((allModules ?? []) as ModuleWithLessons[])
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .flatMap((m) => (m.lessons ?? []).sort((a, b) => a.sort_order - b.sort_order));
 
-    const idx = allLessons.findIndex((l: any) => l.id === lessonId);
+    const idx = allLessons.findIndex((l) => l.id === lessonId);
     const prevLesson = idx > 0 ? { id: allLessons[idx - 1].id, title: allLessons[idx - 1].title } : null;
     const nextLesson = idx < allLessons.length - 1 ? { id: allLessons[idx + 1].id, title: allLessons[idx + 1].title } : null;
     const isLast = idx === allLessons.length - 1;
@@ -258,7 +275,7 @@ router.get('/lessons/:lessonId', requireAuth, async (req: AuthenticatedRequest, 
 
     res.json({ lesson, progress: progress ?? null, prevLesson, nextLesson, isLast });
   } catch (err) {
-    console.error('GET /api/courses/lessons/:id error:', err);
+    logger.error('GET /api/courses/lessons/:id error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -301,7 +318,7 @@ router.patch('/lessons/:lessonId/progress', requireAuth, async (req: Authenticat
 
     res.json(data);
   } catch (err) {
-    console.error('PATCH /api/courses/lessons/:id/progress error:', err);
+    logger.error('PATCH /api/courses/lessons/:id/progress error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -332,7 +349,7 @@ router.get('/me/continue-watching', requireAuth, async (req: AuthenticatedReques
 
     res.json(data ?? []);
   } catch (err) {
-    console.error('GET /api/courses/me/continue-watching error:', err);
+    logger.error('GET /api/courses/me/continue-watching error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -363,7 +380,7 @@ router.get('/lessons/:lessonId/comments', requireAuth, async (req: Authenticated
     if (error) return res.status(500).json({ error: error.message });
 
     // Fetch profiles for user display
-    const userIds = [...new Set((comments ?? []).map((c: any) => c.user_id))];
+    const userIds = [...new Set((comments ?? []).map((c) => c.user_id))];
     let profileMap: Record<string, { email: string; avatar_url?: string }> = {};
 
     if (userIds.length > 0) {
@@ -371,17 +388,17 @@ router.get('/lessons/:lessonId/comments', requireAuth, async (req: Authenticated
         .from('profiles')
         .select('id, email, avatar_url')
         .in('id', userIds);
-      profileMap = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, { email: p.email, avatar_url: p.avatar_url }]));
+      profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, { email: p.email, avatar_url: p.avatar_url }]));
     }
 
-    const result = (comments ?? []).map((c: any) => ({
+    const result = (comments ?? []).map((c) => ({
       ...c,
       user: profileMap[c.user_id] ?? { email: 'Usuário' },
     }));
 
     res.json({ comments: result, hasMore: result.length === limit + 1 });
   } catch (err) {
-    console.error('GET /api/courses/lessons/:id/comments error:', err);
+    logger.error('GET /api/courses/lessons/:id/comments error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -407,7 +424,7 @@ router.post('/lessons/:lessonId/comments', requireAuth, async (req: Authenticate
     if (error) return res.status(500).json({ error: error.message });
     res.status(201).json(data);
   } catch (err) {
-    console.error('POST /api/courses/lessons/:id/comments error:', err);
+    logger.error('POST /api/courses/lessons/:id/comments error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -444,7 +461,7 @@ router.delete('/lessons/comments/:commentId', requireAuth, async (req: Authentic
     if (error) return res.status(500).json({ error: error.message });
     res.json({ ok: true });
   } catch (err) {
-    console.error('DELETE /api/courses/lessons/comments/:id error:', err);
+    logger.error('DELETE /api/courses/lessons/comments/:id error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

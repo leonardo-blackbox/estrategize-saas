@@ -17,8 +17,8 @@ export function ManageTurmaStudentsModal({ turma, isAdding, isRemoving, confirmR
   const { data: enrollData, isLoading } = useQuery({ queryKey: ['admin-turma-enrollments', turma.id], queryFn: () => adminGetTurmaEnrollments(turma.id) });
   const { data: usersData } = useQuery({ queryKey: ['admin-users-search', userSearch], queryFn: () => adminGetUsers({ q: userSearch, limit: 20 }), enabled: userSearch.length >= 2 });
 
-  const enrollments = (enrollData as any)?.enrollments ?? [];
-  const users = (usersData as any)?.users ?? [];
+  const enrollments = enrollData?.enrollments ?? [];
+  const users = usersData?.users ?? [];
 
   return (
     <Modal open onClose={onClose} className="sm:max-w-md">
@@ -32,7 +32,7 @@ export function ManageTurmaStudentsModal({ turma, isAdding, isRemoving, confirmR
           <Input label="" value={userSearch} onChange={(e) => { setUserSearch(e.target.value); setSelectedUserId(''); }} placeholder="Buscar por email ou nome (2+ chars)..." />
           {userSearch.length >= 2 && users.length > 0 && !selectedUserId && (
             <div className="rounded-[var(--radius-sm)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] max-h-32 overflow-y-auto">
-              {users.map((u: any) => (
+              {users.map((u) => (
                 <button key={u.id} onClick={() => { setSelectedUserId(u.id); setUserSearch(u.email ?? u.full_name ?? u.id); }}
                   className="w-full text-left px-3 py-2 hover:bg-[var(--bg-hover)] transition-colors border-b border-[var(--border-hairline)] last:border-0">
                   <p className="text-xs font-medium text-[var(--text-primary)]">{u.email ?? '—'}</p>
@@ -48,7 +48,7 @@ export function ManageTurmaStudentsModal({ turma, isAdding, isRemoving, confirmR
         <div className="max-h-64 overflow-y-auto space-y-1">
           {isLoading ? ([1,2,3].map((i) => <div key={i} className="h-10 animate-pulse rounded bg-[var(--bg-surface-1)]" />))
             : enrollments.length === 0 ? <p className="text-xs text-[var(--text-tertiary)] py-4 text-center">Nenhum aluno nesta turma.</p>
-            : enrollments.map((enr: any) => (
+            : enrollments.map((enr) => (
               <div key={enr.id} className="flex items-center justify-between gap-2 px-3 py-2 rounded-[var(--radius-sm)] bg-[var(--bg-surface-1)] border border-[var(--border-hairline)]">
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-[var(--text-primary)] truncate">{enr.profiles?.full_name ?? enr.profiles?.email ?? 'Usuário'}</p>

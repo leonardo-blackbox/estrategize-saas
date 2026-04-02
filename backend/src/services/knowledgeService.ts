@@ -1,5 +1,6 @@
 import { createRequire } from 'module';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { logger } from '../lib/logger.js';
 import { generateEmbeddings } from './embeddingService.js';
 export { generateEmbeddings };
 import OpenAI from 'openai';
@@ -218,7 +219,7 @@ export async function processDocument(
   } catch (err) {
     // 7. On any error: mark document as 'error'
     const message = err instanceof Error ? err.message : String(err);
-    console.error('[knowledgeService] processDocument error:', message);
+    logger.error('[knowledgeService] processDocument error:', message);
 
     await db
       .from('knowledge_documents')

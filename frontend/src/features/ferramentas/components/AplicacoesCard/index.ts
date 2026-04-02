@@ -1,0 +1,1 @@
+export { AplicacoesCard } from './AplicacoesCard';

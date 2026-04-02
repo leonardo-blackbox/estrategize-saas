@@ -1,6 +1,7 @@
 import { cn } from '../../../../lib/cn.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { StatusDropdown } from './StatusDropdown.tsx';
+import type { AdminFormationSection } from '../../services/admin.api.ts';
 
 export interface SectionCardCallbacks {
   onEditTitleChange: (value: string) => void;
@@ -12,12 +13,12 @@ export interface SectionCardCallbacks {
   onStatusToggle: (id: string) => void;
   onStatusSelect: (id: string, active: boolean) => void;
   onStatusClickOutside: () => void;
-  onManageCourses: (section: any) => void;
+  onManageCourses: (section: AdminFormationSection) => void;
   onDelete: (id: string) => void;
 }
 
 interface SectionCardProps extends SectionCardCallbacks {
-  section: any;
+  section: AdminFormationSection;
   index: number;
   totalCount: number;
   editingId: string | null;

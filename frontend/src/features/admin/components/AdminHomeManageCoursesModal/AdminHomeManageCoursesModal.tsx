@@ -5,8 +5,10 @@ import { cn } from '../../../../lib/cn.ts';
 import { Modal } from '../../../../components/ui/Modal.tsx';
 import { Button } from '../../../../components/ui/Button.tsx';
 
+import type { AdminFormationSection } from '../../services/admin.api.ts';
+
 interface AdminHomeManageCoursesModalProps {
-  section: any;
+  section: AdminFormationSection;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -20,7 +22,7 @@ export function AdminHomeManageCoursesModal({
   });
 
   const currentCourseIds = (section.formation_section_courses ?? [])
-    .map((sc: any) => sc.courses?.id)
+    .map((sc) => sc.courses?.id)
     .filter(Boolean) as string[];
 
   const [selected, setSelected] = useState<Set<string>>(new Set(currentCourseIds));
@@ -62,7 +64,7 @@ export function AdminHomeManageCoursesModal({
           {allCourses.length === 0 ? (
             <p className="text-xs text-[var(--text-tertiary)] py-4 text-center">Nenhum curso encontrado.</p>
           ) : (
-            allCourses.map((course: any) => (
+            allCourses.map((course) => (
               <button
                 key={course.id}
                 onClick={() => toggleCourse(course.id)}

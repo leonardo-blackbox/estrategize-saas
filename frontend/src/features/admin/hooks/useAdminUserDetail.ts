@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { adminGetUser } from '../services/admin.api.ts';
+import type { AdminUserDetail } from '../services/admin.api.ts';
 
 export type TabId = 'overview' | 'courses' | 'credits' | 'history';
 
@@ -24,7 +25,7 @@ export function useAdminUserDetail() {
     enabled: !!id,
   });
 
-  const detail = userDetail as any;
+  const detail = userDetail as AdminUserDetail | undefined;
   const displayName = detail?.profile?.full_name ?? detail?.authUser?.email ?? id;
 
   const invalidateUsers = () =>

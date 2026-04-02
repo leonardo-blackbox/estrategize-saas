@@ -8,10 +8,11 @@ import {
   adminUpdateUserProfile,
   adminGetUserCreditBalance,
 } from '../../services/admin.api.ts';
+import type { AdminUserDetail, AdminSubscription } from '../../services/admin.api.ts';
 import { formatDate, timeAgo } from '../../helpers/format.ts';
 
 interface TabOverviewProps {
-  detail: any;
+  detail: AdminUserDetail;
   userId: string;
   onProfileUpdated: () => void;
 }
@@ -38,9 +39,9 @@ export function AdminUserDetailTabOverview({ detail, userId, onProfileUpdated }:
 
   const profile = detail.profile;
   const authUser = detail.authUser;
-  const sub = (profile?.subscriptions ?? [])[0];
+  const sub: AdminSubscription | undefined = (profile?.subscriptions ?? [])[0];
   const balance = creditBalance?.available ?? 0;
-  const isSuspended = (detail.entitlements ?? []).some((e: any) => e.access === 'deny' && !e.course_id);
+  const isSuspended = (detail.entitlements ?? []).some((e) => e.access === 'deny' && !e.course_id);
 
   return (
     <>
@@ -82,11 +83,11 @@ export function AdminUserDetailTabOverview({ detail, userId, onProfileUpdated }:
           {sub ? (
             <div className="text-xs space-y-1.5">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-sm text-[var(--text-primary)]">{(sub as any).plans?.name ?? 'Plano'}</span>
-                <span className={cn('text-[10px] font-bold uppercase px-1.5 py-0.5 rounded', (sub as any).status === 'active' ? 'bg-emerald-500/15 text-emerald-500' : (sub as any).status === 'past_due' ? 'bg-amber-500/15 text-amber-500' : 'bg-[var(--bg-hover)] text-[var(--text-tertiary)]')}>{(sub as any).status}</span>
+                <span className="font-semibold text-sm text-[var(--text-primary)]">{sub.plans?.name ?? 'Plano'}</span>
+                <span className={cn('text-[10px] font-bold uppercase px-1.5 py-0.5 rounded', sub.status === 'active' ? 'bg-emerald-500/15 text-emerald-500' : sub.status === 'past_due' ? 'bg-amber-500/15 text-amber-500' : 'bg-[var(--bg-hover)] text-[var(--text-tertiary)]')}>{sub.status}</span>
               </div>
-              <div className="flex justify-between text-[var(--text-tertiary)]"><span>Renova em</span><span>{formatDate((sub as any).current_period_end)}</span></div>
-              {(sub as any).plans?.credits_per_month && <div className="flex justify-between text-[var(--text-tertiary)]"><span>Creditos/mes</span><span>{(sub as any).plans.credits_per_month}</span></div>}
+              <div className="flex justify-between text-[var(--text-tertiary)]"><span>Renova em</span><span>{formatDate(sub.current_period_end)}</span></div>
+              {sub.plans?.credits_per_month && <div className="flex justify-between text-[var(--text-tertiary)]"><span>Creditos/mes</span><span>{sub.plans.credits_per_month}</span></div>}
             </div>
           ) : (
             <p className="text-xs text-[var(--text-tertiary)]">Sem plano ativo</p>

@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { logger } from '../lib/logger.js';
 import { buildFullContext } from './consultancyContextService.js';
 import { generateEmbeddings } from './embeddingService.js';
 import { helenaEmitter } from './helenaSSE.js';
@@ -116,7 +117,7 @@ async function generateAndEmit(
     try {
       report = JSON.parse(raw) as HelenaReport;
     } catch {
-      console.error('[helena] Failed to parse GPT response:', raw);
+      logger.error('[helena] Failed to parse GPT response:', raw);
       return;
     }
 
@@ -135,11 +136,11 @@ async function generateAndEmit(
           urgencia: report.urgencia,
         })
         .then(({ error }) => {
-          if (error) console.error('[helena] Failed to persist event:', error.message);
+          if (error) logger.error('[helena] Failed to persist event:', error.message);
         });
     }
   } catch (err) {
-    console.error('[helena] generateAndEmit failed:', err);
+    logger.error('[helena] generateAndEmit failed:', err);
   }
 }
 

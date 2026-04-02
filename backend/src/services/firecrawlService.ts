@@ -1,4 +1,5 @@
 import FirecrawlApp from '@mendable/firecrawl-js';
+import { logger } from '../lib/logger.js';
 
 // ============================================================================
 // Firecrawl Service — URL scraping wrapper
@@ -36,14 +37,14 @@ export async function scrapeUrl(url: string): Promise<string> {
     const markdown = result.markdown ?? '';
 
     if (markdown.length < MIN_CONTENT_LENGTH) {
-      console.log(`[firecrawl] Content too short (${markdown.length} chars) for ${url} — skipping`);
+      logger.info(`[firecrawl] Content too short (${markdown.length} chars) for ${url} — skipping`);
       return '';
     }
 
     return markdown;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`[firecrawl] Error scraping ${url}: ${message}`);
+    logger.error(`[firecrawl] Error scraping ${url}: ${message}`);
     return '';
   }
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { Input } from '../../../../components/ui/Input.tsx';
 import { Modal } from '../../../../components/ui/Modal.tsx';
-import { type Turma } from '../../../../api/courses.ts';
+import { type Turma, type AdminCourseDetail } from '../../../../api/courses.ts';
 
 export interface TurmaFormData {
   course_id: string;
@@ -14,7 +14,7 @@ export interface TurmaFormData {
 
 interface TurmaFormModalProps {
   turma?: Turma;
-  courses: any[];
+  courses: AdminCourseDetail[];
   isSaving: boolean;
   onClose: () => void;
   onSubmit: (data: TurmaFormData) => void;
@@ -45,7 +45,7 @@ export function TurmaFormModal({ turma, courses, isSaving, onClose, onSubmit }: 
             <select value={form.course_id} onChange={(e) => setForm((f) => ({ ...f, course_id: e.target.value }))}
               className="w-full text-xs rounded-[var(--radius-sm)] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] px-3 py-2 text-[var(--text-secondary)] focus:outline-none focus:ring-1 focus:ring-[var(--text-primary)]">
               <option value="">Selecionar curso...</option>
-              {courses.map((c: any) => <option key={c.id} value={c.id}>{c.title}</option>)}
+              {courses.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
             </select>
           </div>
         )}

@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { logger } from '../lib/logger.js';
 import { runActor } from './apifyService.js';
 import { scrapeUrl } from './firecrawlService.js';
 import { getConfig } from './marketPluginConfigService.js';
@@ -53,7 +54,7 @@ async function discoverCompetitors(
 
   if (config.discovery_sources.includes('google_maps')) {
     try {
-      console.log('[market-research] Step 1/5: Discovering competitors via Google Maps...');
+      logger.info('[market-research] Step 1/5: Discovering competitors via Google Maps...');
       const niche = ctx.niche ?? ctx.title ?? 'negocio local';
       const searchString = `${niche}`;
 
@@ -92,7 +93,7 @@ async function discoverCompetitors(
         });
       }
     } catch (err) {
-      console.error('[market-research] Google Maps discovery failed:', err instanceof Error ? err.message : err);
+      logger.error('[market-research] Google Maps discovery failed:', err instanceof Error ? err.message : err);
     }
   }
 
@@ -186,7 +187,7 @@ async function scrapeCompetitorInstagram(
 
   try {
     const usernames = withIG.map((c) => c.instagramHandle!.replace(/^@/, ''));
-    console.log(`[market-research] Step 2/5: Scraping Instagram for ${usernames.length} competitors...`);
+    logger.info(`[market-research] Step 2/5: Scraping Instagram for ${usernames.length} competitors...`);
 
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('Instagram scrape timeout')), 180_000),
@@ -203,7 +204,7 @@ async function scrapeCompetitorInstagram(
       .filter((r): r is ApifyIGProfile & { username: string } => !!r.username)
       .map((r) => ({ handle: r.username, data: mapIGProfile(r) }));
   } catch (err) {
-    console.error('[market-research] Instagram scrape failed:', err instanceof Error ? err.message : err);
+    logger.error('[market-research] Instagram scrape failed:', err instanceof Error ? err.message : err);
     return [];
   }
 }
@@ -224,7 +225,7 @@ async function scrapeCompetitorWebsites(
 
   if (withWebsite.length === 0) return [];
 
-  console.log(`[market-research] Step 3/5: Scraping ${withWebsite.length} competitor websites...`);
+  logger.info(`[market-research] Step 3/5: Scraping ${withWebsite.length} competitor websites...`);
   const results: WebsiteScrapedData[] = [];
 
   for (const competitor of withWebsite) {
@@ -284,7 +285,7 @@ async function generateReport(
   },
   config: PesquisaMercadoConfig,
 ): Promise<{ reportMarkdown: string; keyInsights: KeyInsights }> {
-  console.log('[market-research] Step 4/5: Generating AI report...');
+  logger.info('[market-research] Step 4/5: Generating AI report...');
 
   const lang = config.report_language === 'pt-BR' ? 'Português do Brasil' : 'English';
   const sectionsList = buildSectionsList(config.report_sections, config.report_language);
@@ -393,7 +394,7 @@ Respond as JSON: {"opportunities":["..."],"threats":["..."],"positioning":"..."}
     };
   } catch {
     // Key insights extraction failure is non-fatal
-    console.warn('[market-research] Key insights extraction failed — skipping');
+    logger.warn('[market-research] Key insights extraction failed — skipping');
   }
 
   return { reportMarkdown, keyInsights };
@@ -468,7 +469,7 @@ async function runPipeline(researchId: string): Promise<void> {
         }
       }
     } catch {
-      console.warn('[market-research] Instagram step failed — continuing');
+      logger.warn('[market-research] Instagram step failed — continuing');
     }
     await updateResearch(researchId, {
       instagram_data: instagramResults.map((r) => r.data) as unknown as MarketResearch['instagram_data'],
@@ -480,7 +481,7 @@ async function runPipeline(researchId: string): Promise<void> {
     try {
       websitesData = await scrapeCompetitorWebsites(competitors, config);
     } catch {
-      console.warn('[market-research] Websites step failed — continuing');
+      logger.warn('[market-research] Websites step failed — continuing');
     }
     await updateResearch(researchId, {
       websites_data: websitesData as unknown as MarketResearch['websites_data'],
@@ -501,7 +502,7 @@ async function runPipeline(researchId: string): Promise<void> {
       completed_at: new Date().toISOString(),
     });
 
-    console.log(`[market-research] Pipeline done for research ${researchId}`);
+    logger.info(`[market-research] Pipeline done for research ${researchId}`);
 
     // Step 5 — RAG indexing (optional)
     if (config.auto_index_rag && reportMarkdown) {
@@ -515,12 +516,12 @@ async function runPipeline(researchId: string): Promise<void> {
           { competitors: competitors as unknown[], instagramData: instagramResults.map((r) => r.data) },
         );
       } catch (err) {
-        console.error('[market-research] RAG indexing failed (non-fatal):', err instanceof Error ? err.message : err);
+        logger.error('[market-research] RAG indexing failed (non-fatal):', err instanceof Error ? err.message : err);
       }
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`[market-research] Pipeline failed for ${researchId}:`, message);
+    logger.error(`[market-research] Pipeline failed for ${researchId}:`, message);
     await updateResearch(researchId, { status: 'failed', error_message: message });
   }
 }
@@ -537,7 +538,7 @@ async function indexReportInRAG(
   config: PesquisaMercadoConfig,
   rawData?: { competitors: unknown[] | null; instagramData: unknown[] | null },
 ): Promise<void> {
-  console.log(`[market-research] Indexing report in RAG for consultancy ${consultancyId}...`);
+  logger.info(`[market-research] Indexing report in RAG for consultancy ${consultancyId}...`);
 
   // Lazy import to avoid circular deps
   const { processDocument } = await import('./knowledgeService.js');
@@ -578,7 +579,7 @@ async function indexReportInRAG(
         fileBuffer: rawBuffer,
       });
     } catch (err) {
-      console.warn('[market-research] Raw data RAG index failed (non-fatal):', err instanceof Error ? err.message : err);
+      logger.warn('[market-research] Raw data RAG index failed (non-fatal):', err instanceof Error ? err.message : err);
     }
   }
 
@@ -587,7 +588,7 @@ async function indexReportInRAG(
     .update({ rag_indexed: true })
     .eq('id', researchId);
 
-  console.log(`[market-research] RAG indexed: document consultancy=${consultancyId}`);
+  logger.info(`[market-research] RAG indexed: document consultancy=${consultancyId}`);
 }
 
 // ============================================================================
@@ -597,7 +598,7 @@ async function indexReportInRAG(
 export function startResearch(researchId: string): void {
   setImmediate(() => {
     void runPipeline(researchId).catch((err: unknown) => {
-      console.error('[market-research] Unhandled pipeline error:', err);
+      logger.error('[market-research] Unhandled pipeline error:', err);
     });
   });
 }

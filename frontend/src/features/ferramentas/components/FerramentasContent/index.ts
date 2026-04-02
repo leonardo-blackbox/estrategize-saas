@@ -1,0 +1,1 @@
+export { FerramentasContent } from './FerramentasContent';

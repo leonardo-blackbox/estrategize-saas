@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { z } from 'zod';
 import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
+import { logger } from '../../lib/logger.js';
 
 // ─── Stripe client ────────────────────────────────────────────────
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
@@ -66,7 +67,7 @@ router.post('/checkout-session', async (req: AuthenticatedRequest, res) => {
 
     return res.json({ url: session.url });
   } catch (err) {
-    console.error('Stripe checkout error:', err);
+    logger.error('Stripe checkout error:', err);
     return res.status(502).json({ error: 'Erro ao criar sessao de checkout' });
   }
 });

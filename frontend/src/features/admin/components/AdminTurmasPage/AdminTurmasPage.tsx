@@ -27,8 +27,8 @@ export function AdminTurmasPage() {
 
   const { data: turmasData, isLoading } = useQuery({ queryKey: ['admin-turmas'], queryFn: adminGetTurmas });
   const { data: coursesData } = useQuery({ queryKey: ['admin-courses'], queryFn: adminGetCourses });
-  const turmas = (turmasData as any)?.turmas ?? [];
-  const courses = (coursesData as any[]) ?? [];
+  const turmas = turmasData?.turmas ?? [];
+  const courses = Array.isArray(coursesData) ? coursesData : [];
 
   const invalidateTurmas = () => qc.invalidateQueries({ queryKey: ['admin-turmas'] });
 

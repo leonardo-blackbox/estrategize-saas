@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { logger } from '../lib/logger.js';
 
 // ============================================================================
 // Types
@@ -236,7 +237,7 @@ export async function withCreditCharge<T>(
     try {
       await releaseCredits(userId, reservationId);
     } catch (releaseErr) {
-      console.error(
+      logger.error(
         `CRITICAL: Failed to release reservation ${reservationId} after action failure:`,
         releaseErr,
       );
@@ -282,7 +283,7 @@ export async function expireStaleReservations(
       await releaseCredits(row.user_id, row.id);
       released++;
     } catch {
-      console.error(`Failed to expire reservation ${row.id}`);
+      logger.error(`Failed to expire reservation ${row.id}`);
     }
   }
 

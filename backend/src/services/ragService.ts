@@ -1,5 +1,6 @@
 import { generateEmbeddings } from './embeddingService.js';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { logger } from '../lib/logger.js';
 
 // ============================================================
 // Types
@@ -57,10 +58,10 @@ export async function retrieveRAGContext(
     ]);
 
     if (globalResult.error) {
-      console.error('RAG global retrieval error:', globalResult.error);
+      logger.error('RAG global retrieval error:', globalResult.error);
     }
     if (consultancyResult.error) {
-      console.error('RAG consultancy retrieval error:', consultancyResult.error);
+      logger.error('RAG consultancy retrieval error:', consultancyResult.error);
     }
 
     const globalChunks: RAGChunk[] = (globalResult.data as RAGChunk[]) ?? [];
@@ -79,7 +80,7 @@ export async function retrieveRAGContext(
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, 5);
   } catch (error) {
-    console.error('RAG retrieval failed:', error);
+    logger.error('RAG retrieval failed:', error);
     return [];
   }
 }

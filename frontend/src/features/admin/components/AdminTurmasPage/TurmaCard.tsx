@@ -27,7 +27,7 @@ export function TurmaCard({ turma, confirmDeleteId, isDeletePending, formatDate,
           )}
         </div>
         <p className="text-xs text-[var(--text-tertiary)] mt-0.5">
-          {(turma as any).courses?.title ?? 'Curso'} &middot;{' '}
+          {turma.courses?.title ?? 'Curso'} &middot;{' '}
           {turma.drip_type === 'enrollment_date' ? 'Libera a partir da matrícula' : `Libera em ${formatDate(turma.access_start_date)}`}
           {' '}&middot; {turma.enrollment_count ?? 0} aluno{(turma.enrollment_count ?? 0) !== 1 ? 's' : ''}
         </p>

@@ -4,7 +4,7 @@ import { Input } from '../../../../components/ui/Input.tsx';
 import { CourseCoverUpload } from '../../../../components/admin/CourseCoverUpload.tsx';
 import { CourseBannerUpload } from '../../../../components/admin/CourseBannerUpload.tsx';
 import { LessonLinksModal } from '../../../../components/admin/LessonLinksModal.tsx';
-import type { LessonLink } from '../../services/admin.api.ts';
+import type { LessonLink, AdminCourseDetail, Module, Lesson } from '../../services/admin.api.ts';
 
 interface CourseForm {
   title: string;
@@ -35,31 +35,31 @@ interface AdminCursoDetailModalsProps {
   setEditingCourse: (v: boolean) => void;
   courseForm: CourseForm;
   setCourseForm: (fn: (f: CourseForm) => CourseForm) => void;
-  updateCourseMutation: { mutate: (d: any) => void; isPending: boolean };
+  updateCourseMutation: { mutate: (d: Partial<AdminCourseDetail>) => void; isPending: boolean };
   // Create module
   showModuleModal: boolean;
   setShowModuleModal: (v: boolean) => void;
   moduleForm: ModuleForm;
   setModuleForm: (fn: (f: ModuleForm) => ModuleForm) => void;
-  createModuleMutation: { mutate: (d: any) => void; isPending: boolean };
+  createModuleMutation: { mutate: (d: Partial<Module>) => void; isPending: boolean };
   // Edit module
-  editingModule: any | null;
-  setEditingModule: (v: any) => void;
+  editingModule: Module | null;
+  setEditingModule: (v: Module | null) => void;
   editModuleForm: ModuleForm;
   setEditModuleForm: (fn: (f: ModuleForm) => ModuleForm) => void;
-  updateModuleMutation: { mutate: (d: any) => void; isPending: boolean };
+  updateModuleMutation: { mutate: (d: { mid: string; d: Partial<Module> }) => void; isPending: boolean };
   // Create lesson
   showLessonModal: string | null;
   setShowLessonModal: (v: string | null) => void;
   lessonForm: LessonForm;
   setLessonForm: (fn: (f: LessonForm) => LessonForm) => void;
-  createLessonMutation: { mutate: (d: any) => void; isPending: boolean };
+  createLessonMutation: { mutate: (d: { moduleId: string; d: Partial<Lesson> }) => void; isPending: boolean };
   // Edit lesson
-  editingLesson: any | null;
-  setEditingLesson: (v: any) => void;
+  editingLesson: Lesson | null;
+  setEditingLesson: (v: Lesson | null) => void;
   editLessonForm: LessonForm;
   setEditLessonForm: (fn: (f: LessonForm) => LessonForm) => void;
-  updateLessonMutation: { mutate: (d: any) => void; isPending: boolean };
+  updateLessonMutation: { mutate: (d: { lid: string; d: Partial<Lesson> }) => void; isPending: boolean };
   // Lesson links
   linksLesson: { id: string; title: string; links: LessonLink[] } | null;
   setLinksLesson: (v: null) => void;

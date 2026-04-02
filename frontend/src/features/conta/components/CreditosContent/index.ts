@@ -1,0 +1,1 @@
+export { CreditosContent } from './CreditosContent';

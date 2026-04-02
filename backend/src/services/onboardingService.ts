@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { logger } from '../lib/logger.js';
 
 export interface PurchaseEvent {
   event_id: string;
@@ -36,7 +37,7 @@ async function createSubscriptionRecord(
   }
 
   if (!planDbId) {
-    console.warn('[onboarding] Cannot create subscription: no matching plans row for stripe_price_id', stripePriceId);
+    logger.warn('[onboarding] Cannot create subscription: no matching plans row for stripe_price_id', stripePriceId);
     return;
   }
 
@@ -53,9 +54,9 @@ async function createSubscriptionRecord(
   });
 
   if (error) {
-    console.error('[onboarding] Failed to create subscription record:', error.message);
+    logger.error('[onboarding] Failed to create subscription record:', error.message);
   } else {
-    console.log(`[onboarding] Subscription record created for user ${userId}, plan ${planDbId}`);
+    logger.info(`[onboarding] Subscription record created for user ${userId}, plan ${planDbId}`);
   }
 }
 
@@ -78,7 +79,7 @@ export async function processPurchase(event: PurchaseEvent): Promise<void> {
   if (event.user_id) {
     // Direct userId from Stripe client_reference_id — skip listUsers scan
     userId = event.user_id;
-    console.log(`[onboarding] Using direct userId: ${userId}`);
+    logger.info(`[onboarding] Using direct userId: ${userId}`);
   } else {
     // Fallback: email-based lookup (for Hotmart/Kiwify webhooks)
     const { data: listData } = await supabaseAdmin.auth.admin.listUsers();
@@ -93,10 +94,10 @@ export async function processPurchase(event: PurchaseEvent): Promise<void> {
         throw new Error(`Failed to invite user: ${inviteError?.message}`);
       }
       userId = invited.user.id;
-      console.log(`[onboarding] New user created: ${userId} (${event.customer_email})`);
+      logger.info(`[onboarding] New user created: ${userId} (${event.customer_email})`);
     } else {
       userId = existing.id;
-      console.log(`[onboarding] Existing user found: ${userId}`);
+      logger.info(`[onboarding] Existing user found: ${userId}`);
     }
   }
 
@@ -118,9 +119,9 @@ export async function processPurchase(event: PurchaseEvent): Promise<void> {
       }, { onConflict: 'user_id,course_id' });
 
     if (enrollError) {
-      console.error('[onboarding] Enrollment failed:', enrollError.message);
+      logger.error('[onboarding] Enrollment failed:', enrollError.message);
     } else {
-      console.log(`[onboarding] Enrolled user ${userId} in course ${event.course_id}`);
+      logger.info(`[onboarding] Enrolled user ${userId} in course ${event.course_id}`);
     }
   }
 
@@ -156,7 +157,7 @@ export async function processPurchase(event: PurchaseEvent): Promise<void> {
       }
     }
 
-    console.log(`[onboarding] Plan entitlements applied for plan ${event.plan_id}`);
+    logger.info(`[onboarding] Plan entitlements applied for plan ${event.plan_id}`);
 
     // ─── 4b. Grant credits from plan ──────────────────────────────
     const { data: planProduct } = await supabaseAdmin
@@ -173,7 +174,7 @@ export async function processPurchase(event: PurchaseEvent): Promise<void> {
         'purchase',
         `Plan purchase: ${event.plan_id} (${event.provider})`,
       );
-      console.log(`[onboarding] Granted ${planProduct.credits} credits to user ${userId}`);
+      logger.info(`[onboarding] Granted ${planProduct.credits} credits to user ${userId}`);
     }
 
     // ─── 4c. Create subscription record ───────────────────────────
@@ -219,5 +220,5 @@ export async function processCancellation(event: PurchaseEvent): Promise<void> {
     },
   });
 
-  console.log(`[onboarding] Cancellation recorded for ${event.customer_email}`);
+  logger.info(`[onboarding] Cancellation recorded for ${event.customer_email}`);
 }

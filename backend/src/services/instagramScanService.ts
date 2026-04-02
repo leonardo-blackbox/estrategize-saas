@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { runActor } from './apifyService.js';
+import { logger } from '../lib/logger.js';
 import type {
   InstagramSnapshot,
   InstagramProfileData,
@@ -113,7 +114,7 @@ function extractProfileData(raw: ApifyInstagramProfile): InstagramProfileData {
 
 async function processScan(snapshotId: string, handle: string): Promise<void> {
   const db = ensureAdmin();
-  console.log(`[instagram-scan] Starting scan for @${handle}`);
+  logger.info(`[instagram-scan] Starting scan for @${handle}`);
 
   await db
     .from('instagram_snapshots')
@@ -141,12 +142,12 @@ async function processScan(snapshotId: string, handle: string): Promise<void> {
       })
       .eq('id', snapshotId);
 
-    console.log(
+    logger.info(
       `[instagram-scan] Done: @${handle} — ${profileData.followersCount} followers`,
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`[instagram-scan] Error for @${handle}: ${message}`);
+    logger.error(`[instagram-scan] Error for @${handle}: ${message}`);
 
     await db
       .from('instagram_snapshots')
@@ -173,16 +174,16 @@ export function triggerScan(
       .single(),
   ).then(({ data, error }) => {
     if (error || !data) {
-      console.error('[instagram-scan] Failed to create snapshot record:', error?.message);
+      logger.error('[instagram-scan] Failed to create snapshot record:', error?.message);
       return;
     }
     setImmediate(() => {
       void processScan(data.id as string, handle).catch((err: unknown) => {
-        console.error('[instagram-scan] Unhandled error in processScan:', err);
+        logger.error('[instagram-scan] Unhandled error in processScan:', err);
       });
     });
   }).catch((err: unknown) => {
-    console.error('[instagram-scan] Failed to insert snapshot:', err);
+    logger.error('[instagram-scan] Failed to insert snapshot:', err);
   });
 }
 

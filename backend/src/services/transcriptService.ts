@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
+import { logger } from '../lib/logger.js';
 import { chunkText, generateEmbeddings } from './knowledgeService.js';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? 'missing' });
@@ -145,7 +146,7 @@ export async function processTranscript(sessionId: string): Promise<void> {
       .single();
 
     if (sessionError || !session) {
-      console.warn(`[transcriptService] Session not found: ${sessionId}`);
+      logger.warn(`[transcriptService] Session not found: ${sessionId}`);
       return;
     }
 
@@ -159,13 +160,13 @@ export async function processTranscript(sessionId: string): Promise<void> {
       .order('timestamp', { ascending: true });
 
     if (segmentsError) {
-      console.error(`[transcriptService] Failed to fetch segments for ${sessionId}:`, segmentsError.message);
+      logger.error(`[transcriptService] Failed to fetch segments for ${sessionId}:`, segmentsError.message);
       await db.from('meeting_sessions').update({ status: 'error' }).eq('id', sessionId);
       return;
     }
 
     if (!segments || segments.length === 0) {
-      console.warn(`[transcriptService] No transcript segments for session ${sessionId} — leaving as processing for bot.done fallback`);
+      logger.warn(`[transcriptService] No transcript segments for session ${sessionId} — leaving as processing for bot.done fallback`);
       return;
     }
 
@@ -180,7 +181,7 @@ export async function processTranscript(sessionId: string): Promise<void> {
     try {
       parsed = await analyzeWithGPT(formattedTranscript);
     } catch (gptError) {
-      console.error(`[transcriptService] GPT-4 analysis failed for ${sessionId}:`, gptError);
+      logger.error(`[transcriptService] GPT-4 analysis failed for ${sessionId}:`, gptError);
       await db.from('meeting_sessions').update({ status: 'error' }).eq('id', sessionId);
       return;
     }
@@ -197,7 +198,7 @@ export async function processTranscript(sessionId: string): Promise<void> {
       .eq('id', sessionId);
 
     if (updateError) {
-      console.error(`[transcriptService] Failed to update session ${sessionId}:`, updateError.message);
+      logger.error(`[transcriptService] Failed to update session ${sessionId}:`, updateError.message);
     }
 
     // Step 5b — Index transcript as consultancy RAG document (fire-and-forget)
@@ -222,7 +223,7 @@ export async function processTranscript(sessionId: string): Promise<void> {
           .single();
 
         if (docInsertError || !docData) {
-          console.error(`[transcriptService] Failed to create knowledge doc for ${sessionId}:`, docInsertError?.message);
+          logger.error(`[transcriptService] Failed to create knowledge doc for ${sessionId}:`, docInsertError?.message);
         } else {
           const chunks = chunkText(formattedTranscript);
           if (chunks.length > 0) {
@@ -242,18 +243,18 @@ export async function processTranscript(sessionId: string): Promise<void> {
 
             const { error: chunksError } = await db2.from('knowledge_chunks').insert(chunkRows);
             if (chunksError) {
-              console.error(`[transcriptService] Failed to insert RAG chunks for ${sessionId}:`, chunksError.message);
+              logger.error(`[transcriptService] Failed to insert RAG chunks for ${sessionId}:`, chunksError.message);
               await db2.from('knowledge_documents').update({ status: 'error', error_message: chunksError.message }).eq('id', docData.id);
             } else {
               await db2.from('knowledge_documents').update({ status: 'ready', chunk_count: chunks.length }).eq('id', docData.id);
-              console.log(`[transcriptService] Indexed ${chunks.length} RAG chunk(s) for session ${sessionId}`);
+              logger.info(`[transcriptService] Indexed ${chunks.length} RAG chunk(s) for session ${sessionId}`);
             }
           } else {
             await db2.from('knowledge_documents').update({ status: 'ready', chunk_count: 0 }).eq('id', docData.id);
           }
         }
       } catch (ragError) {
-        console.error(`[transcriptService] RAG indexing failed for ${sessionId} (non-fatal):`, ragError);
+        logger.error(`[transcriptService] RAG indexing failed for ${sessionId} (non-fatal):`, ragError);
       }
     }
 
@@ -278,22 +279,22 @@ export async function processTranscript(sessionId: string): Promise<void> {
         .insert(actionRows);
 
       if (insertError) {
-        console.error(`[transcriptService] Failed to insert action items for ${sessionId}:`, insertError.message);
+        logger.error(`[transcriptService] Failed to insert action items for ${sessionId}:`, insertError.message);
       } else {
-        console.log(`[transcriptService] Inserted ${actionRows.length} action item(s) for session ${sessionId}`);
+        logger.info(`[transcriptService] Inserted ${actionRows.length} action item(s) for session ${sessionId}`);
       }
     }
 
-    console.log(`[transcriptService] Pipeline complete for session ${sessionId}`);
+    logger.info(`[transcriptService] Pipeline complete for session ${sessionId}`);
   } catch (error) {
-    console.error(`[transcriptService] Unhandled error for session ${sessionId}:`, error);
+    logger.error(`[transcriptService] Unhandled error for session ${sessionId}:`, error);
     try {
       const db = supabaseAdmin;
       if (db) {
         await db.from('meeting_sessions').update({ status: 'error' }).eq('id', sessionId);
       }
     } catch (cleanupError) {
-      console.error(`[transcriptService] Cleanup also failed for ${sessionId}:`, cleanupError);
+      logger.error(`[transcriptService] Cleanup also failed for ${sessionId}:`, cleanupError);
     }
   }
 }

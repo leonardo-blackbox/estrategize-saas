@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import https from 'https';
+import { logger } from '../lib/logger.js';
 
 const GRAPH_API_VERSION = 'v19.0';
 
@@ -106,13 +107,13 @@ export function sendCapiEvent(params: CapiEventParams): void {
           error?: { message: string; code?: number; type?: string };
         };
         if (parsed.events_received) {
-          console.info(`[capi] ✓ ${eventName} → pixel ${pixelId} (received: ${parsed.events_received})`);
+          logger.info(`[capi] ✓ ${eventName} → pixel ${pixelId} (received: ${parsed.events_received})`);
         } else if (parsed.error) {
           const isTokenError = parsed.error.code === 190 || /token|oauth|access/i.test(parsed.error.message);
           if (isTokenError) {
-            console.error(`[capi] ✗ TOKEN INVÁLIDO/EXPIRADO — pixel ${pixelId} — regenere o System User Token no Business Manager. Erro: ${parsed.error.message}`);
+            logger.error(`[capi] ✗ TOKEN INVÁLIDO/EXPIRADO — pixel ${pixelId} — regenere o System User Token no Business Manager. Erro: ${parsed.error.message}`);
           } else {
-            console.warn(`[capi] ✗ ${eventName} API error (code ${parsed.error.code}):`, parsed.error.message);
+            logger.warn(`[capi] ✗ ${eventName} API error (code ${parsed.error.code}):`, parsed.error.message);
           }
         }
       } catch { /* ignore parse error */ }
@@ -120,11 +121,11 @@ export function sendCapiEvent(params: CapiEventParams): void {
   });
 
   req.on('error', (err: Error) => {
-    console.warn(`[capi] ✗ ${eventName} request failed:`, err.message);
+    logger.warn(`[capi] ✗ ${eventName} request failed:`, err.message);
   });
 
   req.on('timeout', () => {
-    console.warn(`[capi] ✗ ${eventName} request timed out`);
+    logger.warn(`[capi] ✗ ${eventName} request timed out`);
     req.destroy();
   });
 

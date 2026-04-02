@@ -33,4 +33,28 @@ export {
   adminGetUserAuditLogs,
 } from '../../../api/courses.ts';
 
-export type { LessonLink } from '../../../api/courses.ts';
+export type {
+  LessonLink,
+  AdminCourseDetail,
+  AdminUserDetail,
+  AdminUserListItem,
+  AdminUserListResponse,
+  AdminSubscription,
+  AdminEntitlement,
+  AdminEnrollment,
+  AdminCreditTransaction,
+  AdminCreditTransactionsResponse,
+  AdminAuditLog,
+  AdminAuditLogsResponse,
+  AdminWebhookEvent,
+  AdminWebhookEventsResponse,
+  AdminStats,
+  AdminTurma,
+  AdminOferta,
+  AdminFormationSection,
+  AdminFormationSectionCourse,
+  AdminCourseProgress,
+  Course,
+  Module,
+  Lesson,
+} from '../../../api/courses.ts';

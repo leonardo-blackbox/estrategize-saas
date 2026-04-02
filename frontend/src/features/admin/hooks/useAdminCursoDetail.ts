@@ -13,7 +13,7 @@ import {
   adminPublishLesson,
   adminUnpublishLesson,
 } from '../services/admin.api.ts';
-import type { LessonLink } from '../services/admin.api.ts';
+import type { LessonLink, AdminCourseDetail, Module, Lesson } from '../services/admin.api.ts';
 
 const emptyModule = { title: '', description: '', drip_days: '' };
 const emptyLesson = {
@@ -29,10 +29,10 @@ export function useAdminCursoDetail() {
   // Modal states
   const [editingCourse, setEditingCourse] = useState(false);
   const [showModuleModal, setShowModuleModal] = useState(false);
-  const [editingModule, setEditingModule] = useState<any | null>(null);
+  const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [confirmDeleteModule, setConfirmDeleteModule] = useState<string | null>(null);
   const [showLessonModal, setShowLessonModal] = useState<string | null>(null);
-  const [editingLesson, setEditingLesson] = useState<any | null>(null);
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [confirmDeleteLesson, setConfirmDeleteLesson] = useState<string | null>(null);
   const [linksLesson, setLinksLesson] = useState<{ id: string; title: string; links: LessonLink[] } | null>(null);
   const [openModules, setOpenModules] = useState<Set<string>>(new Set());
@@ -50,7 +50,7 @@ export function useAdminCursoDetail() {
     enabled: !!id,
   });
 
-  const course = data as any;
+  const course = data as AdminCourseDetail | undefined;
 
   const invalidateCourse = () => {
     qc.invalidateQueries({ queryKey: ['admin-course', id] });
@@ -58,12 +58,12 @@ export function useAdminCursoDetail() {
   };
 
   const updateCourseMutation = useMutation({
-    mutationFn: (d: any) => adminUpdateCourse(id!, d),
+    mutationFn: (d: Partial<AdminCourseDetail>) => adminUpdateCourse(id!, d),
     onSuccess: () => { invalidateCourse(); setEditingCourse(false); },
   });
 
   const createModuleMutation = useMutation({
-    mutationFn: (d: any) => adminCreateModule(id!, d),
+    mutationFn: (d: Partial<Module>) => adminCreateModule(id!, d),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-course', id] });
       setShowModuleModal(false);
@@ -72,7 +72,7 @@ export function useAdminCursoDetail() {
   });
 
   const updateModuleMutation = useMutation({
-    mutationFn: ({ mid, d }: { mid: string; d: any }) => adminUpdateModule(mid, d),
+    mutationFn: ({ mid, d }: { mid: string; d: Partial<Module> }) => adminUpdateModule(mid, d),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-course', id] });
       setEditingModule(null);
@@ -88,7 +88,7 @@ export function useAdminCursoDetail() {
   });
 
   const createLessonMutation = useMutation({
-    mutationFn: ({ moduleId, d }: { moduleId: string; d: any }) => adminCreateLesson(moduleId, d),
+    mutationFn: ({ moduleId, d }: { moduleId: string; d: Partial<Lesson> }) => adminCreateLesson(moduleId, d),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-course', id] });
       setShowLessonModal(null);
@@ -97,7 +97,7 @@ export function useAdminCursoDetail() {
   });
 
   const updateLessonMutation = useMutation({
-    mutationFn: ({ lid, d }: { lid: string; d: any }) => adminUpdateLesson(lid, d),
+    mutationFn: ({ lid, d }: { lid: string; d: Partial<Lesson> }) => adminUpdateLesson(lid, d),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-course', id] });
       setEditingLesson(null);
@@ -132,12 +132,12 @@ export function useAdminCursoDetail() {
     setEditingCourse(true);
   };
 
-  const openEditModule = (mod: any) => {
+  const openEditModule = (mod: Module) => {
     setEditingModule(mod);
     setEditModuleForm({ title: mod.title, description: mod.description ?? '', drip_days: mod.drip_days?.toString() ?? '0' });
   };
 
-  const openEditLesson = (lesson: any) => {
+  const openEditLesson = (lesson: Lesson) => {
     setEditingLesson(lesson);
     setEditLessonForm({
       title: lesson.title,

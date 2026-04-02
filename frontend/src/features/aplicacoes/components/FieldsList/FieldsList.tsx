@@ -17,7 +17,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useEditorStore } from '../../../../stores/editorStore.ts';
 import { type FieldType } from '../../../../api/applications.ts';
 import { cn } from '../../../../lib/cn.ts';
-import { FieldTypeSelector } from '../../../../components/aplicacoes/editor/FieldTypeSelector.tsx';
+import { FieldTypeSelector } from '../FieldTypeSelector/index.ts';
 import { FieldsListSortableItem } from '../FieldsListSortableItem/index.ts';
 import { FieldsListItem } from '../FieldsListItem/index.ts';
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { adminGetUserAuditLogs } from '../../services/admin.api.ts';
+import type { AdminAuditLog } from '../../services/admin.api.ts';
 import { formatDateTime } from '../../helpers/format.ts';
 
 interface TabHistoryProps {
@@ -18,8 +19,8 @@ export function AdminUserDetailTabHistory({ userId }: TabHistoryProps) {
     queryFn: () => adminGetUserAuditLogs(userId, { limit, offset }),
   });
 
-  const logs = (auditData as any)?.data ?? [];
-  const total = (auditData as any)?.count ?? 0;
+  const logs = auditData?.data ?? [];
+  const total = auditData?.count ?? 0;
   const totalPages = Math.ceil(total / limit);
 
   return (
@@ -36,7 +37,7 @@ export function AdminUserDetailTabHistory({ userId }: TabHistoryProps) {
         <p className="text-xs text-[var(--text-tertiary)]">Nenhuma acao registrada para este usuario.</p>
       ) : (
         <div className="space-y-1">
-          {logs.map((log: any) => (
+          {logs.map((log: AdminAuditLog) => (
             <div key={log.id} className="px-3 py-2.5 rounded-[var(--radius-sm)] bg-[var(--bg-surface-1)] border border-[var(--border-hairline)]">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">

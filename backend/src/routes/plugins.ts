@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
+import { logger } from '../lib/logger.js';
 import {
   listPlugins,
   listConsultancyPlugins,
@@ -17,7 +18,7 @@ router.get('/', async (_req, res) => {
     const plugins = await listPlugins();
     res.json({ plugins });
   } catch (err) {
-    console.error('[plugins] listPlugins error:', err);
+    logger.error('[plugins] listPlugins error:', err);
     res.status(500).json({ error: 'Failed to fetch plugins' });
   }
 });

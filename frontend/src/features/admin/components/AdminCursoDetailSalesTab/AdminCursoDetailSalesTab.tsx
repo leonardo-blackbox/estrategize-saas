@@ -5,8 +5,10 @@ import { cn } from '../../../../lib/cn.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { Input } from '../../../../components/ui/Input.tsx';
 
+import type { AdminCourseDetail } from '../../services/admin.api.ts';
+
 interface AdminCursoDetailSalesTabProps {
-  course: any;
+  course: AdminCourseDetail;
   courseId: string;
 }
 
@@ -37,7 +39,7 @@ export function AdminCursoDetailSalesTab({ course, courseId }: AdminCursoDetailS
       qc.invalidateQueries({ queryKey: ['admin-course', courseId] });
       setError('');
     },
-    onError: (e: any) => setError((e as Error).message ?? 'Erro ao salvar'),
+    onError: (e: unknown) => setError(e instanceof Error ? e.message : 'Erro ao salvar'),
   });
 
   return (

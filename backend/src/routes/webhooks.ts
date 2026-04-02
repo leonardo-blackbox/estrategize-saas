@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import crypto from 'crypto';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { processPurchase, processCancellation } from '../services/onboardingService.js';
+import { logger } from '../lib/logger.js';
 
 const router = Router();
 
@@ -64,16 +65,21 @@ function normalizeStripe(body: Record<string, unknown>): NormalizedEvent {
     'charge.refunded': 'refunded',
   };
 
-  const data = (body.data as any)?.object ?? {};
+  const bodyData = body.data as Record<string, unknown> | undefined;
+  const data = (bodyData?.object ?? {}) as Record<string, unknown>;
+  const customerDetails = data.customer_details as Record<string, unknown> | undefined;
+  const metadata = data.metadata as Record<string, unknown> | undefined;
+  const customer = data.customer as string | Record<string, unknown> | undefined;
+  const subscription = data.subscription as string | Record<string, unknown> | undefined;
   return {
     event_id: body.id as string,
     event_type: typeMap[body.type as string] ?? 'other',
-    customer_email: data.customer_email ?? data.customer_details?.email ?? '',
-    customer_name: data.customer_details?.name,
-    plan_id: data.metadata?.plan_id,
-    user_id: data.client_reference_id ?? data.metadata?.user_id,
-    stripe_customer_id: typeof data.customer === 'string' ? data.customer : data.customer?.id,
-    stripe_subscription_id: typeof data.subscription === 'string' ? data.subscription : data.subscription?.id,
+    customer_email: (data.customer_email as string) ?? customerDetails?.email ?? '',
+    customer_name: customerDetails?.name as string | undefined,
+    plan_id: metadata?.plan_id as string | undefined,
+    user_id: (data.client_reference_id as string) ?? (metadata?.user_id as string),
+    stripe_customer_id: typeof customer === 'string' ? customer : (customer as Record<string, unknown> | undefined)?.id as string | undefined,
+    stripe_subscription_id: typeof subscription === 'string' ? subscription : (subscription as Record<string, unknown> | undefined)?.id as string | undefined,
     raw: body,
   };
 }
@@ -86,13 +92,15 @@ function normalizeHotmart(body: Record<string, unknown>): NormalizedEvent {
     'SUBSCRIPTION_CANCELLATION': 'canceled',
   };
 
-  const data = (body.data as any) ?? {};
+  const data = (body.data as Record<string, unknown>) ?? {};
+  const buyer = data.buyer as Record<string, unknown> | undefined;
+  const product = data.product as Record<string, unknown> | undefined;
   return {
-    event_id: body.id as string ?? `hotmart-${Date.now()}`,
+    event_id: (body.id as string) ?? `hotmart-${Date.now()}`,
     event_type: typeMap[body.event as string] ?? 'other',
-    customer_email: data.buyer?.email ?? '',
-    customer_name: data.buyer?.name,
-    plan_id: data.product?.id?.toString(),
+    customer_email: (buyer?.email as string) ?? '',
+    customer_name: buyer?.name as string | undefined,
+    plan_id: product?.id?.toString(),
     raw: body,
   };
 }
@@ -107,8 +115,8 @@ function normalizeKiwify(body: Record<string, unknown>): NormalizedEvent {
   return {
     event_id: body.order_id as string ?? `kiwify-${Date.now()}`,
     event_type: typeMap[body.webhook_event_type as string] ?? 'other',
-    customer_email: (body.Customer as any)?.email ?? '',
-    customer_name: (body.Customer as any)?.full_name,
+    customer_email: ((body.Customer as Record<string, unknown> | undefined)?.email as string) ?? '',
+    customer_name: (body.Customer as Record<string, unknown> | undefined)?.full_name as string | undefined,
     raw: body,
   };
 }
@@ -131,14 +139,14 @@ async function handlePurchaseApproved(event: NormalizedEvent): Promise<void> {
       { data: { full_name: event.customer_name ?? '' } },
     );
     if (error || !newUser.user) {
-      console.error('Failed to create user:', error?.message);
+      logger.error('Failed to create user:', error?.message);
       return;
     }
     userId = newUser.user.id;
-    console.log(`[webhook] New user created: ${userId} (${event.customer_email})`);
+    logger.info(`[webhook] New user created: ${userId} (${event.customer_email})`);
   } else {
     userId = existing.id;
-    console.log(`[webhook] Existing user found: ${userId}`);
+    logger.info(`[webhook] Existing user found: ${userId}`);
   }
 
   // Criar enrollment se tiver course_id
@@ -211,7 +219,7 @@ router.post('/:provider', async (req: Request, res: Response) => {
   else if (provider === 'hotmart') signatureValid = verifyHotmartSignature(rawBody, sig, secret);
   else if (provider === 'kiwify') signatureValid = verifyKiwifySignature(rawBody, sig, secret);
 
-  if (!signatureValid && process.env.NODE_ENV === 'production') {
+  if (!signatureValid) {
     return res.status(401).json({ error: 'Invalid signature' });
   }
 
@@ -236,7 +244,7 @@ router.post('/:provider', async (req: Request, res: Response) => {
     .single();
 
   if (existing?.status === 'processed') {
-    console.log(`[webhook] Skipping duplicate event: ${event.event_id}`);
+    logger.info(`[webhook] Skipping duplicate event: ${event.event_id}`);
     return res.json({ ok: true, skipped: true });
   }
 
@@ -254,7 +262,7 @@ router.post('/:provider', async (req: Request, res: Response) => {
     .single();
 
   if (saveError) {
-    console.error('[webhook] Failed to save event:', saveError.message);
+    logger.error('[webhook] Failed to save event:', saveError.message);
     return res.status(500).json({ error: 'Failed to persist event' });
   }
 
@@ -284,13 +292,14 @@ router.post('/:provider', async (req: Request, res: Response) => {
       .eq('id', savedEvent.id);
 
     res.json({ ok: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errMessage = err instanceof Error ? err.message : 'Unknown error';
     await supabaseAdmin
       .from('webhook_events')
-      .update({ status: 'failed', error: err?.message ?? 'Unknown error' })
+      .update({ status: 'failed', error: errMessage })
       .eq('id', savedEvent.id);
 
-    console.error('[webhook] Processing failed:', err);
+    logger.error('[webhook] Processing failed:', err);
     res.status(500).json({ error: 'Processing failed' });
   }
 });

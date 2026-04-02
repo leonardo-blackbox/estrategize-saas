@@ -9,6 +9,7 @@ import {
   adminDeleteSection,
   adminReorderSections,
 } from '../services/admin.api.ts';
+import type { AdminFormationSection } from '../services/admin.api.ts';
 
 export function useAdminHome() {
   const qc = useQueryClient();
@@ -50,7 +51,7 @@ export function useAdminHome() {
   const [newSectionTitle, setNewSectionTitle] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
-  const [managingSection, setManagingSection] = useState<any | null>(null);
+  const [managingSection, setManagingSection] = useState<AdminFormationSection | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [openStatusDropdown, setOpenStatusDropdown] = useState<string | null>(null);
 
@@ -59,7 +60,7 @@ export function useAdminHome() {
     queryFn: adminGetFormacaoSections,
   });
 
-  const sectionList = sections as any[];
+  const sectionList = sections as AdminFormationSection[];
 
   const createMutation = useMutation({
     mutationFn: (t: string) =>
@@ -72,7 +73,7 @@ export function useAdminHome() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
+    mutationFn: ({ id, data }: { id: string; data: { title?: string; sort_order?: number; is_active?: boolean } }) =>
       adminUpdateSection(id, data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-formacao-sections'] });

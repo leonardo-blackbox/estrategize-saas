@@ -4,6 +4,7 @@ import multer from 'multer';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/admin.js';
+import { logger } from '../../lib/logger.js';
 import {
   parseFile,
   chunkText,
@@ -149,7 +150,7 @@ router.post('/', (req, res, next) => {
         .eq('id', document.id);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      console.error(`[knowledge] Background processing failed for doc ${document.id}:`, message);
+      logger.error(`[knowledge] Background processing failed for doc ${document.id}:`, message);
       await supabaseAdmin
         .from('knowledge_documents')
         .update({ status: 'error', error_message: message })

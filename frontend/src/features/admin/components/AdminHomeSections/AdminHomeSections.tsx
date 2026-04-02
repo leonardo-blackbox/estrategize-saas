@@ -2,9 +2,12 @@ import { motion } from 'framer-motion';
 import { staggerItem } from '../../../../lib/motion.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { AdminHomeSectionRow } from '../AdminHomeSectionRow/index.ts';
+import type { AdminFormationSection } from '../../services/admin.api.ts';
+
+interface SectionUpdateData { id: string; data: { title?: string; sort_order?: number; is_active?: boolean } }
 
 interface AdminHomeSectionsProps {
-  sectionList: any[];
+  sectionList: AdminFormationSection[];
   sectionsLoading: boolean;
   editingId: string | null;
   editTitle: string;
@@ -12,11 +15,11 @@ interface AdminHomeSectionsProps {
   setEditingId: (v: string | null) => void;
   openStatusDropdown: string | null;
   setOpenStatusDropdown: (v: string | null) => void;
-  updateMutation: { mutate: (v: any) => void; isPending: boolean };
+  updateMutation: { mutate: (v: SectionUpdateData) => void; isPending: boolean };
   reorderPending: boolean;
   moveSection: (index: number, direction: 'up' | 'down') => void;
   onCreateClick: () => void;
-  onManageSection: (section: any) => void;
+  onManageSection: (section: AdminFormationSection) => void;
   onDeleteSection: (id: string) => void;
 }
 
@@ -49,7 +52,7 @@ export function AdminHomeSections({
             <p className="text-sm text-[var(--text-tertiary)]">Nenhuma secao criada ainda.</p>
           </div>
         ) : (
-          sectionList.map((section: any, index: number) => (
+          sectionList.map((section, index: number) => (
             <AdminHomeSectionRow
               key={section.id}
               section={section}

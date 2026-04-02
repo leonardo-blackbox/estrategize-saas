@@ -3,22 +3,22 @@ import { staggerItem } from '../../../../lib/motion.ts';
 import { cn } from '../../../../lib/cn.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { AdminCursoDetailLessons } from '../AdminCursoDetailLessons/index.ts';
-import type { LessonLink } from '../../services/admin.api.ts';
+import type { LessonLink, Module, Lesson } from '../../services/admin.api.ts';
 
 interface AdminCursoDetailModulesProps {
-  modules: any[];
+  modules: Module[];
   openModules: Set<string>;
   toggleModule: (id: string) => void;
   confirmDeleteModule: string | null;
   setConfirmDeleteModule: (id: string | null) => void;
   deleteModuleMutation: { mutate: (id: string) => void; isPending: boolean };
-  onEditModule: (mod: any) => void;
+  onEditModule: (mod: Module) => void;
   onCreateModule: () => void;
   // Lesson props
   confirmDeleteLesson: string | null;
   setConfirmDeleteLesson: (id: string | null) => void;
   deleteLessonMutation: { mutate: (id: string) => void; isPending: boolean };
-  onEditLesson: (lesson: any) => void;
+  onEditLesson: (lesson: Lesson) => void;
   onLinksLesson: (data: { id: string; title: string; links: LessonLink[] }) => void;
   onAddLesson: (moduleId: string) => void;
   onPublishLesson: (id: string) => void;
@@ -46,7 +46,7 @@ export function AdminCursoDetailModules({
           <p className="text-xs text-[var(--text-tertiary)]">Nenhum modulo criado ainda.</p>
         </div>
       ) : (
-        modules.map((mod: any, mi: number) => {
+        modules.map((mod, mi: number) => {
           const isOpen = openModules.has(mod.id);
           return (
             <div key={mod.id} className="rounded-[var(--radius-md)] bg-[var(--bg-surface-1)] border border-[var(--border-hairline)] overflow-hidden">

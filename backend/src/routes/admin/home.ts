@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/admin.js';
+import { logger } from '../../lib/logger.js';
 
 const router = Router();
 
@@ -50,7 +51,7 @@ router.put('/settings', requireAuth, requireAdmin, async (req, res) => {
 
     res.json(result);
   } catch (err) {
-    console.error('PUT /api/admin/home/settings error:', err);
+    logger.error('PUT /api/admin/home/settings error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

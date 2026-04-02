@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import { logger } from './lib/logger.js';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import type { ErrorRequestHandler } from 'express';
@@ -161,7 +162,7 @@ app.get('/', (_req, res) => {
 
 // ─── Error handlers ──────────────────────────────────────────────
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-  console.error('Error:', err);
+  logger.error('Error:', err);
   res.status(500).json({ error: 'Internal Server Error' });
 };
 
@@ -180,7 +181,7 @@ export async function bootstrapAdmin() {
     const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
     const adminUser = users.find((u) => u.email === adminEmail);
     if (!adminUser) {
-      console.log(`ADMIN_EMAIL "${adminEmail}" not found — skipping bootstrap`);
+      logger.info(`ADMIN_EMAIL "${adminEmail}" not found — skipping bootstrap`);
       return;
     }
 
@@ -194,15 +195,15 @@ export async function bootstrapAdmin() {
       const { error } = await supabaseAdmin
         .from('profiles')
         .insert({ id: adminUser.id, role: 'admin' });
-      if (error) console.error('Admin bootstrap: failed to create profile', error.message);
-      else console.log(`✓ Admin bootstrap: criou profile para ${adminEmail} como admin`);
+      if (error) logger.error('Admin bootstrap: failed to create profile', error.message);
+      else logger.info(`✓ Admin bootstrap: criou profile para ${adminEmail} como admin`);
     } else if (existingProfile.role !== 'admin') {
       await supabaseAdmin.from('profiles').update({ role: 'admin' }).eq('id', adminUser.id);
-      console.log(`✓ Admin bootstrap: promoveu ${adminEmail} para admin`);
+      logger.info(`✓ Admin bootstrap: promoveu ${adminEmail} para admin`);
     } else {
-      console.log(`✓ Admin bootstrap: ${adminEmail} já é admin`);
+      logger.info(`✓ Admin bootstrap: ${adminEmail} já é admin`);
     }
   } catch (err) {
-    console.error('Admin bootstrap error:', err);
+    logger.error('Admin bootstrap error:', err);
   }
 }

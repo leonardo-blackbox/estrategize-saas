@@ -4,6 +4,7 @@ import { cn } from '../../../../lib/cn.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { Input } from '../../../../components/ui/Input.tsx';
 import { adminGetUserCreditTransactions, adminAdjustCredits } from '../../services/admin.api.ts';
+import type { AdminCreditTransaction } from '../../services/admin.api.ts';
 import { formatDate, TX_TYPE_LABEL, TX_TYPE_COLOR } from '../../helpers/format.ts';
 
 interface TabCreditsProps {
@@ -26,14 +27,14 @@ export function AdminUserDetailTabCredits({ userId }: TabCreditsProps) {
   const adjustMutation = useMutation({
     mutationFn: (data: { amount: number; description: string }) => adminAdjustCredits(userId, data),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin-user-credits', userId] }); setAdjustForm({ amount: '', description: '' }); setAdjustError(''); },
-    onError: (e: any) => setAdjustError(e.message ?? 'Erro ao ajustar creditos'),
+    onError: (e: unknown) => setAdjustError(e instanceof Error ? e.message : 'Erro ao ajustar creditos'),
   });
 
-  const tx = (txData as any)?.transactions ?? [];
-  const total = (txData as any)?.total ?? 0;
-  const balance = (txData as any)?.balance ?? 0;
-  const reserved = (txData as any)?.reserved ?? 0;
-  const consumedThisMonth = (txData as any)?.consumed_this_month ?? 0;
+  const tx = txData?.transactions ?? [];
+  const total = txData?.total ?? 0;
+  const balance = txData?.balance ?? 0;
+  const reserved = txData?.reserved ?? 0;
+  const consumedThisMonth = txData?.consumed_this_month ?? 0;
   const totalPages = Math.ceil(total / limit);
 
   const handleAdjust = () => {
@@ -71,7 +72,7 @@ export function AdminUserDetailTabCredits({ userId }: TabCreditsProps) {
           <p className="text-xs text-[var(--text-tertiary)]">Nenhuma transacao registrada.</p>
         ) : (
           <div className="space-y-1">
-            {tx.map((t: any) => (
+            {tx.map((t: AdminCreditTransaction) => (
               <div key={t.id} className="flex items-center gap-3 px-3 py-2 rounded-[var(--radius-sm)] bg-[var(--bg-surface-1)] border border-[var(--border-hairline)]">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">

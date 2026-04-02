@@ -3,6 +3,7 @@ import { z } from 'zod';
 import multer from 'multer';
 import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/admin.js';
+import { logger } from '../../lib/logger.js';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { listAllPlugins, getAllConfig, setConfig } from '../../services/pluginConfigService.js';
 import {
@@ -159,7 +160,7 @@ router.post(
           .eq('id', document.id);
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
-        console.error(
+        logger.error(
           `[plugins/helena] Background processing failed for doc ${document.id}:`,
           message,
         );

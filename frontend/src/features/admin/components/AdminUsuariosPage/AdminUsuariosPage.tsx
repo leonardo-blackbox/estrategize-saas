@@ -44,8 +44,8 @@ export function AdminUsuariosPage() {
     }),
   });
 
-  const users = (usersData as any)?.users ?? [];
-  const total = (usersData as any)?.total ?? 0;
+  const users = usersData?.users ?? [];
+  const total = usersData?.total ?? 0;
   const totalPages = Math.ceil(total / limit);
 
   function handleSearchChange(value: string) { setSearch(value); setPage(0); }
@@ -95,7 +95,7 @@ export function AdminUsuariosPage() {
             <p className="text-sm text-[var(--text-tertiary)]">Nenhum usuário encontrado.</p>
           </div>
         ) : (
-          users.map((user: any) => (
+          users.map((user) => (
             <UserRow
               key={user.id}
               user={user}

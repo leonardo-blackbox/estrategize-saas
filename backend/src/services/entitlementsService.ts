@@ -136,9 +136,10 @@ export async function resolveLessonAccess(
 
   if (!lesson) return { allowed: false, reason: 'no_entitlement' };
 
-  const module = lesson.modules as any;
-  const courseId = module.courses.id;
-  const moduleId = module.id;
+  interface LessonModuleJoin { id: string; drip_days: number | null; courses: { id: string } }
+  const moduleData = lesson.modules as unknown as LessonModuleJoin;
+  const courseId = moduleData.courses.id;
+  const moduleId = moduleData.id;
 
   // 1. Admin → acesso total
   const { data: profile } = await supabaseAdmin
@@ -200,7 +201,7 @@ export async function resolveLessonAccess(
     (now.getTime() - enrolledAt.getTime()) / (1000 * 60 * 60 * 24),
   );
 
-  const effectiveDrip = Math.max(lesson.drip_days ?? 0, module.drip_days ?? 0);
+  const effectiveDrip = Math.max(lesson.drip_days ?? 0, moduleData.drip_days ?? 0);
 
   if (daysSinceEnrollment < effectiveDrip) {
     const unlocksAt = new Date(enrolledAt);
@@ -236,8 +237,9 @@ export async function getUserCoursesCatalog(userId: string) {
   const catalogWithAccess = await Promise.all(
     courses.map(async (course) => {
       const access = await resolveCourseAccess(userId, course.id);
+      interface CourseModule { lessons?: unknown[] }
       const totalLessons = course.modules?.reduce(
-        (sum: number, m: any) => sum + (m.lessons?.length ?? 0),
+        (sum: number, m: CourseModule) => sum + (m.lessons?.length ?? 0),
         0,
       ) ?? 0;
 
@@ -248,9 +250,9 @@ export async function getUserCoursesCatalog(userId: string) {
         cover_url: course.cover_url,
         sort_order: course.sort_order,
         total_lessons: totalLessons,
-        sales_url: (course as any).sales_url ?? null,
-        offer_badge_enabled: (course as any).offer_badge_enabled ?? false,
-        offer_badge_text: (course as any).offer_badge_text ?? null,
+        sales_url: course.sales_url ?? null,
+        offer_badge_enabled: course.offer_badge_enabled ?? false,
+        offer_badge_text: course.offer_badge_text ?? null,
         access,
       };
     }),

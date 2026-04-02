@@ -7,12 +7,13 @@ import {
   adminGetUserProgress,
   adminListCourses,
 } from '../../services/admin.api.ts';
+import type { AdminUserDetail, AdminEntitlement, AdminEnrollment, AdminCourseProgress } from '../../services/admin.api.ts';
 import { GrantEntitlementModal } from './GrantEntitlementModal.tsx';
 import { EntitlementRow } from './EntitlementRow.tsx';
 import { EnrollmentRow } from './EnrollmentRow.tsx';
 
 interface TabCoursesProps {
-  detail: any;
+  detail: AdminUserDetail;
   userId: string;
 }
 
@@ -45,9 +46,9 @@ export function AdminUserDetailTabCourses({ detail, userId }: TabCoursesProps) {
   });
 
   const courses = Array.isArray(coursesData) ? coursesData : [];
-  const progress = (progressData as any)?.progress ?? [];
-  const entitlements: any[] = detail.entitlements ?? [];
-  const enrollments: any[] = detail.enrollments ?? [];
+  const progress: AdminCourseProgress[] = progressData?.progress ?? [];
+  const entitlements: AdminEntitlement[] = detail.entitlements ?? [];
+  const enrollments: AdminEnrollment[] = detail.enrollments ?? [];
 
   return (
     <>
@@ -89,7 +90,7 @@ export function AdminUserDetailTabCourses({ detail, userId }: TabCoursesProps) {
                 <EnrollmentRow
                   key={enr.id}
                   enrollment={enr}
-                  progress={progress.find((p: any) => p.course_id === enr.course_id) ?? null}
+                  progress={progress.find((p) => p.course_id === enr.course_id) ?? null}
                 />
               ))}
             </div>

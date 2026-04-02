@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { cn } from '../../../../lib/cn.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { Modal } from '../../../../components/ui/Modal.tsx';
+import type { AdminFormationSection, AdminCourseDetail } from '../../services/admin.api.ts';
 
 interface ManageSectionCoursesModalProps {
-  section: any;
-  allCourses: any[];
+  section: AdminFormationSection;
+  allCourses: AdminCourseDetail[];
   isSaving: boolean;
   onClose: () => void;
   onSave: (courseIds: string[]) => void;
@@ -13,7 +14,7 @@ interface ManageSectionCoursesModalProps {
 
 export function ManageSectionCoursesModal({ section, allCourses, isSaving, onClose, onSave }: ManageSectionCoursesModalProps) {
   const currentCourseIds = (section.formation_section_courses ?? [])
-    .map((sc: any) => sc.courses?.id).filter(Boolean) as string[];
+    .map((sc) => sc.courses?.id).filter(Boolean) as string[];
 
   const [selected, setSelected] = useState<Set<string>>(new Set(currentCourseIds));
 
@@ -34,7 +35,7 @@ export function ManageSectionCoursesModal({ section, allCourses, isSaving, onClo
           {allCourses.length === 0 ? (
             <p className="text-xs text-[var(--text-tertiary)] py-4 text-center">Nenhum curso encontrado.</p>
           ) : (
-            allCourses.map((course: any) => (
+            allCourses.map((course) => (
               <button key={course.id} onClick={() => toggleCourse(course.id)}
                 className={cn('w-full flex items-center gap-3 px-3 py-2 rounded-[var(--radius-sm)] border text-left transition-colors',
                   selected.has(course.id) ? 'bg-[var(--bg-hover)] border-[var(--border-default)]' : 'bg-[var(--bg-surface-1)] border-[var(--border-hairline)]')}>

@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from 'express';
 import crypto from 'crypto';
 import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
+import { logger } from '../../lib/logger.js';
 import { processTranscript } from '../../services/transcriptService.js';
 import { fetchBotTranscript } from '../../services/recallService.js';
 import { initBuffer, append, removeBuffer, getBuffer } from '../../services/liveTranscriptBuffer.js';
@@ -69,14 +70,15 @@ router.post('/', async (req: Request, res: Response) => {
   const rawBody = rawBodyBuffer.toString('utf-8');
 
   const signature = req.headers['x-recall-signature'] as string ?? '';
-  const secret = process.env.RECALL_WEBHOOK_SECRET ?? '';
+  const secret = process.env.RECALL_WEBHOOK_SECRET;
 
-  if (secret) {
-    const signatureValid = verifyRecallSignature(rawBody, signature, secret);
-    if (!signatureValid) {
-      // Log but do not reject — signature format may differ from expected
-      console.warn('[recall-webhook] Signature mismatch — processing anyway. sig=%s', signature.slice(0, 16));
-    }
+  if (!secret) {
+    return res.status(503).json({ error: 'Webhook secret not configured' });
+  }
+
+  const signatureValid = verifyRecallSignature(rawBody, signature, secret);
+  if (!signatureValid) {
+    return res.status(401).json({ error: 'Invalid signature' });
   }
 
   // Parse the raw body into the event payload
@@ -91,7 +93,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   const botId = data?.bot?.id;
-  console.log('[recall-webhook] event=%s bot_id=%s', event, botId ?? 'none');
+  logger.info('[recall-webhook] event=%s bot_id=%s', event, botId ?? 'none');
 
   if (!event || !data) {
     return res.status(400).json({ error: 'Missing event or data' });
@@ -135,7 +137,7 @@ router.post('/', async (req: Request, res: Response) => {
         });
       } else {
         // No consultancy linked — Helena cannot operate without context
-        console.log(`[recall-webhook] partial_data: no consultancy for bot ${botId} — skipping Helena`);
+        logger.info(`[recall-webhook] partial_data: no consultancy for bot ${botId} — skipping Helena`);
         return res.json({ ok: true });
       }
     }
@@ -164,7 +166,7 @@ router.post('/', async (req: Request, res: Response) => {
       .single();
 
     if (sessionError || !session) {
-      console.warn(`[recall-webhook] Session not found for bot_id=${botId} — skipping`);
+      logger.warn(`[recall-webhook] Session not found for bot_id=${botId} — skipping`);
       return res.json({ ok: true });
     }
 
@@ -188,7 +190,7 @@ router.post('/', async (req: Request, res: Response) => {
       });
 
     if (insertError) {
-      console.error('[recall-webhook] Failed to insert transcript:', insertError.message);
+      logger.error('[recall-webhook] Failed to insert transcript:', insertError.message);
       return res.status(500).json({ error: 'Failed to save transcript' });
     }
 
@@ -204,7 +206,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     const internalStatus = RECALL_EVENT_STATUS_MAP[event];
     if (!internalStatus) {
-      console.warn(`[recall-webhook] Unknown bot event: ${event} — ignoring`);
+      logger.warn(`[recall-webhook] Unknown bot event: ${event} — ignoring`);
       return res.json({ ok: true, ignored: true });
     }
 
@@ -215,7 +217,7 @@ router.post('/', async (req: Request, res: Response) => {
       .single();
 
     if (sessionError || !session) {
-      console.warn(`[recall-webhook] Session not found for bot_id=${botId} — skipping`);
+      logger.warn(`[recall-webhook] Session not found for bot_id=${botId} — skipping`);
       return res.json({ ok: true });
     }
 
@@ -224,7 +226,7 @@ router.post('/', async (req: Request, res: Response) => {
     // so the API transcript fallback has a chance to run
     const isAlreadyTerminal = terminalStatuses.includes(session.status as string);
     if (isAlreadyTerminal && internalStatus !== 'done') {
-      console.log(`[recall-webhook] Session ${session.id} already terminal — ignoring ${event}`);
+      logger.info(`[recall-webhook] Session ${session.id} already terminal — ignoring ${event}`);
       return res.json({ ok: true });
     }
 
@@ -256,19 +258,19 @@ router.post('/', async (req: Request, res: Response) => {
         .not('status', 'in', '("done","error")');
 
       if (updateError) {
-        console.error('[recall-webhook] Failed to update session status:', updateError.message);
+        logger.error('[recall-webhook] Failed to update session status:', updateError.message);
         return res.status(500).json({ error: 'Failed to update session' });
       }
 
-      console.log(`[recall-webhook] Session ${session.id} → ${internalStatus} (${event})`);
+      logger.info(`[recall-webhook] Session ${session.id} → ${internalStatus} (${event})`);
     } else {
-      console.log(`[recall-webhook] Session ${session.id} already terminal, running bot.done pipeline anyway`);
+      logger.info(`[recall-webhook] Session ${session.id} already terminal, running bot.done pipeline anyway`);
     }
 
     // On bot.call_ended → processing: trigger pipeline (will use real-time segments if they exist)
     if (internalStatus === 'processing') {
       processTranscript(session.id).catch((err) => {
-        console.error('[recall-webhook] processTranscript failed:', err);
+        logger.error('[recall-webhook] processTranscript failed:', err);
       });
     }
 
@@ -287,7 +289,7 @@ router.post('/', async (req: Request, res: Response) => {
             .eq('session_id', sessionId);
 
           if (!count || count === 0) {
-            console.log(`[recall-webhook] No real-time transcripts for ${sessionId} — fetching from API`);
+            logger.info(`[recall-webhook] No real-time transcripts for ${sessionId} — fetching from API`);
             const segments = await fetchBotTranscript(botId);
 
             if (segments.length > 0) {
@@ -302,18 +304,18 @@ router.post('/', async (req: Request, res: Response) => {
                 .from('meeting_transcripts')
                 .insert(rows);
               if (insertErr) {
-                console.error('[recall-webhook] Failed to insert API transcript:', insertErr.message);
+                logger.error('[recall-webhook] Failed to insert API transcript:', insertErr.message);
               } else {
-                console.log(`[recall-webhook] Stored ${rows.length} transcript segment(s) from API for ${sessionId}`);
+                logger.info(`[recall-webhook] Stored ${rows.length} transcript segment(s) from API for ${sessionId}`);
               }
             } else {
-              console.warn(`[recall-webhook] Recall.ai API returned empty transcript for ${sessionId}`);
+              logger.warn(`[recall-webhook] Recall.ai API returned empty transcript for ${sessionId}`);
             }
           }
 
           await processTranscript(sessionId);
         } catch (err) {
-          console.error('[recall-webhook] bot.done pipeline failed:', err);
+          logger.error('[recall-webhook] bot.done pipeline failed:', err);
         }
       })();
     }
@@ -322,7 +324,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   // ─── Unknown events — never return 4xx to avoid retries ──────
-  console.log(`[recall-webhook] Unhandled event: ${event} — ignoring`);
+  logger.info(`[recall-webhook] Unhandled event: ${event} — ignoring`);
   return res.json({ ok: true, ignored: true });
 });
 

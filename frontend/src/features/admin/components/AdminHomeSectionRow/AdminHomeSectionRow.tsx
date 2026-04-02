@@ -1,9 +1,12 @@
 import { cn } from '../../../../lib/cn.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import { AdminHomeStatusDropdown } from '../AdminHomeStatusDropdown/index.ts';
+import type { AdminFormationSection } from '../../services/admin.api.ts';
+
+interface SectionUpdateData { id: string; data: { title?: string; sort_order?: number; is_active?: boolean } }
 
 interface AdminHomeSectionRowProps {
-  section: any;
+  section: AdminFormationSection;
   index: number;
   totalCount: number;
   editingId: string | null;
@@ -12,7 +15,7 @@ interface AdminHomeSectionRowProps {
   setEditingId: (v: string | null) => void;
   openStatusDropdown: string | null;
   setOpenStatusDropdown: (v: string | null) => void;
-  updateMutation: { mutate: (v: any) => void; isPending: boolean };
+  updateMutation: { mutate: (v: SectionUpdateData) => void; isPending: boolean };
   reorderPending: boolean;
   onMoveUp: () => void;
   onMoveDown: () => void;

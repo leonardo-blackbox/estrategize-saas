@@ -77,7 +77,7 @@ export function AdminCursosPage() {
     });
   };
 
-  const allCourses = courses as any[];
+  const allCourses = Array.isArray(courses) ? courses : [];
   const counts = {
     all: allCourses.length,
     published: allCourses.filter((c) => c.status === 'published').length,
@@ -138,7 +138,7 @@ export function AdminCursosPage() {
           </motion.div>
         ) : (
           <motion.div variants={staggerItem} className="space-y-2">
-            {filteredCourses.map((course: any) => (
+            {filteredCourses.map((course) => (
               <CourseCard
                 key={course.id}
                 course={course}

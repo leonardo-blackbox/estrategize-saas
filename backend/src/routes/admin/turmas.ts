@@ -27,7 +27,7 @@ router.get('/', async (_req, res) => {
 
   if (error) return res.status(500).json({ error: error.message });
 
-  const turmas = (data ?? []).map((t: any) => ({
+  const turmas = (data ?? []).map((t) => ({
     ...t,
     enrollment_count: Array.isArray(t.enrollments) ? t.enrollments.length : 0,
     enrollments: undefined,

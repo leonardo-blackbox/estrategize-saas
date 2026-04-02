@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { getBalance } from '../services/creditService.js';
+import { logger } from '../lib/logger.js';
 
 // ─── Stripe client ────────────────────────────────────────────────
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
@@ -55,7 +56,7 @@ router.get('/subscription', async (req: AuthenticatedRequest, res) => {
         stripePeriodEnd = new Date(stripeSub.current_period_end * 1000).toISOString();
         cancelAtPeriodEnd = stripeSub.cancel_at_period_end;
       } catch (stripeErr) {
-        console.warn('[account] Failed to fetch Stripe subscription, using DB data:', stripeErr);
+        logger.warn('[account] Failed to fetch Stripe subscription, using DB data:', stripeErr);
       }
     }
 
@@ -105,7 +106,7 @@ router.post('/billing-portal', async (req: AuthenticatedRequest, res) => {
 
     return res.json({ data: { url: session.url } });
   } catch (err) {
-    console.error('[account] Billing portal error:', err);
+    logger.error('[account] Billing portal error:', err);
     return res.status(502).json({ error: 'Erro ao criar sessao do portal de faturamento' });
   }
 });

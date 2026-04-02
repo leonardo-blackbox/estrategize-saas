@@ -47,7 +47,7 @@ export function ManageOfertaTurmasModal({ oferta, activeTurmas, isSaving, onClos
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm text-[var(--text-primary)] truncate">{turma.name}</p>
-                  <p className="text-[10px] text-[var(--text-tertiary)] truncate">{(turma as any).courses?.title ?? 'Curso'}</p>
+                  <p className="text-[10px] text-[var(--text-tertiary)] truncate">{turma.courses?.title ?? 'Curso'}</p>
                 </div>
               </button>
             ))

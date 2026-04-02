@@ -48,10 +48,10 @@ export function AdminStripePage() {
     enabled: tab === 'audit',
   });
 
-  const webhooks = (webhooksData as any)?.data ?? [];
-  const webhookTotal = (webhooksData as any)?.count ?? 0;
-  const auditLogs = (auditData as any)?.data ?? [];
-  const auditTotal = (auditData as any)?.count ?? 0;
+  const webhooks = webhooksData?.data ?? [];
+  const webhookTotal = webhooksData?.count ?? 0;
+  const auditLogs = auditData?.data ?? [];
+  const auditTotal = auditData?.count ?? 0;
 
   return (
     <motion.div

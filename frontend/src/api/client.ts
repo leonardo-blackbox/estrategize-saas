@@ -1,6 +1,6 @@
 import { useAuthStore } from '../stores/authStore.ts';
 
-const API_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3001';
+const API_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3010';
 
 interface RequestOptions {
   json?: unknown;

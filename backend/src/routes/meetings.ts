@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { requireAuth, type AuthenticatedRequest } from '../middleware/auth.js';
 import { createBot } from '../services/recallService.js';
+import { logger } from '../lib/logger.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -34,7 +35,7 @@ router.post('/', async (req: AuthenticatedRequest, res) => {
     bot = await createBot({ meetingUrl: meeting_url, botName: 'Iris AI Notetaker' });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error('[meetings] createBot failed:', msg);
+    logger.error('[meetings] createBot failed:', msg);
     return res.status(502).json({ error: 'Failed to create meeting bot', detail: msg });
   }
 

@@ -1,377 +1,126 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { supabaseAdmin } from '../../lib/supabaseAdmin.js';
 import { requireAuth, type AuthenticatedRequest } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/admin.js';
-import { getBalance } from '../../services/creditService.js';
+import * as userSvc from '../../services/adminUserService.js';
+import * as dataSvc from '../../services/adminDataService.js';
+import * as entSvc from '../../services/adminEntitlementService.js';
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
 
 // ─── LIST USERS ────────────────────────────────────────────────
 router.get('/', async (req, res) => {
-  const limit = Math.min(Number(req.query.limit) || 50, 100);
-  const offset = Number(req.query.offset) || 0;
-  const search = (req.query.q as string | undefined)?.toLowerCase().trim();
-  const planId = req.query.plan_id as string | undefined;
-  const status = req.query.status as string | undefined;
-
-  const { data: { users: authUsers } = { users: [] } } =
-    await supabaseAdmin!.auth.admin.listUsers({ perPage: 1000 });
-
-  const emailMap: Record<string, string> = {};
-  for (const au of authUsers ?? []) {
-    if (au.email) emailMap[au.id] = au.email;
-  }
-
-  let filteredAuthIds: string[] | null = null;
-  if (search && search.includes('@')) {
-    filteredAuthIds = (authUsers ?? [])
-      .filter((u) => u.email?.toLowerCase().includes(search))
-      .map((u) => u.id);
-  }
-
-  // Build filterUserIds from plan_id and status filters
-  let filterUserIds: string[] | null = null;
-  let excludeUserIds: string[] | null = null;
-
-  function intersect(current: string[] | null, incoming: string[]): string[] {
-    return current === null ? incoming : current.filter((id: string) => incoming.includes(id));
-  }
-
-  if (planId) {
-    const { data: subRows } = await supabaseAdmin!
-      .from('subscriptions')
-      .select('user_id')
-      .eq('plan_id', planId)
-      .eq('status', 'active');
-    filterUserIds = intersect(filterUserIds, (subRows ?? []).map((r: any) => r.user_id as string));
-  }
-
-  if (status === 'active') {
-    const { data: subRows } = await supabaseAdmin!
-      .from('subscriptions')
-      .select('user_id')
-      .eq('status', 'active');
-    filterUserIds = intersect(filterUserIds, (subRows ?? []).map((r: any) => r.user_id as string));
-  } else if (status === 'no_plan') {
-    const { data: subRows } = await supabaseAdmin!
-      .from('subscriptions')
-      .select('user_id')
-      .eq('status', 'active');
-    excludeUserIds = (subRows ?? []).map((r: any) => r.user_id as string);
-  } else if (status === 'suspended') {
-    const { data: entRows } = await supabaseAdmin!
-      .from('user_entitlements')
-      .select('user_id')
-      .eq('access', 'deny')
-      .is('course_id', null);
-    filterUserIds = intersect(filterUserIds, (entRows ?? []).map((r: any) => r.user_id as string));
-  }
-
-  // Early return if filter yields empty set
-  if (filterUserIds !== null && filterUserIds.length === 0) {
-    return res.json({ users: [], total: 0, limit, offset });
-  }
-
-  let query = supabaseAdmin!
-    .from('profiles')
-    .select('id, full_name, role, created_at', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
-
-  if (filterUserIds !== null) {
-    query = query.in('id', filterUserIds);
-  }
-
-  if (excludeUserIds !== null && excludeUserIds.length > 0) {
-    query = query.not('id', 'in', `(${excludeUserIds.join(',')})`);
-  }
-
-  if (search) {
-    if (filteredAuthIds !== null) {
-      if (filteredAuthIds.length > 0) {
-        query = query.in('id', filteredAuthIds);
-      } else {
-        return res.json({ users: [], total: 0, limit, offset });
-      }
-    } else {
-      query = query.ilike('full_name', `%${search}%`);
-    }
-  }
-
-  const { data, error, count } = await query;
-  if (error) return res.status(500).json({ error: error.message });
-
-  // Fetch active subscriptions for the returned users
-  const userIds = (data ?? []).map((u: any) => u.id);
-  let subMap = new Map<string, any>();
-  if (userIds.length > 0) {
-    const { data: subs } = await supabaseAdmin!
-      .from('subscriptions')
-      .select('user_id, status, plans (name)')
-      .in('user_id', userIds)
-      .eq('status', 'active');
-    subMap = new Map((subs ?? []).map((s: any) => [s.user_id, s]));
-  }
-
-  const users = (data ?? []).map((u: any) => ({
-    ...u,
-    email: emailMap[u.id] ?? null,
-    subscription: subMap.get(u.id) ?? null,
-  }));
-  res.json({ users, total: count ?? 0, limit, offset });
+  try {
+    const result = await userSvc.listUsers({
+      limit: Math.min(Number(req.query.limit) || 50, 100),
+      offset: Number(req.query.offset) || 0,
+      search: (req.query.q as string | undefined)?.toLowerCase().trim(),
+      planId: req.query.plan_id as string | undefined,
+      status: req.query.status as string | undefined,
+    });
+    res.json(result);
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── PLANS SUMMARY (for filter dropdown) ───────────────────────
+// ─── PLANS SUMMARY ─────────────────────────────────────────────
 router.get('/plans-summary', async (_req, res) => {
-  const { data, error } = await supabaseAdmin!
-    .from('plans')
-    .select('id, name')
-    .order('name');
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data ?? []);
+  try { res.json(await userSvc.getPlansSummary()); }
+  catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── STATIC ROUTES (must be before /:id to avoid param capture) ─
-
-// ADMIN STATS
+// ─── ADMIN STATS ───────────────────────────────────────────────
 router.get('/stats', async (_req, res) => {
-  const [
-    { count: totalUsers },
-    { count: totalCourses },
-    { count: totalEnrollments },
-    { count: totalWebhookEvents },
-    { count: failedWebhooks },
-    { count: totalAuditActions },
-  ] = await Promise.all([
-    supabaseAdmin!.from('profiles').select('*', { count: 'exact', head: true }),
-    supabaseAdmin!.from('courses').select('*', { count: 'exact', head: true }).eq('status', 'published'),
-    supabaseAdmin!.from('enrollments').select('*', { count: 'exact', head: true }),
-    supabaseAdmin!.from('webhook_events').select('*', { count: 'exact', head: true }),
-    supabaseAdmin!.from('webhook_events').select('*', { count: 'exact', head: true }).eq('status', 'failed'),
-    supabaseAdmin!.from('audit_logs').select('*', { count: 'exact', head: true }),
-  ]);
-
-  res.json({
-    totalUsers: totalUsers ?? 0,
-    totalCourses: totalCourses ?? 0,
-    totalEnrollments: totalEnrollments ?? 0,
-    totalWebhookEvents: totalWebhookEvents ?? 0,
-    failedWebhooks: failedWebhooks ?? 0,
-    totalAuditActions: totalAuditActions ?? 0,
-  });
+  try { res.json(await dataSvc.getAdminStats()); }
+  catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ENROLLMENTS LIST
-router.get('/enrollments', async (req, res) => {
-  const limit = Math.min(Number(req.query.limit) || 50, 200);
-  const offset = Number(req.query.offset) || 0;
-  const courseId = req.query.course_id as string | undefined;
-
-  let query = supabaseAdmin!
-    .from('enrollments')
-    .select('*, profiles (full_name), courses (title)', { count: 'exact' })
-    .order('enrolled_at', { ascending: false })
-    .range(offset, offset + limit - 1);
-
-  if (courseId) query = query.eq('course_id', courseId);
-
-  const { data, error, count } = await query;
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ enrollments: data ?? [], total: count ?? 0 });
-});
-
-// CREATE ENROLLMENT
+// ─── ENROLLMENTS ───────────────────────────────────────────────
 const createEnrollmentSchema = z.object({
   user_id: z.string().uuid(),
   course_id: z.string().uuid(),
 });
 
+router.get('/enrollments', async (req, res) => {
+  try {
+    res.json(await entSvc.listEnrollments(
+      Math.min(Number(req.query.limit) || 50, 200),
+      Number(req.query.offset) || 0,
+      req.query.course_id as string | undefined,
+    ));
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
+});
+
 router.post('/enrollments', async (req: AuthenticatedRequest, res) => {
   const parsed = createEnrollmentSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-
-  const { data, error } = await supabaseAdmin!
-    .from('enrollments')
-    .insert(parsed.data)
-    .select('*, profiles (full_name), courses (title)')
-    .single();
-
-  if (error) {
-    if (error.code === '23505') return res.status(409).json({ error: 'Usuário já matriculado neste curso.' });
-    return res.status(500).json({ error: error.message });
-  }
-
-  await supabaseAdmin!.from('audit_logs').insert({
-    actor_id: req.userId,
-    action: 'admin_create_enrollment',
-    target_type: 'user',
-    target_id: parsed.data.user_id,
-    metadata: { course_id: parsed.data.course_id, enrollment_id: data.id },
-  });
-
-  res.status(201).json(data);
+  try {
+    const actorId = req.userId as string;
+    const { data, conflict } = await entSvc.createEnrollment(parsed.data.user_id, parsed.data.course_id, actorId);
+    if (conflict) return res.status(409).json({ error: 'Usuário já matriculado neste curso.' });
+    res.status(201).json(data);
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// DELETE ENROLLMENT
 router.delete('/enrollments/:id', async (req: AuthenticatedRequest, res) => {
-  const { data: enrollment } = await supabaseAdmin!
-    .from('enrollments')
-    .select('user_id, course_id')
-    .eq('id', req.params.id)
-    .single();
-
-  const { error } = await supabaseAdmin!
-    .from('enrollments')
-    .delete()
-    .eq('id', req.params.id);
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  if (enrollment) {
-    await supabaseAdmin!.from('audit_logs').insert({
-      actor_id: req.userId,
-      action: 'admin_delete_enrollment',
-      target_type: 'user',
-      target_id: (enrollment as any).user_id,
-      metadata: { course_id: (enrollment as any).course_id, enrollment_id: req.params.id },
-    });
-  }
-
-  res.json({ ok: true });
+  try {
+    await entSvc.deleteEnrollment(req.params.id as string, req.userId as string);
+    res.json({ ok: true });
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// AUDIT LOGS (supports ?target_id= for filtering by user)
+// ─── AUDIT / WEBHOOKS ──────────────────────────────────────────
 router.get('/audit', async (req, res) => {
-  const limit = Math.min(Number(req.query.limit) || 50, 200);
-  const offset = Number(req.query.offset) || 0;
-  const targetId = req.query.target_id as string | undefined;
-
-  let query = supabaseAdmin!
-    .from('audit_logs')
-    .select('*, profiles!actor_id (full_name)', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
-
-  if (targetId) query = query.eq('target_id', targetId);
-
-  const { data, error, count } = await query;
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ data, count, limit, offset });
+  try {
+    res.json(await dataSvc.getAuditLogs(
+      Math.min(Number(req.query.limit) || 50, 200),
+      Number(req.query.offset) || 0,
+      req.query.target_id as string | undefined,
+    ));
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// WEBHOOK EVENTS
 router.get('/webhooks/events', async (req, res) => {
-  const limit = Math.min(Number(req.query.limit) || 50, 200);
-  const offset = Number(req.query.offset) || 0;
-  const status = req.query.status as string | undefined;
-  const provider = req.query.provider as string | undefined;
-
-  let query = supabaseAdmin!
-    .from('webhook_events')
-    .select('id, provider, event_type, event_id, status, error, processed_at, created_at', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
-
-  if (status) query = query.eq('status', status);
-  if (provider) query = query.eq('provider', provider);
-
-  const { data, error, count } = await query;
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ data, count, limit, offset });
+  try {
+    res.json(await dataSvc.getWebhookEvents(
+      Math.min(Number(req.query.limit) || 50, 200),
+      Number(req.query.offset) || 0,
+      req.query.status as string | undefined,
+      req.query.provider as string | undefined,
+    ));
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
 router.get('/webhooks/events/:id', async (req, res) => {
-  const { data, error } = await supabaseAdmin!
-    .from('webhook_events')
-    .select('*')
-    .eq('id', req.params.id)
-    .single();
-  if (error || !data) return res.status(404).json({ error: 'Not found' });
-  res.json(data);
+  try {
+    const data = await dataSvc.getWebhookEventById(req.params.id);
+    if (!data) return res.status(404).json({ error: 'Not found' });
+    res.json(data);
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
 // ─── USER DETAIL ───────────────────────────────────────────────
 router.get('/:id', async (req, res) => {
-  const { data: profile, error: pe } = await supabaseAdmin!
-    .from('profiles')
-    .select(`
-      id, full_name, role, created_at,
-      subscriptions (plan_id, status, current_period_end, plans (name, credits_per_month))
-    `)
-    .eq('id', req.params.id)
-    .single();
-
-  if (pe || !profile) return res.status(404).json({ error: 'User not found' });
-
-  const { data: entitlements } = await supabaseAdmin!
-    .from('user_entitlements')
-    .select('*, courses (title), modules (title), lessons (title)')
-    .eq('user_id', req.params.id)
-    .order('created_at', { ascending: false });
-
-  const { data: enrollments } = await supabaseAdmin!
-    .from('enrollments')
-    .select('*, courses (title)')
-    .eq('user_id', req.params.id)
-    .order('enrolled_at', { ascending: false });
-
-  // Auth user info (last login, email verification)
-  const { data: authData } = await supabaseAdmin!.auth.admin.getUserById(req.params.id);
-  const authUser = authData.user ? {
-    email: authData.user.email,
-    last_sign_in_at: authData.user.last_sign_in_at,
-    email_confirmed_at: authData.user.email_confirmed_at,
-    created_at: authData.user.created_at,
-  } : null;
-
-  res.json({
-    profile,
-    entitlements: entitlements ?? [],
-    enrollments: enrollments ?? [],
-    authUser,
-  });
-});
-
-// ─── CREDIT BALANCE (dedicated endpoint) ───────────────────────
-router.get('/:id/credit-balance', async (req, res) => {
   try {
-    const balance = await getBalance(req.params.id);
-    res.json(balance);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
+    const result = await userSvc.getUserDetail(req.params.id);
+    if (!result) return res.status(404).json({ error: 'User not found' });
+    res.json(result);
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── CREDIT TRANSACTIONS ───────────────────────────────────────
+router.get('/:id/credit-balance', async (req, res) => {
+  try { res.json(await dataSvc.getCreditBalance(req.params.id)); }
+  catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
+});
+
 router.get('/:id/credit-transactions', async (req, res) => {
-  const limit = Math.min(Number(req.query.limit) || 20, 100);
-  const offset = Number(req.query.offset) || 0;
-
-  const [{ data, error, count }, balanceResult] = await Promise.all([
-    supabaseAdmin!
-      .from('credit_transactions')
-      .select('*', { count: 'exact' })
-      .eq('user_id', req.params.id)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1),
-    getBalance(req.params.id),
-  ]);
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  res.json({
-    transactions: data ?? [],
-    total: count ?? 0,
-    balance: balanceResult.available,
-    reserved: balanceResult.reserved,
-    consumed_this_month: balanceResult.consumed_this_month,
-    total_consumed: balanceResult.total_consumed,
-  });
+  try {
+    res.json(await dataSvc.getCreditTransactions(
+      req.params.id, Math.min(Number(req.query.limit) || 20, 100), Number(req.query.offset) || 0,
+    ));
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── CREDIT ADJUSTMENT ─────────────────────────────────────────
 const creditAdjustSchema = z.object({
   amount: z.number().int().refine((n) => n !== 0, { message: 'amount cannot be zero' }),
   description: z.string().min(1).max(255),
@@ -380,132 +129,33 @@ const creditAdjustSchema = z.object({
 router.post('/:id/credits', async (req: AuthenticatedRequest, res) => {
   const parsed = creditAdjustSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-
-  const { amount, description } = parsed.data;
-  const type = amount > 0 ? 'purchase' : 'consume';
-  const storedAmount = Math.abs(amount); // DB always stores positive amounts
-
-  const { data, error } = await supabaseAdmin!
-    .from('credit_transactions')
-    .insert({
-      user_id: req.params.id,
-      amount: storedAmount,
-      type,
-      status: 'confirmed',
-      description,
-      idempotency_key: `admin_adjust_${req.userId}_${Date.now()}`,
-    })
-    .select()
-    .single();
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  await supabaseAdmin!.from('audit_logs').insert({
-    actor_id: req.userId,
-    action: 'admin_credit_adjustment',
-    target_type: 'user',
-    target_id: req.params.id,
-    metadata: { amount, description, transaction_id: data.id },
-  });
-
-  res.status(201).json(data);
+  try {
+    const data = await dataSvc.adjustCredits(
+      req.params.id as string, req.userId as string, parsed.data.amount, parsed.data.description,
+    );
+    res.status(201).json(data);
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── UPDATE PROFILE ────────────────────────────────────────────
 const updateProfileSchema = z.object({
   role: z.enum(['member', 'admin']).optional(),
   full_name: z.string().min(1).max(255).optional(),
-}).refine((d) => d.role !== undefined || d.full_name !== undefined, {
-  message: 'At least one field required',
-});
+}).refine((d) => d.role !== undefined || d.full_name !== undefined, { message: 'At least one field required' });
 
 router.patch('/:id', async (req: AuthenticatedRequest, res) => {
   const parsed = updateProfileSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-
-  const { data, error } = await supabaseAdmin!
-    .from('profiles')
-    .update(parsed.data)
-    .eq('id', req.params.id)
-    .select()
-    .single();
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  await supabaseAdmin!.from('audit_logs').insert({
-    actor_id: req.userId,
-    action: 'admin_update_profile',
-    target_type: 'user',
-    target_id: req.params.id,
-    metadata: parsed.data,
-  });
-
-  res.json(data);
+  try {
+    res.json(await userSvc.updateProfile(req.params.id as string, req.userId as string, parsed.data));
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── USER PROGRESS ─────────────────────────────────────────────
 router.get('/:id/progress', async (req, res) => {
-  const { data: enrollments } = await supabaseAdmin!
-    .from('enrollments')
-    .select('course_id, courses (id, title)')
-    .eq('user_id', req.params.id);
-
-  if (!enrollments || enrollments.length === 0) {
-    return res.json({ progress: [] });
-  }
-
-  const result = await Promise.all(
-    (enrollments as any[]).map(async (enr) => {
-      const courseId = enr.course_id;
-
-      // Get module IDs for this course
-      const { data: modules } = await supabaseAdmin!
-        .from('modules')
-        .select('id')
-        .eq('course_id', courseId);
-
-      const moduleIds = (modules ?? []).map((m: any) => m.id);
-
-      if (moduleIds.length === 0) {
-        return { course_id: courseId, title: enr.courses?.title ?? courseId, total_lessons: 0, completed_lessons: 0 };
-      }
-
-      // Count all lessons in those modules
-      const { count: totalLessons } = await supabaseAdmin!
-        .from('lessons')
-        .select('id', { count: 'exact', head: true })
-        .in('module_id', moduleIds);
-
-      // Get lesson IDs for completed progress check
-      const { data: lessons } = await supabaseAdmin!
-        .from('lessons')
-        .select('id')
-        .in('module_id', moduleIds);
-
-      const lessonIds = (lessons ?? []).map((l: any) => l.id);
-
-      const { count: completedLessons } = lessonIds.length > 0
-        ? await supabaseAdmin!
-            .from('lesson_progress')
-            .select('lesson_id', { count: 'exact', head: true })
-            .eq('user_id', req.params.id)
-            .eq('completed', true)
-            .in('lesson_id', lessonIds)
-        : { count: 0 };
-
-      return {
-        course_id: courseId,
-        title: enr.courses?.title ?? courseId,
-        total_lessons: totalLessons ?? 0,
-        completed_lessons: completedLessons ?? 0,
-      };
-    }),
-  );
-
-  res.json({ progress: result });
+  try { res.json({ progress: await dataSvc.getUserProgress(req.params.id) }); }
+  catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── GRANT ENTITLEMENT ─────────────────────────────────────────
+// ─── ENTITLEMENTS ──────────────────────────────────────────────
 const entitlementSchema = z.object({
   course_id: z.string().uuid().optional(),
   module_id: z.string().uuid().optional(),
@@ -518,96 +168,27 @@ const entitlementSchema = z.object({
 router.post('/:id/entitlements', async (req: AuthenticatedRequest, res) => {
   const parsed = entitlementSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-
-  const { data, error } = await supabaseAdmin!
-    .from('user_entitlements')
-    .insert({
-      ...parsed.data,
-      user_id: req.params.id,
-      granted_by: req.userId,
-    })
-    .select()
-    .single();
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  await supabaseAdmin!.from('audit_logs').insert({
-    actor_id: req.userId,
-    action: 'grant_entitlement',
-    target_type: 'user',
-    target_id: req.params.id,
-    metadata: { entitlement_id: data.id, access: parsed.data.access },
-  });
-
-  res.status(201).json(data);
+  try {
+    res.status(201).json(await entSvc.grantEntitlement(req.params.id as string, req.userId as string, parsed.data));
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── REVOKE ENTITLEMENT ────────────────────────────────────────
 router.delete('/:id/entitlements/:entitlementId', async (req: AuthenticatedRequest, res) => {
-  const { error } = await supabaseAdmin!
-    .from('user_entitlements')
-    .delete()
-    .eq('id', req.params.entitlementId)
-    .eq('user_id', req.params.id);
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  await supabaseAdmin!.from('audit_logs').insert({
-    actor_id: req.userId,
-    action: 'revoke_entitlement',
-    target_type: 'user',
-    target_id: req.params.id,
-    metadata: { entitlement_id: req.params.entitlementId },
-  });
-
-  res.json({ ok: true });
+  try {
+    await entSvc.revokeEntitlement(req.params.id as string, req.params.entitlementId as string, req.userId as string);
+    res.json({ ok: true });
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── GRANT FULL ACCESS ─────────────────────────────────────────
 router.post('/:id/grant-full-access/:courseId', async (req: AuthenticatedRequest, res) => {
-  const { data, error } = await supabaseAdmin!
-    .from('user_entitlements')
-    .upsert({
-      user_id: req.params.id,
-      course_id: req.params.courseId,
-      access: 'full_access',
-      granted_by: req.userId,
-      reason: 'admin_grant_full_access',
-    }, { onConflict: 'user_id,course_id' })
-    .select()
-    .single();
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  await supabaseAdmin!.from('audit_logs').insert({
-    actor_id: req.userId,
-    action: 'grant_full_access',
-    target_type: 'user',
-    target_id: req.params.id,
-    metadata: { course_id: req.params.courseId },
-  });
-
-  res.json(data);
+  try {
+    res.json(await entSvc.grantFullAccess(req.params.id as string, req.params.courseId as string, req.userId as string));
+  } catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
-// ─── REPROCESS ENTITLEMENTS ────────────────────────────────────
 router.post('/:id/reprocess-entitlements', async (req: AuthenticatedRequest, res) => {
-  const { data: sub } = await supabaseAdmin!
-    .from('subscriptions')
-    .select('plan_id, status')
-    .eq('user_id', req.params.id)
-    .eq('status', 'active')
-    .single();
-
-  await supabaseAdmin!.from('audit_logs').insert({
-    actor_id: req.userId,
-    action: 'reprocess_entitlements',
-    target_type: 'user',
-    target_id: req.params.id,
-    metadata: { plan_id: sub?.plan_id ?? null },
-  });
-
-  res.json({ ok: true, subscription: sub ?? null });
+  try { res.json(await entSvc.reprocessEntitlements(req.params.id as string, req.userId as string)); }
+  catch (err: unknown) { const message = err instanceof Error ? err.message : String(err); res.status(500).json({ error: message }); }
 });
 
 export default router;

@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { logger } from '../lib/logger.js';
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@iris.app';
 const APP_URL = process.env.FRONTEND_URL || 'https://app.estrategize.co';
@@ -104,7 +105,7 @@ export async function notifyNewResponse(params: NotifyNewResponseParams): Promis
     if (cc) payload.cc = cc;
     await resend.emails.send(payload);
   } catch (err) {
-    console.error('[emailNotificationService] Failed to send notification:', err);
+    logger.error('[emailNotificationService] Failed to send notification:', err);
     // Don't throw — email failure must not affect form submission
   }
 }
