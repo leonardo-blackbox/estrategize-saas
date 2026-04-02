@@ -18,7 +18,7 @@ export function AdminFormacaoPage() {
   const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
-  const [managingSection, setManagingSection] = useState<any | null>(null);
+  const [managingSection, setManagingSection] = useState<{ id: string; title: string; sort_order: number; is_active: boolean; formation_section_courses?: { sort_order: number; courses?: { id: string } | null }[] } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [openStatusDropdown, setOpenStatusDropdown] = useState<string | null>(null);
 
@@ -26,7 +26,7 @@ export function AdminFormacaoPage() {
     queryKey: ['admin-formacao-sections'],
     queryFn: adminGetFormacaoSections,
   });
-  const sectionList = sections as any[];
+  const sectionList = sections;
 
   const { data: allCoursesData } = useQuery({ queryKey: ['admin-courses'], queryFn: adminListCourses });
   const allCourses = Array.isArray(allCoursesData) ? allCoursesData : [];
@@ -38,7 +38,7 @@ export function AdminFormacaoPage() {
     onSuccess: () => { invalidateSections(); setShowCreateModal(false); setNewTitle(''); },
   });
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => adminUpdateSection(id, data),
+    mutationFn: ({ id, data }: { id: string; data: { title?: string; sort_order?: number; is_active?: boolean } }) => adminUpdateSection(id, data),
     onSuccess: () => { invalidateSections(); setEditingId(null); },
   });
   const deleteMutation = useMutation({
@@ -81,7 +81,7 @@ export function AdminFormacaoPage() {
             <p className="text-sm text-[var(--text-tertiary)]">Nenhuma seção criada ainda.</p>
           </div>
         ) : (
-          sectionList.map((section: any, index: number) => (
+          sectionList.map((section, index: number) => (
             <SectionCard
               key={section.id} section={section} index={index} totalCount={sectionList.length}
               editingId={editingId} editTitle={editTitle} openStatusDropdown={openStatusDropdown}

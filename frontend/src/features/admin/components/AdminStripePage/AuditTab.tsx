@@ -5,7 +5,7 @@ interface AuditLog {
   target_id?: string;
   created_at?: string | null;
   metadata?: unknown;
-  profiles?: { full_name?: string } | null;
+  profiles?: { full_name?: string | null } | null;
 }
 
 interface AuditTabProps {

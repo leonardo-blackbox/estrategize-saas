@@ -40,7 +40,7 @@ export function AdminDashboardPage() {
     refetchInterval: 60_000,
   });
 
-  const s = stats as any;
+  const s = stats;
 
   return (
     <motion.div
@@ -64,7 +64,7 @@ export function AdminDashboardPage() {
             <StatCard label="Cursos publicados" value={s?.totalCourses?.toLocaleString('pt-BR') ?? '—'} href="/admin/cursos" />
             <StatCard label="Matrículas" value={s?.totalEnrollments?.toLocaleString('pt-BR') ?? '—'} href="/admin/turmas" />
             <StatCard label="Webhook events" value={s?.totalWebhookEvents?.toLocaleString('pt-BR') ?? '—'} href="/admin/stripe" />
-            <StatCard label="Webhooks com falha" value={s?.failedWebhooks?.toLocaleString('pt-BR') ?? '—'} sub={s?.failedWebhooks > 0 ? 'Atenção: reprocessar eventos' : 'Tudo certo'} href="/admin/stripe" />
+            <StatCard label="Webhooks com falha" value={s?.failedWebhooks?.toLocaleString('pt-BR') ?? '—'} sub={(s?.failedWebhooks ?? 0) > 0 ? 'Atenção: reprocessar eventos' : 'Tudo certo'} href="/admin/stripe" />
             <StatCard label="Ações de auditoria" value={s?.totalAuditActions?.toLocaleString('pt-BR') ?? '—'} href="/admin/stripe" />
           </>
         )}

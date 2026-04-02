@@ -5,8 +5,8 @@ interface EntitlementRowProps {
   entitlement: {
     id: string;
     access: string;
-    expires_at: string | null;
-    reason: string | null;
+    expires_at?: string | null;
+    reason?: string | null;
     courses?: { title: string } | null;
   };
   onRevoke: (id: string) => void;

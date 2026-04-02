@@ -5,7 +5,7 @@ import { staggerContainer, staggerItem } from '../../../../lib/motion.ts';
 import { Button } from '../../../../components/ui/Button.tsx';
 import {
   adminGetOfertas, adminCreateOferta, adminUpdateOferta, adminDeleteOferta,
-  adminUpdateOfertaTurmas, adminGetTurmas, type Oferta, type Turma,
+  adminUpdateOfertaTurmas, adminGetTurmas, type Oferta,
 } from '../../../../api/courses.ts';
 import { OfertaCard } from './OfertaCard.tsx';
 import { OfertaFormModal, type OfertaFormData } from './OfertaFormModal.tsx';
@@ -20,8 +20,8 @@ export function AdminOfertasPage() {
 
   const { data: ofertasData, isLoading } = useQuery({ queryKey: ['admin-ofertas'], queryFn: adminGetOfertas });
   const { data: turmasData } = useQuery({ queryKey: ['admin-turmas'], queryFn: adminGetTurmas });
-  const ofertas = ((ofertasData as any)?.ofertas ?? []) as Oferta[];
-  const activeTurmas = (((turmasData as any)?.turmas ?? []) as Turma[]).filter((t) => t.status === 'active');
+  const ofertas = (ofertasData?.ofertas ?? []) as Oferta[];
+  const activeTurmas = (turmasData?.turmas ?? []).filter((t) => t.status === 'active');
 
   const invalidateOfertas = () => qc.invalidateQueries({ queryKey: ['admin-ofertas'] });
 

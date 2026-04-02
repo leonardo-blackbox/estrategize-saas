@@ -45,8 +45,8 @@ export function AdminUserDetailPage() {
       className="max-w-4xl mx-auto space-y-6"
     >
       <AdminUserDetailHeader
-        displayName={u.displayName}
-        email={u.detail.authUser?.email}
+        displayName={u.displayName ?? ''}
+        email={u.detail.authUser?.email ?? ''}
         activeTab={u.activeTab}
         setActiveTab={u.setActiveTab}
       />

@@ -50,6 +50,7 @@ export interface Lesson {
   sort_order: number;
   drip_days: number;
   is_free_preview: boolean;
+  status?: 'draft' | 'published';
   lesson_attachments: Attachment[];
   lesson_links?: LessonLink[];
 }
@@ -103,6 +104,187 @@ export interface ContinueWatchingItem {
   };
 }
 
+// ─── Admin Types ──────────────────────────────────────────────
+
+export interface AdminSubscription {
+  plan_id: string;
+  status: string;
+  current_period_end?: string;
+  plans?: { name: string; credits_per_month?: number };
+}
+
+export interface AdminUserProfile {
+  id: string;
+  full_name: string | null;
+  role: string;
+  created_at: string;
+  subscriptions?: AdminSubscription[];
+}
+
+export interface AdminEntitlement {
+  id: string;
+  user_id: string;
+  course_id?: string | null;
+  module_id?: string | null;
+  lesson_id?: string | null;
+  access: string;
+  expires_at?: string | null;
+  reason?: string | null;
+  courses?: { title: string } | null;
+  modules?: { title: string } | null;
+  lessons?: { title: string } | null;
+}
+
+export interface AdminEnrollment {
+  id: string;
+  user_id: string;
+  course_id: string;
+  enrolled_at: string;
+  courses?: { title: string } | null;
+}
+
+export interface AdminAuthUser {
+  email?: string;
+  last_sign_in_at?: string | null;
+  email_confirmed_at?: string | null;
+  created_at?: string;
+}
+
+export interface AdminUserDetail {
+  profile: AdminUserProfile;
+  entitlements: AdminEntitlement[];
+  enrollments: AdminEnrollment[];
+  authUser: AdminAuthUser | null;
+}
+
+export interface AdminUserListItem {
+  id: string;
+  full_name: string | null;
+  role: string;
+  created_at: string;
+  email: string | null;
+  subscription: AdminSubscription | null;
+}
+
+export interface AdminUserListResponse {
+  users: AdminUserListItem[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface AdminCreditTransaction {
+  id: string;
+  user_id: string;
+  amount: number;
+  type: string;
+  status: string;
+  description?: string;
+  created_at: string;
+}
+
+export interface AdminCreditTransactionsResponse {
+  transactions: AdminCreditTransaction[];
+  total: number;
+  balance: number;
+  reserved: number;
+  consumed_this_month: number;
+  total_consumed: number;
+}
+
+export interface AdminAuditLog {
+  id: string;
+  actor_id?: string;
+  action: string;
+  target_type: string;
+  target_id: string;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+  profiles?: { full_name: string | null } | null;
+}
+
+export interface AdminAuditLogsResponse {
+  data: AdminAuditLog[];
+  count: number;
+  limit: number;
+  offset: number;
+}
+
+export interface AdminWebhookEvent {
+  id: string;
+  provider: string;
+  event_type: string;
+  event_id: string;
+  status: string;
+  error?: string | null;
+  processed_at?: string | null;
+  created_at: string;
+  payload?: Record<string, unknown>;
+}
+
+export interface AdminWebhookEventsResponse {
+  data: AdminWebhookEvent[];
+  count: number;
+  limit: number;
+  offset: number;
+}
+
+export interface AdminStats {
+  totalUsers: number;
+  totalCourses: number;
+  totalEnrollments: number;
+  totalWebhookEvents: number;
+  failedWebhooks: number;
+  totalAuditActions: number;
+}
+
+export interface AdminCourseDetail extends Course {
+  sales_url?: string | null;
+  offer_badge_enabled?: boolean;
+  offer_badge_text?: string | null;
+}
+
+export interface AdminTurma {
+  id: string;
+  name: string;
+  description?: string | null;
+  drip_type?: string;
+  access_start_date?: string | null;
+  status: string;
+  created_at: string;
+  course_id: string;
+  courses?: { id: string; title: string; cover_url?: string } | null;
+  enrollment_count?: number;
+}
+
+export interface AdminOferta {
+  id: string;
+  title: string;
+  slug: string;
+  turma_ids?: string[];
+  [key: string]: unknown;
+}
+
+export interface AdminFormationSectionCourse {
+  sort_order: number;
+  courses?: { id: string; title?: string; cover_url?: string } | null;
+}
+
+export interface AdminFormationSection {
+  id: string;
+  title: string;
+  sort_order: number;
+  is_active: boolean;
+  formation_section_courses?: AdminFormationSectionCourse[];
+}
+
+export interface AdminCourseProgress {
+  course_id: string;
+  title: string;
+  total_lessons: number;
+  completed_lessons: number;
+}
+
 // Catalog
 export async function getCatalog(): Promise<CatalogCourse[]> {
   return client.get('/api/courses').json();
@@ -142,11 +324,11 @@ export async function getContinueWatching(): Promise<ContinueWatchingItem[]> {
 }
 
 // Admin
-export async function adminGetCourses() {
+export async function adminGetCourses(): Promise<AdminCourseDetail[]> {
   return client.get('/api/admin/courses').json();
 }
 
-export async function adminGetCourse(id: string) {
+export async function adminGetCourse(id: string): Promise<AdminCourseDetail> {
   return client.get(`/api/admin/courses/${id}`).json();
 }
 
@@ -228,7 +410,7 @@ export async function adminGetUsers(params?: {
   q?: string;
   plan_id?: string;
   status?: string;
-}) {
+}): Promise<AdminUserListResponse> {
   const clean: Record<string, string> = {};
   if (params?.limit != null) clean.limit = String(params.limit);
   if (params?.offset != null) clean.offset = String(params.offset);
@@ -243,7 +425,7 @@ export async function adminGetPlansSummary(): Promise<Array<{ id: string; name: 
   return client.get('/api/admin/users/plans-summary').json();
 }
 
-export async function adminGetUser(id: string) {
+export async function adminGetUser(id: string): Promise<AdminUserDetail> {
   return client.get(`/api/admin/users/${id}`).json();
 }
 
@@ -264,7 +446,7 @@ export async function adminGrantFullAccess(userId: string, courseId: string) {
   return client.post(`/api/admin/users/${userId}/grant-full-access/${courseId}`).json();
 }
 
-export async function adminGetWebhookEvents(params?: { limit?: number; offset?: number; status?: string; provider?: string }) {
+export async function adminGetWebhookEvents(params?: { limit?: number; offset?: number; status?: string; provider?: string }): Promise<AdminWebhookEventsResponse> {
   const clean: Record<string, string> = {};
   if (params?.limit != null) clean.limit = String(params.limit);
   if (params?.offset != null) clean.offset = String(params.offset);
@@ -274,7 +456,7 @@ export async function adminGetWebhookEvents(params?: { limit?: number; offset?: 
   return client.get(`/api/admin/users/webhooks/events${search ? `?${search}` : ''}`).json();
 }
 
-export async function adminGetAuditLogs(params?: { limit?: number; offset?: number }) {
+export async function adminGetAuditLogs(params?: { limit?: number; offset?: number }): Promise<AdminAuditLogsResponse> {
   const clean: Record<string, string> = {};
   if (params?.limit != null) clean.limit = String(params.limit);
   if (params?.offset != null) clean.offset = String(params.offset);
@@ -282,11 +464,11 @@ export async function adminGetAuditLogs(params?: { limit?: number; offset?: numb
   return client.get(`/api/admin/users/audit${search ? `?${search}` : ''}`).json();
 }
 
-export async function adminGetStats() {
+export async function adminGetStats(): Promise<AdminStats> {
   return client.get('/api/admin/users/stats').json();
 }
 
-export async function adminGetEnrollments(params?: { limit?: number; offset?: number; course_id?: string }) {
+export async function adminGetEnrollments(params?: { limit?: number; offset?: number; course_id?: string }): Promise<{ enrollments: AdminEnrollment[]; total: number }> {
   const clean: Record<string, string> = {};
   if (params?.limit != null) clean.limit = String(params.limit);
   if (params?.offset != null) clean.offset = String(params.offset);
@@ -300,7 +482,7 @@ export async function adminGetEnrollments(params?: { limit?: number; offset?: nu
 export async function adminGetUserCreditTransactions(
   id: string,
   params?: { limit?: number; offset?: number },
-) {
+): Promise<AdminCreditTransactionsResponse> {
   const clean: Record<string, string> = {};
   if (params?.limit != null) clean.limit = String(params.limit);
   if (params?.offset != null) clean.offset = String(params.offset);
@@ -352,7 +534,7 @@ export async function getFormacaoSections(): Promise<FormationSection[]> {
 
 // ─── Admin: Formation Sections ──────────────────────────────────
 
-export async function adminGetFormacaoSections() {
+export async function adminGetFormacaoSections(): Promise<AdminFormationSection[]> {
   return client.get('/api/admin/formacao/sections').json();
 }
 
@@ -389,7 +571,7 @@ export async function adminListCourses() {
   return client.get('/api/admin/courses').json();
 }
 
-export async function adminGetUserProgress(id: string) {
+export async function adminGetUserProgress(id: string): Promise<{ progress: AdminCourseProgress[] }> {
   return client.get(`/api/admin/users/${id}/progress`).json();
 }
 
@@ -406,7 +588,7 @@ export async function adminGetUserCreditBalance(id: string): Promise<{
 export async function adminGetUserAuditLogs(
   id: string,
   params?: { limit?: number; offset?: number },
-) {
+): Promise<AdminAuditLogsResponse> {
   const clean: Record<string, string> = { target_id: id };
   if (params?.limit != null) clean.limit = String(params.limit);
   if (params?.offset != null) clean.offset = String(params.offset);

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { AdminShell } from '../../../../components/layout/AdminShell'
+import { AdminShell } from './AdminShell'
 
 describe('AdminShell — sidebar navigation', () => {
   it('renders 6 nav items (5 links + 1 disabled item)', () => {

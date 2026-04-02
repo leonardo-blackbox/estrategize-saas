@@ -8,7 +8,9 @@ import { adminUpdateCourse, adminPublishCourse } from '../../../../api/courses.t
 import { CoursePlanSelect } from './CoursePlanSelect.tsx';
 import { CoursePublishButton } from './CoursePublishButton.tsx';
 
-interface AdminCursoDetailHeaderProps { course: any; onEditClick: () => void; }
+import type { AdminCourseDetail } from '../../services/admin.api.ts';
+
+interface AdminCursoDetailHeaderProps { course: AdminCourseDetail; onEditClick: () => void; }
 
 export function AdminCursoDetailHeader({ course, onEditClick }: AdminCursoDetailHeaderProps) {
   const qc = useQueryClient();
@@ -52,7 +54,7 @@ export function AdminCursoDetailHeader({ course, onEditClick }: AdminCursoDetail
             </div>
             <div className="flex items-center gap-3 mt-3 flex-wrap">
               <CoursePlanSelect currentPlanId={course.stripe_product_id ?? null} plans={activeProducts} onSelect={(id) => planMutation.mutate(id)} isPending={isMutating} />
-              <CoursePublishButton status={course.status} onPublish={() => publishMutation.mutate()} onUnpublish={() => unpublishMutation.mutate()} isPending={isMutating} />
+              <CoursePublishButton status={course.status as 'archived' | 'draft' | 'published'} onPublish={() => publishMutation.mutate()} onUnpublish={() => unpublishMutation.mutate()} isPending={isMutating} />
             </div>
           </div>
         </div>
