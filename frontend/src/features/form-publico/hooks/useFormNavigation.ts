@@ -46,9 +46,9 @@ export function useFormNavigation(params: UseFormNavigationParams) {
     setValidationError(null);
     if (isLastQuestion) {
       const answersArr = collectibleFields
-        .filter((f) => answers[f.id] !== undefined)
+        .filter((f) => answersRef.current[f.id] !== undefined)
         .map((f) => {
-          let value = answers[f.id];
+          let value = answersRef.current[f.id];
           if (f.type === 'multiple_choice' && Array.isArray(value)) {
             const opts = getFieldOptions(f);
             value = (value as string[]).map((id) => opts.find((o) => o.id === id)?.label ?? id);

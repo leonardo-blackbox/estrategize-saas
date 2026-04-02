@@ -21,7 +21,7 @@ export function MemberShell() {
 
       {/* Content — padded top so it starts BELOW the fixed nav */}
       <main className="pt-[80px] md:pt-[120px] pb-[calc(var(--bottom-tabs-height,56px)+env(safe-area-inset-bottom,0px)+16px)] lg:pb-8 px-5 sm:px-8 lg:px-12">
-        <AnimatePresence mode="sync">
+        <AnimatePresence mode="popLayout">
           <PageTransition key={location.pathname}>
             <Outlet />
           </PageTransition>

@@ -85,24 +85,17 @@ export type DateFilter = 'all' | 'today' | '7d' | '30d';
 export type CompletionFilter = 'all' | 'complete' | 'incomplete';
 
 /**
- * A response is complete when EVERY collectible field has a non-empty answer.
- * This is more reliable than the DB `status` field, which is set when the
- * respondent reaches the thank_you screen — not when all fields are filled.
+ * A response is complete when the DB status is 'complete' (respondent reached
+ * the thank_you screen). The previous field-by-field check was too strict:
+ * it incorrectly marked responses as incomplete when fields were skipped via
+ * conditional_logic, or when new fields were added to the form after older
+ * responses were submitted.
  */
 export function isResponseComplete(
   response: ResponseWithAnswers,
-  collectibleFields: ApplicationField[],
+  _collectibleFields: ApplicationField[],
 ): boolean {
-  if (collectibleFields.length === 0) return true;
-  return collectibleFields.every((field) => {
-    const answer = response.answers.find((a) => a.field_id === field.id);
-    if (!answer) return false;
-    const v = answer.value;
-    if (v === null || v === undefined) return false;
-    if (typeof v === 'string' && v.trim() === '') return false;
-    if (Array.isArray(v) && v.length === 0) return false;
-    return true;
-  });
+  return response.status === 'complete';
 }
 
 /** Filters collectible fields (excludes welcome, thank_you, message). */

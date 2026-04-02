@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useAuthStore } from './stores/authStore.ts';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
@@ -10,7 +10,7 @@ import './stores/themeStore.ts';
 
 // New layouts
 import { MemberShell } from './components/layout/MemberShell.tsx';
-import { AdminShell } from './components/layout/AdminShell.tsx';
+import { AdminShell } from './features/admin/components/AdminShell/index.ts';
 
 // Public pages
 import { LoginPage } from './pages/LoginPage.tsx';
@@ -61,6 +61,12 @@ import { AdminPluginsPage } from './pages/admin/AdminPluginsPage.tsx';
 import { AdminHelenaPage } from './pages/admin/AdminHelenaPage.tsx';
 import { AdminPluginPesquisaMercadoPage } from './pages/admin/AdminPluginPesquisaMercadoPage.tsx';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize);
 
@@ -71,6 +77,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Toaster position="top-right" richColors />
       <Routes>
         {/* ── Public routes ── */}
