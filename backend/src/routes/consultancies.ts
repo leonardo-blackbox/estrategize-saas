@@ -466,6 +466,14 @@ router.post('/:id/deliverables/generate', async (req: AuthenticatedRequest, res)
     const userId = req.userId!;
     const consultancyId = paramId(req);
     const { type } = parsed.data;
+
+    // Validate type is actually implemented BEFORE charging credits
+    const SUPPORTED_GENERATION_TYPES = ['action_plan', 'strategic_diagnosis'] as const;
+    if (!SUPPORTED_GENERATION_TYPES.includes(type as typeof SUPPORTED_GENERATION_TYPES[number])) {
+      res.status(400).json({ error: `Deliverable type "${type}" is not yet available for AI generation` });
+      return;
+    }
+
     const creditCost = DELIVERABLE_CREDIT_COSTS[type];
 
     const consultancy = await getConsultancy(userId, consultancyId);
@@ -473,8 +481,8 @@ router.post('/:id/deliverables/generate', async (req: AuthenticatedRequest, res)
 
     const output = await withCreditCharge(userId, creditCost, async () => {
       if (type === 'action_plan') return generateActionPlan(userId, consultancyId, consultancy.title);
-      if (type === 'strategic_diagnosis') return generateStrategicDiagnosis(userId, consultancyId, consultancy.title);
-      throw new Error(`Generation for type "${type}" not implemented yet`);
+      // type === 'strategic_diagnosis' (guaranteed by SUPPORTED_GENERATION_TYPES check above)
+      return generateStrategicDiagnosis(userId, consultancyId, consultancy.title);
     }, {
       idempotencyKey: `deliverable:${consultancyId}:${type}:${Date.now()}`,
       referenceId: consultancyId,
