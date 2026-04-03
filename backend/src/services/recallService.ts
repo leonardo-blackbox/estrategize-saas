@@ -1,5 +1,6 @@
 const RECALL_API_URL = 'https://us-west-2.recall.ai/api/v1';
 const RECALL_API_V2_URL = 'https://us-west-2.recall.ai/api/v2';
+const RECALL_TIMEOUT_MS = 15_000;
 
 interface CreateBotParams {
   meetingUrl: string;
@@ -62,6 +63,7 @@ export async function createBot(params: CreateBotParams): Promise<RecallBot> {
       bot_name: params.botName ?? 'Iris AI Notetaker',
       recording_config: recordingConfig,
     }),
+    signal: AbortSignal.timeout(RECALL_TIMEOUT_MS),
   });
 
   if (!res.ok) {
@@ -82,6 +84,7 @@ export async function fetchBotTranscript(botId: string): Promise<NormalizedTrans
 
   const res = await fetch(`${RECALL_API_V2_URL}/bot/${botId}/transcript/`, {
     headers: { 'Authorization': `Token ${apiKey}` },
+    signal: AbortSignal.timeout(RECALL_TIMEOUT_MS),
   });
 
   if (!res.ok) {
