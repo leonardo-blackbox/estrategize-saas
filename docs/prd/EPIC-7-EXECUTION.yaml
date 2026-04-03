@@ -1,0 +1,109 @@
+epic_id: "EPIC-7"
+epic_name: "Market Intelligence — Pesquisa de Mercado"
+prd_file: "docs/prd/epic-7-market-intelligence.md"
+version: "1.0"
+created: "2026-04-01"
+status: "ready_for_execution"
+
+# Execução em 5 waves com paralelismo máximo
+
+waves:
+  - wave: 1
+    name: "Foundation"
+    description: "DB migration, tipos TypeScript e plugin catalog"
+    can_parallelize: false
+    stories:
+      - id: "7.1"
+        file: "docs/stories/story-7.1-market-intelligence-foundation.md"
+        branch: "feat/7.1-market-intelligence-foundation"
+        estimated_complexity: "medium"
+
+  - wave: 2
+    name: "Core Services"
+    description: "Serviços backend + config admin backend — paralelos"
+    can_parallelize: true
+    depends_on_wave: 1
+    stories:
+      - id: "7.2"
+        file: "docs/stories/story-7.2-instagram-scan-service.md"
+        branch: "feat/7.2-instagram-scan-service"
+        estimated_complexity: "high"
+      - id: "7.3"
+        file: "docs/stories/story-7.3-admin-config-backend.md"
+        branch: "feat/7.3-admin-plugin-config-backend"
+        estimated_complexity: "medium"
+
+  - wave: 3
+    name: "Pipeline + Admin UI"
+    description: "Pipeline completo de pesquisa + painel admin frontend — paralelos"
+    can_parallelize: true
+    depends_on_wave: 2
+    stories:
+      - id: "7.4"
+        file: "docs/stories/story-7.4-admin-config-frontend.md"
+        branch: "feat/7.4-admin-plugin-config-frontend"
+        estimated_complexity: "high"
+        depends_on: ["7.3"]
+      - id: "7.5"
+        file: "docs/stories/story-7.5-market-research-pipeline.md"
+        branch: "feat/7.5-market-research-pipeline"
+        estimated_complexity: "very_high"
+        depends_on: ["7.2", "7.3"]
+
+  - wave: 4
+    name: "API Routes + Instagram UI"
+    description: "Rotas de market research + card de Instagram — paralelos"
+    can_parallelize: true
+    depends_on_wave: 3
+    stories:
+      - id: "7.6"
+        file: "docs/stories/story-7.6-market-research-api-routes.md"
+        branch: "feat/7.6-market-research-api"
+        estimated_complexity: "medium"
+        depends_on: ["7.5"]
+      - id: "7.7"
+        file: "docs/stories/story-7.7-instagram-card-ui.md"
+        branch: "feat/7.7-instagram-card-ui"
+        estimated_complexity: "medium"
+        depends_on: ["7.2"]
+
+  - wave: 5
+    name: "Full Frontend + RAG"
+    description: "Aba Pesquisa Profunda + integração RAG final — paralelos"
+    can_parallelize: true
+    depends_on_wave: 4
+    stories:
+      - id: "7.8"
+        file: "docs/stories/story-7.8-pesquisa-profunda-tab.md"
+        branch: "feat/7.8-pesquisa-profunda-tab"
+        estimated_complexity: "high"
+        depends_on: ["7.6", "7.7"]
+      - id: "7.9"
+        file: "docs/stories/story-7.9-rag-integration.md"
+        branch: "feat/7.9-rag-integration"
+        estimated_complexity: "low"
+        depends_on: ["7.5", "7.8"]
+
+# Critérios de conclusão do epic
+completion_criteria:
+  - "Criar consultoria com IG → card de diagnóstico aparece em < 3 min"
+  - "Admin acessa /admin/plugins/pesquisa-mercado → todas as seções de config funcionam"
+  - "Admin salva config → persiste e afeta próximas pesquisas"
+  - "Consultora instala plugin → tab Pesquisa de Mercado visível"
+  - "Iniciar pesquisa → stepper atualiza em tempo real → relatório renderizado"
+  - "Relatório indexado no RAG → IA Dedicada usa contexto"
+  - "Créditos debitados corretamente após pesquisa concluída"
+  - "TypeScript: zero erros (npx tsc --noEmit)"
+  - "Backend: zero erros de compilação"
+
+# Instruções especiais para executor
+execution_notes:
+  - "Executar stories em ordem de wave — nunca pular dependências"
+  - "Story 7.1 DEVE estar 100% concluída antes de qualquer outra começar"
+  - "Waves 2, 3, 4, 5 podem ter stories executadas em paralelo (agentes separados)"
+  - "Instalar @mendable/firecrawl-js no backend durante Story 7.2"
+  - "Verificar react-markdown no frontend durante Story 7.8 — instalar se ausente"
+  - "Após cada story: rodar npx tsc --noEmit e garantir zero erros"
+  - "NÃO fazer deploy — apenas localhost"
+  - "Migration 031 deve ser aplicada com: cd supabase && supabase db push"
+  - "Testar fluxo completo após Wave 5: criar consultoria → scan IG → iniciar pesquisa → ver relatório"

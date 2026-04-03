@@ -10,7 +10,10 @@
     "dev": "concurrently -k --names backend,frontend -c auto \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
     "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
     "build": "npm --prefix backend run build && npm --prefix frontend run build",
-    "type-check": "npm --prefix backend run type-check && npm --prefix frontend run type-check"
+    "type-check": "npm --prefix backend run type-check && npm --prefix frontend run type-check",
+    "deploy": "./scripts/deploy.sh all",
+    "deploy:frontend": "./scripts/deploy.sh frontend",
+    "deploy:backend": "./scripts/deploy.sh backend"
   },
   "repository": {
     "type": "git",

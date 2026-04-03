@@ -1,3 +1,27 @@
 {
-  "language": "portuguese"
+  "language": "portuguese",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \".claude/hooks/synapse-wrapper.cjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \".claude/hooks/precompact-wrapper.cjs\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
 }

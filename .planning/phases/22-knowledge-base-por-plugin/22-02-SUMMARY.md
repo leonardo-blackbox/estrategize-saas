@@ -94,6 +94,12 @@ None — no external service configuration required.
 - Phase 24 (helena-frontend) can now build admin UI to list/upload/delete Helena documents against these endpoints
 - Existing plugin config routes (GET /, GET /:slug/config, PUT /:slug/config) remain unaffected
 
+## Self-Check: PASSED
+
+- `backend/src/routes/admin/plugins.ts` — FOUND
+- `22-02-SUMMARY.md` — FOUND
+- commit `cf35a1f` — FOUND
+
 ---
 *Phase: 22-knowledge-base-por-plugin*
 *Completed: 2026-04-01*
