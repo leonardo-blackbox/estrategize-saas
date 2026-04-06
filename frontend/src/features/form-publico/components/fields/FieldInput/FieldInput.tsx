@@ -2,6 +2,7 @@ import type { ApplicationField, ThemeConfig } from '../../../types';
 import { TextInputField } from '../TextInputField';
 import { TextareaInputField } from '../TextareaInputField';
 import { MultipleChoiceField } from '../MultipleChoiceField';
+import { PhoneInputField } from '../PhoneInputField';
 
 interface FieldInputProps {
   field: ApplicationField;
@@ -24,7 +25,7 @@ export function FieldInput({ field, value, onChange, theme, onAutoAdvance }: Fie
     case 'email':
       return <TextInputField field={field} value={strVal} onChange={onChange} theme={theme} type="email" />;
     case 'phone':
-      return <TextInputField field={field} value={strVal} onChange={onChange} theme={theme} type="tel" />;
+      return <PhoneInputField field={field} value={strVal} onChange={onChange} theme={theme} />;
     case 'number':
       return <TextInputField field={field} value={strVal} onChange={onChange} theme={theme} type="number" />;
     case 'date':

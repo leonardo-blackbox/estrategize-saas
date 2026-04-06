@@ -38,10 +38,14 @@ export function useFormNavigation(params: UseFormNavigationParams) {
       setCurrentIndex(firstIdx >= 0 ? firstIdx : 0);
       return;
     }
-    if (currentField.required && currentField.type !== 'message' && currentField.type !== 'welcome') {
+    if (currentField.type !== 'message' && currentField.type !== 'welcome') {
       const v = answersRef.current[currentField.id];
       const hasValue = Array.isArray(v) ? v.length > 0 : Boolean(v);
-      if (!hasValue) { setValidationError('Este campo é obrigatório'); return; }
+      if (currentField.required && !hasValue) { setValidationError('Este campo é obrigatório'); return; }
+      if (currentField.type === 'phone' && hasValue) {
+        const digits = String(v).replace(/\D/g, '');
+        if (digits.length !== 11) { setValidationError('Digite um número válido: DDD + 9 dígitos (ex: 11 99999-9999)'); return; }
+      }
     }
     setValidationError(null);
     if (isLastQuestion) {
