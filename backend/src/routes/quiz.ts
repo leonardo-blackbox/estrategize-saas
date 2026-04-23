@@ -11,6 +11,7 @@ import {
   updateApplication,
   type FieldType,
 } from '../services/applicationService.js';
+import { duplicateOutcomes, listOutcomes, upsertOutcomes } from '../services/quizService.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -39,6 +40,28 @@ const fieldItemSchema = z.object({
   conditional_logic: z.unknown().optional(),
 });
 const bulkFieldsSchema = z.object({ fields: z.array(fieldItemSchema).max(100) });
+const outcomeSchema = z.object({
+  outcome_key: z.string().min(1).max(80),
+  title: z.string().min(1, 'Título é obrigatório').max(200),
+  description: z.string().nullable().optional(),
+  score_min: z.number().int().min(0).max(100),
+  score_max: z.number().int().min(0).max(100),
+  cta_type: z.enum(['url', 'whatsapp', 'none']).default('none'),
+  cta_url: z.string().nullable().optional(),
+  cta_label: z.string().nullable().optional(),
+  image_url: z.string().nullable().optional(),
+  background_color: z.string().nullable().optional(),
+  order: z.number().int().optional().default(0),
+  pixel_event_name: z.string().nullable().optional(),
+}).superRefine((outcome, ctx) => {
+  if (outcome.score_min >= outcome.score_max) {
+    ctx.addIssue({ code: 'custom', message: 'score_min deve ser menor que score_max' });
+  }
+  if (outcome.cta_type !== 'none' && !outcome.cta_url?.trim()) {
+    ctx.addIssue({ code: 'custom', message: 'cta_url é obrigatório para este CTA' });
+  }
+});
+const outcomesSchema = z.object({ outcomes: z.array(outcomeSchema).max(10) });
 
 type QuizData = Awaited<ReturnType<typeof getApplicationById>>;
 
@@ -112,7 +135,26 @@ router.post('/:id/duplicate', async (req: AuthenticatedRequest, res) => {
     const existing = await getOwnedQuiz(req.userId!, paramId(req));
     if (!existing) return res.status(403).json({ error: 'Acesso negado' });
     const data = await duplicateApplication(req.userId!, paramId(req));
+    if (data) await duplicateOutcomes(req.userId!, paramId(req), data.id);
     res.status(201).json({ data });
+  } catch (err) { res.status(500).json({ error: errorMsg(err) }); }
+});
+
+router.get('/:id/outcomes', async (req: AuthenticatedRequest, res) => {
+  try {
+    const data = await listOutcomes(req.userId!, paramId(req));
+    if (data === null) return res.status(403).json({ error: 'Acesso negado' });
+    res.json({ data });
+  } catch (err) { res.status(500).json({ error: errorMsg(err) }); }
+});
+
+router.put('/:id/outcomes', async (req: AuthenticatedRequest, res) => {
+  const parsed = outcomesSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: zodError(parsed.error) });
+  try {
+    const data = await upsertOutcomes(req.userId!, paramId(req), parsed.data.outcomes);
+    if (data === null) return res.status(403).json({ error: 'Acesso negado' });
+    res.json({ data });
   } catch (err) { res.status(500).json({ error: errorMsg(err) }); }
 });
 
