@@ -4,7 +4,7 @@ import { client } from './client.ts';
 // Shared Types
 // ─────────────────────────────────────────────
 
-export type FieldType =
+export type BaseFieldType =
   | 'welcome'
   | 'message'
   | 'short_text'
@@ -16,6 +16,16 @@ export type FieldType =
   | 'number'
   | 'date'
   | 'thank_you';
+
+export type QuizFieldType =
+  | 'image_choice'
+  | 'rating'
+  | 'opinion_scale'
+  | 'yes_no'
+  | 'ranking'
+  | 'slider';
+
+export type FieldType = BaseFieldType | QuizFieldType | (string & {});
 
 export interface ThemeConfig {
   backgroundColor: string;
@@ -46,7 +56,12 @@ export interface FormSettings {
 export interface FieldOption {
   id: string;
   label: string;
+  value?: string;
+  scoreValue?: number;
+  imageUrl?: string;
 }
+
+export type FieldOptions = FieldOption[] | Record<string, unknown>;
 
 export interface ConditionalLogic {
   enabled: boolean;
@@ -67,7 +82,7 @@ export interface ApplicationField {
   title: string;
   description?: string;
   required: boolean;
-  options: FieldOption[] | Record<string, unknown>;
+  options: FieldOptions;
   conditional_logic: ConditionalLogic;
   created_at: string;
   updated_at: string;
@@ -81,6 +96,8 @@ export interface Application {
   status: 'draft' | 'published' | 'archived';
   theme_config: ThemeConfig;
   settings: FormSettings;
+  tool_type?: 'form' | 'quiz';
+  quiz_config?: Record<string, unknown> | null;
   response_count: number;
   fields?: ApplicationField[];
   created_at: string;
@@ -124,6 +141,53 @@ export const DEFAULT_SETTINGS: FormSettings = {
   thankYouTitle: 'Obrigado!',
   thankYouMessage: 'Suas respostas foram recebidas.',
 };
+
+export const DEFAULT_FIELD_OPTIONS: Record<QuizFieldType, Record<string, unknown>> = {
+  image_choice: {
+    choices: [
+      { label: 'Opção 1', value: 'a', imageUrl: '', scoreValue: 0 },
+      { label: 'Opção 2', value: 'b', imageUrl: '', scoreValue: 0 },
+    ],
+    columns: 2,
+  },
+  rating: { max: 5, style: 'star', labelMin: '', labelMax: '' },
+  opinion_scale: {
+    min: 0,
+    max: 10,
+    labelMin: 'Discordo totalmente',
+    labelMax: 'Concordo totalmente',
+    scoreMap: {},
+  },
+  yes_no: {
+    yesLabel: 'Sim',
+    noLabel: 'Não',
+    yesIcon: '👍',
+    noIcon: '👎',
+    yesScoreValue: 10,
+    noScoreValue: 0,
+  },
+  ranking: {
+    items: [
+      { id: '1', label: 'Item 1' },
+      { id: '2', label: 'Item 2' },
+      { id: '3', label: 'Item 3' },
+    ],
+  },
+  slider: { min: 0, max: 100, step: 1, unit: '', scoreRanges: [] },
+};
+
+export const QUIZ_FIELD_TYPE_OPTIONS: Array<{
+  type: QuizFieldType;
+  label: string;
+  icon: 'LayoutGrid' | 'Star' | 'Sliders' | 'ThumbsUp' | 'List' | 'SlidersHorizontal';
+}> = [
+  { type: 'image_choice', label: 'Escolha com Imagem', icon: 'LayoutGrid' },
+  { type: 'rating', label: 'Avaliação', icon: 'Star' },
+  { type: 'opinion_scale', label: 'Escala de Opinião', icon: 'Sliders' },
+  { type: 'yes_no', label: 'Sim / Não', icon: 'ThumbsUp' },
+  { type: 'ranking', label: 'Ranking', icon: 'List' },
+  { type: 'slider', label: 'Slider', icon: 'SlidersHorizontal' },
+];
 
 // ─────────────────────────────────────────────
 // Query Key Factory
