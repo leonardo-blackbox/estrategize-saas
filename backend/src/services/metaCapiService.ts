@@ -27,6 +27,7 @@ export interface CapiEventParams {
   eventTime?: number;
   eventSourceUrl?: string;
   userData: CapiUserData;
+  customData?: Record<string, unknown>;
   testEventCode?: string;
 }
 
@@ -81,6 +82,7 @@ export function sendCapiEvent(params: CapiEventParams): void {
   };
   if (eventId) eventPayload.event_id = eventId;
   if (eventSourceUrl) eventPayload.event_source_url = eventSourceUrl;
+  if (params.customData) eventPayload.custom_data = params.customData;
 
   const payload: Record<string, unknown> = { data: [eventPayload] };
   if (testEventCode) payload.test_event_code = testEventCode;
