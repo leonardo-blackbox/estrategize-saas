@@ -10,6 +10,7 @@ import { cn } from '../../lib/cn.ts';
 const navItems = [
   { to: '/formacao', label: 'Formação' },
   { to: '/ferramentas', label: 'Ferramentas' },
+  { to: '/quiz', label: 'Quiz' },
   { to: '/consultorias', label: 'Consultorias' },
   { to: '/conta', label: 'Conta' },
 ];

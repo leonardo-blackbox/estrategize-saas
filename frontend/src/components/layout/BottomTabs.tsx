@@ -27,6 +27,15 @@ const tabs: TabItem[] = [
     ),
   },
   {
+    to: '/quiz',
+    label: 'Quiz',
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 9.75h6m-6 4.5h3.75M12 3.75c-4.556 0-8.25 3.11-8.25 6.945 0 2.175 1.19 4.116 3.052 5.39l-.552 3.165 3.38-1.69c.75.16 1.544.245 2.37.245 4.556 0 8.25-3.11 8.25-6.945S16.556 3.75 12 3.75Z" />
+      </svg>
+    ),
+  },
+  {
     to: '/consultorias',
     label: 'Consultorias',
     icon: (

@@ -39,6 +39,7 @@ import OpcoesPage from './pages/member/aplicacoes/OpcoesPage.tsx';
 import IntegracaoPage from './pages/member/aplicacoes/IntegracaoPage.tsx';
 import AnalyticsPage from './pages/member/aplicacoes/AnalyticsPage.tsx';
 import FormPublicoPage from './pages/public/FormPublicoPage.tsx';
+import { QuizPage } from './features/quiz/index.ts';
 import { PlanosPage } from './pages/public/PlanosPage.tsx';
 import { CheckoutSucessoPage } from './pages/public/CheckoutSucessoPage.tsx';
 
@@ -102,6 +103,7 @@ export default function App() {
           <Route path="/ferramentas" element={<FerramentasPage />} />
           <Route path="/ferramentas/helena" element={<HelenaPage />} />
           <Route path="/aplicacoes" element={<AplicacoesPage />} />
+          <Route path="/quiz" element={<QuizPage />} />
           <Route path="/reunioes" element={<ReunioesPage />} />
           <Route path="/consultorias" element={<ConsultoriasPage />} />
           <Route path="/consultorias/:id" element={<ConsultoriaDetailPage />} />
