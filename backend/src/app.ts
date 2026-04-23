@@ -25,6 +25,7 @@ import meetingsRouter from './routes/meetings.js';
 import helenaSSERouter from './routes/helenaSSE.js';
 import { pluginsRouter } from './routes/plugins.js';
 import applicationsRouter from './routes/applications.js';
+import quizRouter from './routes/quiz.js';
 import publicFormsRouter from './routes/public/forms.js';
 import publicPlansRouter from './routes/public/plans.js';
 import stripeCheckoutRouter from './routes/stripe/checkout.js';
@@ -143,6 +144,7 @@ app.use('/api/plugins', pluginsRouter);
 // /api/webhooks/recall is registered above (before express.json) with raw body parser
 app.use('/api/webhooks', webhookLimit, webhooksRouter);
 app.use('/api/applications', applicationsRouter);
+app.use('/api/quizzes', quizRouter);
 app.use('/api/applications', assetsRouter);
 app.use('/api/applications', analyticsRouter);
 app.use('/api/templates', templatesRouter);

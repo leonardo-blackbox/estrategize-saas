@@ -15,7 +15,15 @@ export type FieldType =
   | 'multiple_choice'
   | 'number'
   | 'date'
-  | 'thank_you';
+  | 'thank_you'
+  | 'image_choice'
+  | 'rating'
+  | 'opinion_scale'
+  | 'yes_no'
+  | 'ranking'
+  | 'slider';
+
+export type ToolType = 'form' | 'quiz';
 
 export const DEFAULT_THEME = {
   backgroundColor: '#000000',
@@ -79,13 +87,14 @@ async function generateSlug(): Promise<string> {
 
 // ─── Service Functions ───────────────────────────────────────────────────────
 
-export async function listApplications(userId: string) {
+export async function listApplications(userId: string, toolType: ToolType = 'form') {
   const db = ensureDb();
 
   const { data: applications, error } = await db
     .from('applications')
     .select('*, application_fields(count)')
     .eq('user_id', userId)
+    .eq('tool_type', toolType)
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -110,15 +119,20 @@ export async function listApplications(userId: string) {
     if (Array.isArray(raw) && raw.length > 0 && typeof raw[0].count === 'number') {
       fieldCount = raw[0].count;
     }
-    const { application_fields: _dropped, ...rest } = app as typeof app & {
+    const appWithoutFields = { ...(app as typeof app & {
       application_fields: unknown;
-    };
+    }) };
+    delete appWithoutFields.application_fields;
     const liveCount = realCountMap[app.id] ?? 0;
-    return { ...rest, field_count: fieldCount, response_count: liveCount };
+    return { ...appWithoutFields, field_count: fieldCount, response_count: liveCount };
   });
 }
 
-export async function createApplication(userId: string, input: { title: string }) {
+export async function createApplication(
+  userId: string,
+  input: { title: string },
+  toolType: ToolType = 'form',
+) {
   const db = ensureDb();
   const slug = await generateSlug();
 
@@ -129,8 +143,10 @@ export async function createApplication(userId: string, input: { title: string }
       title: input.title,
       slug,
       status: 'draft',
+      tool_type: toolType,
       theme_config: DEFAULT_THEME,
       settings: DEFAULT_SETTINGS,
+      quiz_config: toolType === 'quiz' ? {} : null,
     })
     .select()
     .single();
@@ -265,8 +281,10 @@ export async function duplicateApplication(userId: string, applicationId: string
       title: newTitle,
       slug: newSlug,
       status: 'draft',
+      tool_type: source.tool_type ?? 'form',
       theme_config: source.theme_config,
       settings: source.settings,
+      quiz_config: source.quiz_config ?? null,
     })
     .select()
     .single();
