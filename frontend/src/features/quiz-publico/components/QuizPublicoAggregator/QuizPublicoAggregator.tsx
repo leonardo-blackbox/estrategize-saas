@@ -5,6 +5,8 @@ import { QuizError } from '../QuizError/index.ts';
 import { QuizLoading } from '../QuizLoading/index.ts';
 import { QuizProgressBar } from '../QuizProgressBar/index.ts';
 import { QuizQuestionStep } from '../QuizQuestionStep/index.ts';
+import { QuizResultScreen } from '../QuizResultScreen/index.ts';
+import { QuizScoreReveal } from '../QuizScoreReveal/index.ts';
 import { QuizWelcomeScreen } from '../QuizWelcomeScreen/index.ts';
 import { useQuizPublico } from '../../hooks/useQuizPublico.ts';
 
@@ -27,7 +29,8 @@ export function QuizPublicoAggregator() {
   if (flow.state === 'error' || !flow.quiz) return <QuizError />;
   if (flow.state === 'welcome') return <QuizWelcomeScreen quiz={flow.quiz} onStart={flow.start} />;
   if (flow.state === 'submitting') return <QuizLoading />;
-  if (flow.state === 'score_reveal' || flow.state === 'result') return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">Resultado em construção...</div>;
+  if (flow.state === 'score_reveal') return <QuizScoreReveal score={flow.submitResult?.score ?? 0} onDone={() => flow.setState('result')} />;
+  if (flow.state === 'result') return <QuizResultScreen quiz={flow.quiz} result={flow.submitResult} />;
   if (!currentField) return <QuizError />;
 
   const autoAdvance = (value: unknown) => {
