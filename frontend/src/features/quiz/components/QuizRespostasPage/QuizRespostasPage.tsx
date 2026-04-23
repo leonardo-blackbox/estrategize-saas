@@ -1,3 +1,3 @@
 export function QuizRespostasPage() {
-  return <div className="rounded-[28px] border border-white/10 bg-white/[.04] p-8 text-slate-200">Respostas em construção...</div>;
+  return <div className="rounded-[28px] border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-8 text-[var(--text-primary)]">Respostas em construção...</div>;
 }

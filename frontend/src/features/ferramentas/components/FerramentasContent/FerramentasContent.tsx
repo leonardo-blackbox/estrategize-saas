@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { staggerContainer, staggerItem } from '../../../../lib/motion.ts';
 import { AplicacoesCard } from '../AplicacoesCard';
+import { QuizCard } from '../QuizCard';
 import { ReunioesCard } from '../ReunioesCard';
 import { HelenaCard } from '../HelenaCard';
 
@@ -25,6 +26,7 @@ export function FerramentasContent() {
         </h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <AplicacoesCard />
+          <QuizCard />
           <ReunioesCard />
           <HelenaCard />
         </div>

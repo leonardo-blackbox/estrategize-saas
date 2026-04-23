@@ -49,11 +49,11 @@ export function QuizOutcomesPage() {
     setSelected(0);
   };
 
-  if (isLoading) return <div className="rounded-3xl border border-white/10 bg-white/[.04] p-8 text-slate-300">Carregando resultados...</div>;
+  if (isLoading) return <div className="rounded-3xl border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-8 text-[var(--text-secondary)]">Carregando resultados...</div>;
   return (
     <div className="space-y-5">
       <ScoreRangeBar outcomes={outcomes} />
-      <div className="flex justify-end"><button disabled={outcomes.length >= 10} onClick={addOutcome} className="rounded-full bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 disabled:opacity-40">Adicionar resultado</button></div>
+      <div className="flex justify-end"><button disabled={outcomes.length >= 10} onClick={addOutcome} className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-text)] disabled:opacity-40">Adicionar resultado</button></div>
       <div className="grid gap-5 xl:grid-cols-[1fr_390px]">
         <div className="grid gap-4 md:grid-cols-2">{outcomes.map((outcome, index) => <OutcomeCard key={outcome.outcome_key} outcome={outcome} active={selected === index} onEdit={() => setSelected(index)} onDelete={() => removeOutcome(index)} />)}</div>
         <OutcomeEditorPanel outcome={outcomes[selected]} onChange={updateSelected} saveStatus={saveStatus} />

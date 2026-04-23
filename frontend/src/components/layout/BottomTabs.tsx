@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '../../lib/cn.ts';
 
 interface TabItem {
@@ -27,15 +27,6 @@ const tabs: TabItem[] = [
     ),
   },
   {
-    to: '/quiz',
-    label: 'Quiz',
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 9.75h6m-6 4.5h3.75M12 3.75c-4.556 0-8.25 3.11-8.25 6.945 0 2.175 1.19 4.116 3.052 5.39l-.552 3.165 3.38-1.69c.75.16 1.544.245 2.37.245 4.556 0 8.25-3.11 8.25-6.945S16.556 3.75 12 3.75Z" />
-      </svg>
-    ),
-  },
-  {
     to: '/consultorias',
     label: 'Consultorias',
     icon: (
@@ -55,7 +46,13 @@ const tabs: TabItem[] = [
   },
 ];
 
+function isFerramentasRoute(pathname: string) {
+  return pathname.startsWith('/ferramentas') || pathname.startsWith('/quiz');
+}
+
 export function BottomTabs() {
+  const location = useLocation();
+
   return (
     <nav
       className={cn(
@@ -72,16 +69,19 @@ export function BottomTabs() {
           <NavLink
             key={tab.to}
             to={tab.to}
-            className={({ isActive }) =>
-              cn(
-                'flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-2 min-h-[44px]',
-                'text-[10px] font-medium transition-all duration-200 tracking-tight',
-                'active:scale-[0.92]',
-                isActive
-                  ? 'text-[var(--accent)] font-semibold'
-                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]',
-              )
-            }
+            className={({ isActive }) => {
+              const active = tab.to === '/ferramentas' ? isFerramentasRoute(location.pathname) : isActive;
+              return (
+                cn(
+                  'flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-2 min-h-[44px]',
+                  'text-[10px] font-medium transition-all duration-200 tracking-tight',
+                  'active:scale-[0.92]',
+                  active
+                    ? 'text-[var(--accent)] font-semibold'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]',
+                )
+              );
+            }}
           >
             {tab.icon}
             <span>{tab.label}</span>

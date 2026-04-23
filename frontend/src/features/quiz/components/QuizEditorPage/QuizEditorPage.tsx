@@ -74,8 +74,8 @@ export function QuizEditorPage() {
 
   return (
     <div className="space-y-4">
-      {!hasLead && <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm text-amber-100"><span>📡 Nenhum gatilho de Lead configurado. O evento Lead não será disparado.</span>{suggestedLeadIndex >= 0 && <button onClick={() => setSelected(suggestedLeadIndex)} className="rounded-full bg-amber-200 px-3 py-1 text-xs font-semibold text-slate-950">Configurar</button>}</div>}
-      <div className="flex items-center justify-between text-sm text-slate-300"><span>{fields.length} campos</span><span>{saveStatus === 'saving' ? 'Salvando...' : saveStatus === 'saved' ? 'Salvo' : 'Erro ao salvar'}</span></div>
+      {!hasLead && <div className="flex items-center justify-between gap-3 rounded-2xl border border-[rgba(255,159,10,0.3)] bg-[rgba(255,159,10,0.10)] px-4 py-3 text-sm text-[var(--text-primary)]"><span>📡 Nenhum gatilho de Lead configurado. O evento Lead não será disparado.</span>{suggestedLeadIndex >= 0 && <button onClick={() => setSelected(suggestedLeadIndex)} className="rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-semibold text-[var(--accent-text)]">Configurar</button>}</div>}
+      <div className="flex items-center justify-between text-sm text-[var(--text-secondary)]"><span>{fields.length} campos</span><span>{saveStatus === 'saving' ? 'Salvando...' : saveStatus === 'saved' ? 'Salvo' : 'Erro ao salvar'}</span></div>
       <div className="grid gap-5 xl:grid-cols-[280px_1fr_340px]">
         <QuizFieldsList fields={fields} selected={selected} onSelect={setSelected} onAdd={addField} onRemove={removeField} />
         <QuizLivePreview field={selectedField} />

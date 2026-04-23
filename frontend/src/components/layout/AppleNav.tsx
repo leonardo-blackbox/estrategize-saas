@@ -10,10 +10,13 @@ import { cn } from '../../lib/cn.ts';
 const navItems = [
   { to: '/formacao', label: 'Formação' },
   { to: '/ferramentas', label: 'Ferramentas' },
-  { to: '/quiz', label: 'Quiz' },
   { to: '/consultorias', label: 'Consultorias' },
   { to: '/conta', label: 'Conta' },
 ];
+
+function isFerramentasRoute(pathname: string) {
+  return pathname.startsWith('/ferramentas') || pathname.startsWith('/quiz');
+}
 
 export function AppleNav() {
   const location = useLocation();
@@ -86,15 +89,18 @@ export function AppleNav() {
               <NavLink
                 key={item.to}
                 to={item.to}
-                className={({ isActive }) =>
-                  cn(
-                    'px-3 py-1.5 rounded-full text-[13px] font-medium leading-none whitespace-nowrap',
-                    'transition-all duration-150',
-                    isActive
-                      ? 'bg-[var(--accent)] text-[var(--accent-text)] shadow-sm'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]',
-                  )
-                }
+                className={({ isActive }) => {
+                  const active = item.to === '/ferramentas' ? isFerramentasRoute(location.pathname) : isActive;
+                  return (
+                    cn(
+                      'px-3 py-1.5 rounded-full text-[13px] font-medium leading-none whitespace-nowrap',
+                      'transition-all duration-150',
+                      active
+                        ? 'bg-[var(--accent)] text-[var(--accent-text)] shadow-sm'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]',
+                    )
+                  );
+                }}
               >
                 {item.label}
               </NavLink>
@@ -102,7 +108,7 @@ export function AppleNav() {
           </div>
           {/* Mobile */}
           <span className="lg:hidden text-[14px] font-semibold text-[var(--text-primary)] tracking-[-0.01em] pointer-events-auto">
-            {navItems.find((i) => location.pathname.startsWith(i.to))?.label ?? 'Estrategize'}
+            {isFerramentasRoute(location.pathname) ? 'Ferramentas' : navItems.find((i) => location.pathname.startsWith(i.to))?.label ?? 'Estrategize'}
           </span>
         </div>
 
