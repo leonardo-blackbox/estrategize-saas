@@ -48,6 +48,7 @@ import {
   QuizRespostasPage,
   QuizShell,
 } from './features/quiz/index.ts';
+import { QuizPublicoAggregator } from './features/quiz-publico/index.ts';
 import { PlanosPage } from './pages/public/PlanosPage.tsx';
 import { CheckoutSucessoPage } from './pages/public/CheckoutSucessoPage.tsx';
 
@@ -94,6 +95,7 @@ export default function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/f/:slug" element={<FormPublicoPage />} />
+        <Route path="/q/:slug" element={<QuizPublicoAggregator />} />
         <Route path="/planos" element={<PlanosPage />} />
         <Route path="/checkout/sucesso" element={<CheckoutSucessoPage />} />
 
