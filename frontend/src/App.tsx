@@ -39,7 +39,15 @@ import OpcoesPage from './pages/member/aplicacoes/OpcoesPage.tsx';
 import IntegracaoPage from './pages/member/aplicacoes/IntegracaoPage.tsx';
 import AnalyticsPage from './pages/member/aplicacoes/AnalyticsPage.tsx';
 import FormPublicoPage from './pages/public/FormPublicoPage.tsx';
-import { QuizPage } from './features/quiz/index.ts';
+import {
+  QuizAnalyticsPage,
+  QuizEditorPage,
+  QuizIntegracoesPage,
+  QuizOutcomesPage,
+  QuizPage,
+  QuizRespostasPage,
+  QuizShell,
+} from './features/quiz/index.ts';
 import { PlanosPage } from './pages/public/PlanosPage.tsx';
 import { CheckoutSucessoPage } from './pages/public/CheckoutSucessoPage.tsx';
 
@@ -109,6 +117,22 @@ export default function App() {
           <Route path="/consultorias/:id" element={<ConsultoriaDetailPage />} />
           <Route path="/conta" element={<ContaPage />} />
           <Route path="/creditos" element={<CreditosPage />} />
+        </Route>
+
+        <Route
+          path="/quiz/:id"
+          element={
+            <ProtectedRoute>
+              <QuizShell />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="editor" replace />} />
+          <Route path="editor" element={<QuizEditorPage />} />
+          <Route path="resultados" element={<QuizOutcomesPage />} />
+          <Route path="integracoes" element={<QuizIntegracoesPage />} />
+          <Route path="respostas" element={<QuizRespostasPage />} />
+          <Route path="analytics" element={<QuizAnalyticsPage />} />
         </Route>
 
         {/* ── Application Shell (full-viewport, sem MemberShell) ── */}
