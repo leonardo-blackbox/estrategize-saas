@@ -22,10 +22,11 @@ export function QuizOutcomesPage() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) return undefined;
     const initial = data.length > 0 ? data : defaults;
-    setOutcomes(initial);
+    const id = window.setTimeout(() => setOutcomes(initial), 0);
     if (data.length === 0) saveQuizOutcomes(quiz.id, defaults).catch(() => undefined);
+    return () => window.clearTimeout(id);
   }, [data, isLoading, quiz.id]);
 
   const scheduleSave = (next: QuizOutcome[]) => {
@@ -38,7 +39,7 @@ export function QuizOutcomesPage() {
   const updateSelected = (updates: Partial<QuizOutcome>) => scheduleSave(outcomes.map((outcome, index) => index === selected ? { ...outcome, ...updates } : outcome));
   const addOutcome = () => {
     if (outcomes.length >= 10) return;
-    const next = { outcome_key: `resultado-${Date.now()}`, title: 'Novo resultado', score_min: 0, score_max: 100, cta_type: 'none' as const, order: outcomes.length * 10 };
+    const next = { outcome_key: `resultado-${outcomes.length + 1}`, title: 'Novo resultado', score_min: 0, score_max: 100, cta_type: 'none' as const, order: outcomes.length * 10 };
     setSelected(outcomes.length);
     scheduleSave([...outcomes, next]);
   };

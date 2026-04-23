@@ -16,8 +16,17 @@ export function useQuizPublico(slug: string, preview: boolean) {
   const submitMutation = useQuizSubmit(slug);
   const questionFields = (query.data?.fields ?? []).filter((field) => !['welcome', 'thank_you'].includes(field.type));
 
-  useEffect(() => { if (query.data) { setState('welcome'); trackQuiz(slug, 'view', metadata).catch(() => undefined); } }, [metadata, query.data, slug]);
-  useEffect(() => { if (query.error) setState('error'); }, [query.error]);
+  useEffect(() => {
+    if (!query.data) return undefined;
+    const id = window.setTimeout(() => setState('welcome'), 0);
+    trackQuiz(slug, 'view', metadata).catch(() => undefined);
+    return () => window.clearTimeout(id);
+  }, [metadata, query.data, slug]);
+  useEffect(() => {
+    if (!query.error) return undefined;
+    const id = window.setTimeout(() => setState('error'), 0);
+    return () => window.clearTimeout(id);
+  }, [query.error]);
 
   const start = () => { setState('questions'); trackQuiz(slug, 'start', metadata).catch(() => undefined); };
   const answerCurrent = (value: unknown) => {
