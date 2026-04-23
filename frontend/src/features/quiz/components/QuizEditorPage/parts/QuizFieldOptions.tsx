@@ -1,0 +1,31 @@
+import type { EditorField } from '../types.ts';
+
+interface QuizFieldOptionsProps { field?: EditorField; onChange: (updates: Partial<EditorField>) => void; onLeadTrigger: () => void; }
+
+type Choice = { label: string; value: string; scoreValue?: number; imageUrl?: string };
+function asOptions(field?: EditorField) { return (field?.options ?? {}) as Record<string, unknown>; }
+function asChoices(field?: EditorField): Choice[] { return ((asOptions(field).choices as Choice[] | undefined) ?? []); }
+function asItems(field?: EditorField) { return ((asOptions(field).items as Array<{ id: string; label: string }> | undefined) ?? []); }
+
+export function QuizFieldOptions({ field, onChange, onLeadTrigger }: QuizFieldOptionsProps) {
+  if (!field) return <aside className="rounded-[28px] border border-white/10 bg-white/[.04] p-6 text-slate-400">Selecione um campo.</aside>;
+  const options = asOptions(field);
+  const updateOptions = (patch: Record<string, unknown>) => onChange({ options: { ...options, ...patch } });
+  const updateChoice = (index: number, patch: Partial<Choice>) => updateOptions({ choices: asChoices(field).map((choice, i) => i === index ? { ...choice, ...patch } : choice) });
+  const leadActive = Boolean(options.triggerLeadEvent);
+
+  return (
+    <aside className="rounded-[28px] border border-white/10 bg-white/[.04] p-5 text-slate-200">
+      <h2 className="text-sm font-semibold uppercase tracking-[.24em] text-cyan-200">Opções</h2>
+      <label className="mt-4 block text-sm">Título<input value={field.title} onChange={(event) => onChange({ title: event.target.value })} className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-white outline-none" /></label>
+      <label className="mt-4 flex items-start gap-3 rounded-2xl bg-white/5 p-3 text-sm"><input type="checkbox" checked={field.required} onChange={(event) => onChange({ required: event.target.checked })} />Obrigatório</label>
+      <label className="mt-3 flex items-start gap-3 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-sm"><input type="checkbox" checked={leadActive} onChange={onLeadTrigger} />📡 Gatilho de Lead <span className="text-xs text-slate-400">{['phone', 'email'].includes(field.type) ? 'Recomendado' : ''}</span></label>
+      {['multiple_choice', 'image_choice'].includes(field.type) && <div className="mt-5 space-y-3"><p className="text-xs font-semibold uppercase tracking-[.2em] text-slate-400">Alternativas + Pontos</p>{asChoices(field).map((choice, index) => <div key={index} className="rounded-2xl bg-white/5 p-3"><input value={choice.label} onChange={(event) => updateChoice(index, { label: event.target.value })} className="w-full rounded-xl bg-slate-950/60 px-3 py-2 text-sm" /><div className="mt-2 grid grid-cols-2 gap-2"><input type="number" min={0} max={10} value={choice.scoreValue ?? 0} onChange={(event) => updateChoice(index, { scoreValue: Number(event.target.value) })} className="rounded-xl bg-slate-950/60 px-3 py-2 text-sm" />{field.type === 'image_choice' && <input value={choice.imageUrl ?? ''} onChange={(event) => updateChoice(index, { imageUrl: event.target.value })} placeholder="URL imagem" className="rounded-xl bg-slate-950/60 px-3 py-2 text-sm" />}</div></div>)}<button onClick={() => updateOptions({ choices: [...asChoices(field), { label: `Opção ${asChoices(field).length + 1}`, value: crypto.randomUUID(), scoreValue: 0 }] })} className="rounded-full bg-white/10 px-3 py-2 text-sm">Adicionar opção</button></div>}
+      {field.type === 'yes_no' && <div className="mt-5 grid gap-2"><input value={String(options.yesLabel ?? 'Sim')} onChange={(event) => updateOptions({ yesLabel: event.target.value })} className="rounded-xl bg-white/5 px-3 py-2" /><input value={String(options.noLabel ?? 'Não')} onChange={(event) => updateOptions({ noLabel: event.target.value })} className="rounded-xl bg-white/5 px-3 py-2" /><input type="number" value={Number(options.yesScoreValue ?? 10)} onChange={(event) => updateOptions({ yesScoreValue: Number(event.target.value) })} className="rounded-xl bg-white/5 px-3 py-2" /><input type="number" value={Number(options.noScoreValue ?? 0)} onChange={(event) => updateOptions({ noScoreValue: Number(event.target.value) })} className="rounded-xl bg-white/5 px-3 py-2" /></div>}
+      {field.type === 'rating' && <div className="mt-5 grid gap-2"><select value={Number(options.max ?? 5)} onChange={(event) => updateOptions({ max: Number(event.target.value) })} className="rounded-xl bg-slate-900 px-3 py-2"><option value={5}>5</option><option value={10}>10</option></select><select value={String(options.style ?? 'star')} onChange={(event) => updateOptions({ style: event.target.value })} className="rounded-xl bg-slate-900 px-3 py-2"><option value="star">Estrelas</option><option value="number">Números</option><option value="emoji">Emojis</option></select></div>}
+      {field.type === 'opinion_scale' && <div className="mt-5 grid grid-cols-2 gap-2"><input type="number" value={Number(options.min ?? 0)} onChange={(event) => updateOptions({ min: Number(event.target.value) })} className="rounded-xl bg-white/5 px-3 py-2" /><input type="number" value={Number(options.max ?? 10)} onChange={(event) => updateOptions({ max: Number(event.target.value) })} className="rounded-xl bg-white/5 px-3 py-2" /></div>}
+      {field.type === 'ranking' && <div className="mt-5 space-y-2">{asItems(field).map((item, index) => <input key={item.id} value={item.label} onChange={(event) => updateOptions({ items: asItems(field).map((it, i) => i === index ? { ...it, label: event.target.value } : it) })} className="w-full rounded-xl bg-white/5 px-3 py-2" />)}<button onClick={() => updateOptions({ items: [...asItems(field), { id: crypto.randomUUID(), label: 'Novo item' }] })} className="rounded-full bg-white/10 px-3 py-2 text-sm">Adicionar item</button></div>}
+      {field.type === 'slider' && <div className="mt-5 grid grid-cols-2 gap-2">{['min', 'max', 'step'].map((key) => <input key={key} type="number" value={Number(options[key] ?? 0)} onChange={(event) => updateOptions({ [key]: Number(event.target.value) })} className="rounded-xl bg-white/5 px-3 py-2" />)}<input value={String(options.unit ?? '')} onChange={(event) => updateOptions({ unit: event.target.value })} placeholder="Unidade" className="rounded-xl bg-white/5 px-3 py-2" /></div>}
+    </aside>
+  );
+}
