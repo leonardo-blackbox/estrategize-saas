@@ -3,7 +3,6 @@ import { staggerContainer } from '../../../../lib/motion.ts';
 import { useFormacao } from '../../hooks/useFormacao';
 import { FormacaoHero } from '../FormacaoHero';
 import { FormacaoSectionBlock } from '../FormacaoSectionBlock';
-import { FormacaoJourney } from '../FormacaoJourney';
 
 export function FormacaoPage() {
   const prefersReducedMotion = useReducedMotion();
@@ -27,10 +26,18 @@ export function FormacaoPage() {
         variants={containerVariants}
         initial="initial"
         animate="animate"
-        className="w-full max-w-5xl mx-auto pb-24 lg:pb-12"
+        className="w-full max-w-6xl mx-auto pb-24 lg:pb-12"
       >
         <div className={homeSettings?.subtitle ? 'mb-4 sm:mb-6' : 'mb-8 sm:mb-12'}>
-          <h1 className="text-[32px] sm:text-[40px] font-semibold tracking-tight text-[var(--color-text-primary)]">
+          <h1
+            className="text-[28px] sm:text-[32px] font-bold tracking-tight leading-none"
+            style={{
+              background: 'linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
             {homeSettings?.title ?? 'Forma\u00e7\u00e3o'}
           </h1>
           {homeSettings?.subtitle && (
@@ -61,7 +68,6 @@ export function FormacaoPage() {
           />
         )}
 
-        <FormacaoJourney />
       </motion.div>
     </>
   );

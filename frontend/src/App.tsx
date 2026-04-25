@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { useAuthStore } from './stores/authStore.ts';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { AdminRoute } from './components/AdminRoute.tsx';
+import { CustomCursor } from './components/ui/CustomCursor/index.ts';
 
 // Theme store import — side-effect: applies data-theme on <html> at module load
 import './stores/themeStore.ts';
@@ -87,6 +88,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <CustomCursor />
       <ScrollToTop />
       <Toaster position="top-right" richColors />
       <Routes>

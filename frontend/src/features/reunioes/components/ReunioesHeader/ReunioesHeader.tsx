@@ -16,7 +16,17 @@ export function ReunioesHeader({ totalMeetings, onNewMeeting }: ReunioesHeaderPr
           <span>/</span>
           <span className="text-[var(--text-secondary)]">Reuniões</span>
         </div>
-        <h1 className="text-lg font-semibold text-[var(--text-primary)]">Reuniões</h1>
+        <h1
+          className="text-[28px] sm:text-[32px] font-bold tracking-tight leading-none"
+          style={{
+            background: 'linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          Reuniões
+        </h1>
         <p className="text-sm text-[var(--text-secondary)]">
           {totalMeetings === 0
             ? 'Nenhuma reunião registrada.'

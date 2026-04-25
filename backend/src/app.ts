@@ -21,6 +21,7 @@ import adminStripeRouter from './routes/admin/stripe.js';
 import adminKnowledgeRouter from './routes/admin/knowledge.js';
 import adminPluginsRouter from './routes/admin/plugins.js';
 import consultancyDocumentsRouter from './routes/consultancyDocuments.js';
+import centralRouter from './routes/central.js';
 import meetingsRouter from './routes/meetings.js';
 import helenaSSERouter from './routes/helenaSSE.js';
 import { pluginsRouter } from './routes/plugins.js';
@@ -35,6 +36,7 @@ import assetsRouter from './routes/assets.js';
 import analyticsRouter from './routes/analytics.js';
 import templatesRouter from './routes/templates.js';
 import marketResearchRouter from './routes/marketResearch.js';
+import proxyRouter from './routes/proxy.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
 export const app = express();
@@ -128,6 +130,7 @@ app.get('/health/db', async (_req, res) => {
 app.use('/auth', authLimit, authRouter);
 app.use('/api/consultancies', consultanciesRouter);
 app.use('/api/consultancies/:consultancyId/documents', consultancyDocumentsRouter);
+app.use('/api/consultancies/:consultancyId/central', centralRouter);
 app.use('/api/credits', creditsRouter);
 app.use('/api/courses', coursesRouter);
 app.use('/api/admin/courses', adminLimit, adminCoursesRouter);
@@ -155,6 +158,7 @@ app.use('/api/plans', publicPlansRouter);
 app.use('/api/stripe', stripeCheckoutRouter);
 app.use('/api/account', accountRouter);
 app.use('/api/market-research', marketResearchRouter);
+app.use('/api/proxy', proxyRouter);
 
 app.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {
   res.json({ user_id: req.userId });

@@ -63,6 +63,7 @@ export function ConsultoriaCard({ consultancy: c, onArchive, onDelete, onUnarchi
         {hovered && (
           <CardActions
             consultancyId={c.id}
+            clientName={c.client_name ?? ''}
             isArchived={isArchived}
             onArchive={onArchive}
             onDelete={onDelete}

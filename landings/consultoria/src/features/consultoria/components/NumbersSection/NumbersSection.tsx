@@ -12,9 +12,9 @@ interface NumberItem {
 }
 
 const NUMBERS: NumberItem[] = [
-  { prefix: 'R$', value: 23547, separator: '.', label: 'Faturamento em 1 mês\n(Raquel — resultado real)' },
   { prefix: 'R$', value: 22000, separator: '.', label: 'Em 1 dia de carrinho aberto\n(Thaís Bessa — sem anúncio)' },
-  { value: 7, suffix: ' turmas', label: 'Em 1 ano a partir do zero\n(Thaís — método aplicado)' },
+  { value: 30, suffix: ' dias', label: 'Para ver alunas qualificadas\nchegando no seu WhatsApp' },
+  { value: 8, suffix: ' vagas', label: 'Por mês. Máximo.\nCada consultoria é do zero.' },
 ];
 
 function formatNumber(n: number, separator?: string): string {

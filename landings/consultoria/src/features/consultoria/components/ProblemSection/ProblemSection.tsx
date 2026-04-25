@@ -2,9 +2,9 @@ import { motion } from 'framer-motion';
 import { staggerReveal, fadeInUp } from '@/lib/motion';
 
 const PAINS = [
-  'Mais um mês. Mais um ano. Com o mesmo sonho parado no mesmo lugar.',
-  'Não é falta de curso. Não é falta de talento. É falta de alguém que olhe para o SEU caso.',
-  'Enquanto você espera o momento certo, outras professoras estão fechando turma.',
+  'Você posta. Recebe "quanto é?" e a aluna some. Isso não é azar. É comunicação errada.',
+  'Cada mês sem resolver o posicionamento é mais um mês afastando a aluna certa e queimando a audiência com conteúdo que todo mundo já posta.',
+  'Você sabe que precisa de conteúdo estratégico. O problema é que trava no como fazer na prática, sozinha, todo dia.',
 ];
 
 export function ProblemSection() {
@@ -21,10 +21,10 @@ export function ProblemSection() {
           O problema
         </motion.p>
         <motion.h2 className="landing-section-title" variants={fadeInUp}>
-          Adiar também<br />é uma decisão.
+          Você não está vendendo menos<br />por falta de técnica.
         </motion.h2>
         <motion.p className="landing-section-sub" variants={fadeInUp}>
-          E ela tem um preço que a maioria ignora.
+          Quem te segue ainda não consegue enxergar o quanto você é boa.
         </motion.p>
       </motion.div>
 

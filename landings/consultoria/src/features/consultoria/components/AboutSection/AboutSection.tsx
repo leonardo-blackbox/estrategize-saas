@@ -43,16 +43,17 @@ export function AboutSection() {
           <motion.h2 className="landing-section-title" variants={fadeInUp}>Iris Matos</motion.h2>
           <motion.div className="landing-about-divider" variants={fadeInUp} />
           <motion.p className="landing-section-sub" variants={fadeInUp}>
-            Consultora estratégica especializada em educadoras da beleza. Ajudo nail designers
-            e profissionais da beleza a transformarem o que já sabem em negócios digitais lucrativos.
+            A maioria dos consultores te ensina estratégia genérica. Estratégia genérica não
+            comunica o que é único em você. Comunica o que todo mundo já está postando.
           </motion.p>
           <motion.p className="landing-section-sub" variants={fadeInUp}>
-            Não trabalho com receitas genéricas. Cada estratégia é construída a partir da
-            realidade, do nicho e dos objetivos específicos de cada cliente.
+            Na consultoria eu faço o oposto. Primeiro mergulho na sua técnica e experiência
+            para encontrar o que só você tem. Depois traduzo isso em um sistema de conteúdo
+            que você consegue executar sozinha, sem travar, sem passar horas pensando no que falar.
           </motion.p>
           <motion.p className="landing-section-sub" variants={fadeInUp}>
-            Resultados como R$22.000 em um dia de carrinho aberto e turmas fechando em questão
-            de semanas não são coincidência. São estratégia bem executada.
+            É por isso que as clientes param de ouvir "está caro" e começam a fechar alunas
+            que já chegam querendo especificamente o que elas ensinam.
           </motion.p>
         </motion.div>
       </div>

@@ -6,8 +6,8 @@ import { Button } from '../../../../components/ui/Button.tsx';
 import { useConsultoriaDetail } from '../../hooks/useConsultoriaDetail.ts';
 import { ConsultoriaDetailSkeleton } from '../ConsultoriaDetailSkeleton';
 import { ConsultoriaDetailHeader } from '../ConsultoriaDetailHeader';
-import { ConsultoriaDetailInsights } from '../ConsultoriaDetailInsights';
 import { ConsultoriaDetailTabs } from '../ConsultoriaDetailTabs';
+import { ConsultoriaDetailInstagramInsights } from '../ConsultoriaDetailInstagramInsights';
 import { ConsultoriaDetailOverview } from '../ConsultoriaDetailOverview';
 import { ConsultoriaDetailDados } from '../ConsultoriaDetailDados';
 import { ConsultoriaDetailDiagnosis } from '../ConsultoriaDetailDiagnosis';
@@ -20,14 +20,15 @@ import { ConsultoriaDetailMemory } from '../ConsultoriaDetailMemory';
 import { PluginInstallerModal } from '../PluginInstallerModal';
 import { ConsultoriaDetailHelena } from '../ConsultoriaDetailHelena/ConsultoriaDetailHelena';
 import { ConsultoriaDetailPesquisa } from '../ConsultoriaDetailPesquisa/index.ts';
+import { ConsultoriaCentral } from '../ConsultoriaCentral/index.ts';
 
 export function ConsultoriaDetailPage() {
   const [showPluginInstaller, setShowPluginInstaller] = useState(false);
 
   const {
-    id, navigate, activeTab, setActiveTab,
+    id, activeTab, setActiveTab,
     consultancy, consultancyLoading, consultancyError,
-    insights, aiContextLoading, recentMeetings, generateDiagnosis,
+    insights, recentMeetings,
     tabs, hasMeetingsPlugin,
   } = useConsultoriaDetail();
 
@@ -50,29 +51,14 @@ export function ConsultoriaDetailPage() {
     );
   }
 
-  const handleNewMeeting = () => {
-    if (hasMeetingsPlugin) {
-      setActiveTab('meetings');
-    } else {
-      setShowPluginInstaller(true);
-    }
-  };
-
   return (
     <>
       <motion.div variants={staggerContainer} initial="initial" animate="animate" className="max-w-6xl mx-auto space-y-6 pb-16">
         <motion.div variants={staggerItem}>
           <ConsultoriaDetailHeader
             consultancy={consultancy}
-            onEditClick={() => navigate(`/consultorias/${id}/editar`)}
-            onGenerateDiagnosis={generateDiagnosis}
-            onNewMeeting={handleNewMeeting}
-            hasMeetingsPlugin={hasMeetingsPlugin}
+            onEditClick={() => setActiveTab('dados')}
           />
-        </motion.div>
-
-        <motion.div variants={staggerItem}>
-          <ConsultoriaDetailInsights insights={insights} isLoading={aiContextLoading} />
         </motion.div>
 
         <motion.div variants={staggerItem}>
@@ -89,9 +75,11 @@ export function ConsultoriaDetailPage() {
             <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
               {activeTab === 'overview' && <ConsultoriaDetailOverview consultancy={consultancy} insights={insights} recentMeetings={recentMeetings} onTabChange={setActiveTab} />}
+              {activeTab === 'central' && id && <ConsultoriaCentral consultancyId={id} />}
               {activeTab === 'ai' && id && <ConsultoriaDetailChat consultancyId={id} clientName={consultancy.client_name} />}
               {activeTab === 'meetings' && id && hasMeetingsPlugin && <ConsultoriaDetailMeetings consultancyId={id} />}
               {activeTab === 'documentos' && id && <ConsultoriaDocumentos consultancyId={id} />}
+              {activeTab === 'instagram-insights' && id && <ConsultoriaDetailInstagramInsights consultancyId={id} instagram={consultancy.instagram ?? null} />}
               {activeTab === 'diagnosis' && id && <ConsultoriaDetailDiagnosis consultancyId={id} />}
               {activeTab === 'actions' && id && <ConsultoriaDetailActions consultancyId={id} />}
               {activeTab === 'deliverables' && id && <ConsultoriaDetailDeliverables consultancyId={id} />}

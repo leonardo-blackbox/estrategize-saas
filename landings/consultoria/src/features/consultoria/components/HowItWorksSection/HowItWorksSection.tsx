@@ -4,18 +4,18 @@ import { staggerReveal, fadeInUp } from '@/lib/motion';
 const STEPS = [
   {
     number: '01',
-    title: 'DIAGNÓSTICO',
-    description: 'Olho para o SEU caso, entendo o SEU nicho, mapeio os gargalos reais do seu negócio.',
+    title: 'MERGULHO NA TÉCNICA',
+    description: 'Eu mergulho na sua técnica e experiência para encontrar o que só você tem. O método que você desenvolveu ao longo dos anos e a transformação que suas alunas querem viver. Esse é o ouro que ninguém mais tem.',
   },
   {
     number: '02',
-    title: 'ESTRATÉGIA',
-    description: 'Crio as estratégias específicas para você. Não receita pronta — o que funciona para a sua realidade.',
+    title: 'SISTEMA DE CONTEÚDO',
+    description: 'Traduzo isso em um sistema que você executa sozinha todo dia, sem travar. Cada dia da semana tem seu tipo de conteúdo. Cada tipo tem uma pasta com mais de 50 assuntos prontos para você usar.',
   },
   {
     number: '03',
-    title: 'RESULTADO',
-    description: 'Em poucos dias você já está executando e vendo o resultado acontecer.',
+    title: 'EXECUÇÃO E RESULTADO',
+    description: 'Em até 10 dias úteis você já consegue produzir conteúdo no dia seguinte. Em 30 dias executando, alunas qualificadas chegam no seu WhatsApp querendo especificamente o que você ensina, sem questionar o preço.',
   },
 ];
 
@@ -32,7 +32,7 @@ export function HowItWorksSection() {
           Como funciona
         </motion.p>
         <motion.h2 className="landing-section-title" variants={fadeInUp}>
-          Três passos.<br />Resultado real.
+          O mecanismo único.<br />Não é receita genérica.
         </motion.h2>
       </motion.div>
 

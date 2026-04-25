@@ -51,7 +51,17 @@ export function CreditosContent() {
       className="max-w-3xl mx-auto space-y-6"
     >
       <motion.div variants={staggerItem}>
-        <h1 className="text-lg font-semibold text-[var(--text-primary)]">Créditos</h1>
+        <h1
+          className="text-[28px] sm:text-[32px] font-bold tracking-tight leading-none"
+          style={{
+            background: 'linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}
+        >
+          Créditos
+        </h1>
       </motion.div>
 
       {/* Balance card */}

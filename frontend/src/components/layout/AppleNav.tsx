@@ -62,7 +62,7 @@ export function AppleNav() {
           "h-12 rounded-full",
           "flex items-center justify-between relative px-2",
           "bg-[var(--glass-bg)] border border-[var(--glass-border)]",
-          "backdrop-blur-[40px] saturate-[1.8]",
+          "backdrop-blur-[40px] backdrop-saturate-[1.8]",
           "[-webkit-backdrop-filter:blur(40px)_saturate(1.8)]",
           "transition-shadow duration-300"
         )}

@@ -46,11 +46,7 @@ export function ConsultoriasHeader({ isLoading, activeCount, onCreateClick }: Co
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
         onClick={onCreateClick}
-        className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)] text-[13px] font-semibold text-white transition-all"
-        style={{
-          background: 'linear-gradient(135deg, #00c896 0%, #00a87a 100%)',
-          boxShadow: '0 4px 16px -2px rgba(0,200,150,0.35), 0 1px 0 rgba(255,255,255,0.15) inset',
-        }}
+        className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)] text-[13px] font-semibold transition-all bg-[var(--accent)] text-[var(--accent-text)] shadow-sm"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

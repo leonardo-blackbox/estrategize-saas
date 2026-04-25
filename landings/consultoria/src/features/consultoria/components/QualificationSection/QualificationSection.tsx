@@ -2,17 +2,17 @@ import { motion } from 'framer-motion';
 import { staggerReveal, fadeInUp, checklistItem } from '@/lib/motion';
 
 const FOR_ITEMS = [
-  'Você já atua como nail designer ou profissional da beleza',
-  'Já tem técnica e experiência — não é iniciante do zero',
-  'Quer criar ou já tem um curso/mentoria, mas não sabe como vender',
-  'Está cansada de trabalhar muito e ganhar pouco',
-  'Quer parar de depender apenas do atendimento físico',
+  'Já tem curso e já vendeu pelo menos 2 vezes',
+  'Fatura acima de R$8k por mês no atendimento e sua agenda está estável',
+  'Sabe que precisa de posicionamento e conteúdo estratégico mas trava no como fazer na prática',
+  'É executora, não procrastina e entende que resultado vem de consistência',
 ];
 
 const NOT_FOR_ITEMS = [
-  'Você ainda está começando do zero, sem experiência',
-  'Quer uma mentoria genérica de marketing',
-  'Não está disposta a implementar o que for recomendado',
+  'Ainda não vendeu curso',
+  'Fatura menos de R$5k por mês',
+  'Ainda não tem uma agenda estável',
+  'Quer que alguém execute por você diariamente',
 ];
 
 export function QualificationSection() {
@@ -68,7 +68,7 @@ export function QualificationSection() {
             ))}
           </ul>
           <p className="landing-qual-note">
-            A consultoria é personalizada e as vagas são limitadas para garantir atenção dedicada a cada cliente.
+            A consultoria é construída do zero para cada cliente. Por isso atendo no máximo 8 por mês.
           </p>
         </motion.div>
       </div>

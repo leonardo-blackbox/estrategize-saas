@@ -33,7 +33,7 @@ export function ConsultoriasPage() {
 
   return (
     <>
-      <div className="space-y-5">
+      <div className="max-w-6xl mx-auto space-y-5">
         <ConsultoriasHeader
           isLoading={isLoading}
           activeCount={stats.active}

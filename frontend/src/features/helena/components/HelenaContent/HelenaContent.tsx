@@ -24,7 +24,17 @@ export function HelenaContent() {
           🤖
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-[var(--text-primary)]">Helena</h1>
+          <h1
+            className="text-[28px] sm:text-[32px] font-bold tracking-tight leading-none"
+            style={{
+              background: 'linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            Helena
+          </h1>
           <p className="text-sm text-[var(--text-secondary)]">Copiloto de reuniões com IA</p>
         </div>
       </motion.div>

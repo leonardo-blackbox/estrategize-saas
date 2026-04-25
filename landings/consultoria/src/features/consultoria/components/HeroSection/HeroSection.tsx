@@ -48,12 +48,13 @@ export function HeroSection() {
         </motion.p>
 
         <motion.h1 variants={staggerItem}>
-          Você tem a técnica.<br />O que falta<br />é <em>estratégia.</em>
+          Seu curso é excelente.<br />O problema é que seu<br />perfil não comunica <em>isso.</em>
         </motion.h1>
 
         <motion.p className="landing-hero-sub" variants={staggerItem}>
-          Mais de 50 educadoras da beleza já descobriram que o problema nunca foi o curso.
-          Foi a falta de direção para o que já sabem.
+          Por isso você atrai aluna que acha caro, pergunta preço e some.
+          A consultoria resolve isso em 30 dias, te entregando exatamente o que postar,
+          em qual dia e com qual ângulo.
         </motion.p>
 
         <motion.div className="landing-hero-actions" variants={staggerItem}>
@@ -61,7 +62,7 @@ export function HeroSection() {
             Quero aplicar para a consultoria →
           </a>
           <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
-            Vagas limitadas · Resposta em até 48h
+            Vagas limitadas. Resposta em até 48h.
           </span>
         </motion.div>
       </motion.div>

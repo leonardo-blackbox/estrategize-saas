@@ -5,3 +5,4 @@ export { Modal } from './Modal.tsx';
 export { SegmentedControl } from './SegmentedControl.tsx';
 export { Input, Textarea } from './Input.tsx';
 export { ThemeToggle } from './ThemeToggle.tsx';
+export { DynamicGrid, GRID_CONFIG } from './DynamicGrid.tsx';
