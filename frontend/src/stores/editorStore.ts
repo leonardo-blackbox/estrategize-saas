@@ -37,6 +37,12 @@ const DEFAULT_FIELD_TITLES: Record<FieldType, string> = {
   number: 'Informe um número',
   date: 'Selecione uma data',
   thank_you: 'Obrigado!',
+  image_choice: 'Escolha uma imagem',
+  rating: 'Como você avalia?',
+  opinion_scale: 'Em uma escala de 0 a 10',
+  yes_no: 'Sim ou Não?',
+  ranking: 'Ordene as opções',
+  slider: 'Selecione um valor',
 };
 
 function buildDefaultField(type: FieldType, position: number): LocalField {

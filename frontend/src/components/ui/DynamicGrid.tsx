@@ -52,10 +52,13 @@ export function DynamicGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const canvasMaybe = canvasRef.current;
+    if (!canvasMaybe) return;
+    const ctxMaybe = canvasMaybe.getContext('2d');
+    if (!ctxMaybe) return;
+    // TS doesn't narrow across nested function declarations — cast to non-null aliases
+    const canvas: HTMLCanvasElement = canvasMaybe;
+    const ctx: CanvasRenderingContext2D = ctxMaybe;
 
     const {
       speed, dotSize, gridSize,

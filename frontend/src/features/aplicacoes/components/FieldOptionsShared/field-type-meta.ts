@@ -12,6 +12,12 @@ export const FIELD_TYPE_META: Record<FieldType, { label: string; icon: string }>
   number: { label: 'Número', icon: '#' },
   date: { label: 'Data', icon: '📅' },
   thank_you: { label: 'Agradecimento', icon: '✓' },
+  image_choice: { label: 'Escolha por Imagem', icon: '🖼️' },
+  rating: { label: 'Avaliação', icon: '★' },
+  opinion_scale: { label: 'Escala de Opinião', icon: '📊' },
+  yes_no: { label: 'Sim ou Não', icon: '✓✗' },
+  ranking: { label: 'Ranking', icon: '⇅' },
+  slider: { label: 'Slider', icon: '⇔' },
 };
 
 export const TYPE_BADGE_COLORS: Record<string, { bg: string; text: string }> = {

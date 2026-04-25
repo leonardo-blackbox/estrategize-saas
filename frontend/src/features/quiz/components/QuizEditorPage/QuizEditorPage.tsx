@@ -19,7 +19,7 @@ function serialize(fields: EditorField[]) {
     description: field.description,
     required: field.required,
     options: field.options,
-    conditional_logic: field.conditional_logic ?? {},
+    conditional_logic: field.conditional_logic ?? { enabled: false, conditions: [] },
     position: index * 10,
   }));
 }

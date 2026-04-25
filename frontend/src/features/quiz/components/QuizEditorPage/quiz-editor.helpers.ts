@@ -1,5 +1,7 @@
-import { DEFAULT_FIELD_OPTIONS, type FieldType, type QuizFieldType } from '../../../../api/applications.ts';
+import { DEFAULT_FIELD_OPTIONS, type FieldType, type QuizFieldType, type FieldOptions, type ConditionalLogic } from '../../../../api/applications.ts';
 import type { EditorField } from './types.ts';
+
+const EMPTY_CONDITIONAL_LOGIC: ConditionalLogic = { enabled: false, conditions: [] };
 
 export const FIELD_LABELS: Record<string, string> = {
   welcome: 'Boas-vindas', message: 'Mensagem', short_text: 'Texto curto', long_text: 'Texto longo',
@@ -17,19 +19,19 @@ const questionTitles: Record<string, string> = {
   message: 'Mensagem', welcome: 'Bem-vindo(a)!', thank_you: 'Obrigado!',
 };
 
-export function defaultOptions(type: FieldType): unknown {
+export function defaultOptions(type: FieldType): FieldOptions {
   if (type === 'multiple_choice') return { choices: [{ label: 'Opção 1', value: 'a', scoreValue: 0 }, { label: 'Opção 2', value: 'b', scoreValue: 0 }] };
-  if (type in DEFAULT_FIELD_OPTIONS) return DEFAULT_FIELD_OPTIONS[type as QuizFieldType];
+  if (type in DEFAULT_FIELD_OPTIONS) return DEFAULT_FIELD_OPTIONS[type as QuizFieldType] as FieldOptions;
   if (type === 'welcome') return { buttonText: 'Começar', description: '' };
   return {};
 }
 
 export function createEditorField(type: FieldType, position: number): EditorField {
-  return { localId: crypto.randomUUID(), position, type, title: questionTitles[type] ?? 'Nova pergunta', required: false, options: defaultOptions(type), conditional_logic: {} };
+  return { localId: crypto.randomUUID(), position, type, title: questionTitles[type] ?? 'Nova pergunta', required: false, options: defaultOptions(type), conditional_logic: EMPTY_CONDITIONAL_LOGIC };
 }
 
 export function toEditorField(field: Partial<EditorField>): EditorField {
-  return { localId: crypto.randomUUID(), type: field.type ?? 'short_text', title: field.title ?? '', required: field.required ?? false, options: field.options ?? {}, ...field };
+  return { localId: crypto.randomUUID(), type: field.type ?? 'short_text', title: field.title ?? '', required: field.required ?? false, options: field.options ?? {}, conditional_logic: field.conditional_logic ?? EMPTY_CONDITIONAL_LOGIC, ...field };
 }
 
 export function withoutLeadOnOthers(fields: EditorField[], activeLocalId: string) {

@@ -12,6 +12,12 @@ const FIELD_TYPE_META: Record<FieldType, { label: string; icon: string }> = {
   number: { label: 'Numero', icon: '#' },
   date: { label: 'Data', icon: 'Dt' },
   thank_you: { label: 'Agradecimento', icon: '\u2713' },
+  image_choice: { label: 'Imagem', icon: 'Im' },
+  rating: { label: 'Avaliacao', icon: '\u2605' },
+  opinion_scale: { label: 'Escala', icon: '\u25bd' },
+  yes_no: { label: 'Sim/Nao', icon: 'Y/N' },
+  ranking: { label: 'Ranking', icon: '\u21c5' },
+  slider: { label: 'Slider', icon: '\u21d4' },
 };
 
 const TYPE_BADGE_COLORS: Record<string, { bg: string; text: string }> = {

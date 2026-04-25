@@ -23,7 +23,7 @@ export function QuizResultScreen({ quiz, result }: { quiz: PublicQuizData; resul
         <h1 className="mt-6 text-4xl font-semibold tracking-[-.04em]">{title}</h1>
         <p className="mt-4 whitespace-pre-line text-lg leading-8 text-slate-100">{description}</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          {outcome?.cta_type !== 'none' && ctaHref && <a href={ctaHref} target="_blank" rel="noopener noreferrer" aria-label={outcome.cta_label ?? 'Abrir próximo passo'} className="min-h-11 rounded-full bg-cyan-300 px-6 py-3 font-semibold text-slate-950">{outcome.cta_label || 'Quero saber mais'}</a>}
+          {outcome && outcome.cta_type !== 'none' && ctaHref && <a href={ctaHref} target="_blank" rel="noopener noreferrer" aria-label={outcome.cta_label ?? 'Abrir próximo passo'} className="min-h-11 rounded-full bg-cyan-300 px-6 py-3 font-semibold text-slate-950">{outcome.cta_label || 'Quero saber mais'}</a>}
           <button onClick={share} className="min-h-11 rounded-full bg-white/10 px-6 py-3 font-semibold text-white">Compartilhar quiz</button>
         </div>
       </section>

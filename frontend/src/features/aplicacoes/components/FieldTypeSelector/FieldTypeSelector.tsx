@@ -19,6 +19,12 @@ const FIELD_TYPE_META: Record<FieldType, { label: string; icon: string; category
   number:          { label: 'Número',         icon: '#',   category: 'basic' },
   date:            { label: 'Data',           icon: 'Dt',  category: 'basic' },
   thank_you:       { label: 'Agradecimento',  icon: '✓',   category: 'structure' },
+  image_choice:    { label: 'Imagem',          icon: 'Im',  category: 'choice' },
+  rating:          { label: 'Avaliação',       icon: '★',   category: 'choice' },
+  opinion_scale:   { label: 'Escala',          icon: '▽',   category: 'choice' },
+  yes_no:          { label: 'Sim/Não',         icon: 'Y/N', category: 'choice' },
+  ranking:         { label: 'Ranking',         icon: '⇅',   category: 'choice' },
+  slider:          { label: 'Slider',          icon: '⇔',   category: 'choice' },
 };
 
 const SECTIONS: { title: string; types: FieldType[] }[] = [
