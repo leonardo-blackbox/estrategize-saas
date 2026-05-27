@@ -201,6 +201,30 @@ router.post('/:id/diagnose', async (req: AuthenticatedRequest, res) => {
   }
 });
 
+// Diagnóstico enriquecido com dados oficiais Meta + última pesquisa de mercado
+router.post('/:id/diagnose/with-insights', async (req: AuthenticatedRequest, res) => {
+  try {
+    const userId = req.userId!;
+    const consultancyId = paramId(req);
+    const consultancy = await getConsultancy(userId, consultancyId);
+    if (!consultancy) { res.status(404).json({ error: 'Consultancy not found' }); return; }
+    const existing = await getDiagnosisByConsultancy(userId, consultancyId);
+    if (existing) { res.status(409).json({ error: 'Diagnosis already exists. Use PUT to update.' }); return; }
+    const diagnosis = await withCreditCharge(userId, DIAGNOSIS_CREDIT_COST, async () =>
+      createDiagnosis(userId, consultancyId, consultancy.title, consultancy.client_name, { enrichWithInsights: true }),
+      { idempotencyKey: `diagnosis-enriched:${consultancyId}:v1`, referenceId: consultancyId, description: `Enriched AI diagnosis for "${consultancy.title}"` },
+    );
+    res.status(201).json({ data: diagnosis });
+  } catch (err) {
+    const error = err as Error & { statusCode?: number };
+    if (error.statusCode === 402 || error.message?.includes('Insufficient credits')) {
+      res.status(402).json({ error: 'Insufficient credits' });
+    } else {
+      res.status(500).json({ error: error.message ?? 'Unknown error' });
+    }
+  }
+});
+
 router.get('/:id/diagnose', async (req: AuthenticatedRequest, res) => {
   try {
     const diagnosis = await getDiagnosisByConsultancy(req.userId!, paramId(req));

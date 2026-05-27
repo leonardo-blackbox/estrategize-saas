@@ -33,6 +33,16 @@ export function generateDiagnosis(consultancyId: string): Promise<{ data: Diagno
 }
 
 /**
+ * Generate a new diagnosis enriched with official Meta data + market research.
+ * Epic 10, Story 10.6.
+ */
+export function generateDiagnosisWithInsights(consultancyId: string): Promise<{ data: Diagnosis }> {
+  return apiFetch(`/api/consultancies/${consultancyId}/diagnose/with-insights`, {
+    method: 'POST',
+  });
+}
+
+/**
  * Get the latest diagnosis for a consultancy
  */
 export function getDiagnosis(consultancyId: string): Promise<{ data: Diagnosis }> {

@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '../lib/supabaseAdmin.js';
 import { generateDiagnosis, type DiagnosisContent } from './irisAIService.js';
+import { buildInstagramContext, buildMarketResearchContext } from './irisContextService.js';
 
 export interface DiagnosisRecord {
   id: string;
@@ -22,6 +23,7 @@ export async function createDiagnosis(
   consultancyId: string,
   title: string,
   clientName?: string | null,
+  options: { enrichWithInsights?: boolean } = {},
 ): Promise<DiagnosisRecord> {
   if (!supabaseAdmin) {
     throw new Error('Supabase not initialized');
@@ -39,8 +41,23 @@ export async function createDiagnosis(
     throw new Error(`Consultancy not found or unauthorized: ${consultancyId}`);
   }
 
+  // Build optional contexts (oficial Meta + última market research)
+  let instagramContext = null;
+  let marketResearchContext = null;
+  if (options.enrichWithInsights) {
+    [instagramContext, marketResearchContext] = await Promise.all([
+      buildInstagramContext(consultancyId),
+      buildMarketResearchContext(consultancyId),
+    ]);
+  }
+
   // Generate diagnosis via OpenAI
-  const { content, tokensUsed } = await generateDiagnosis(title, clientName);
+  const { content, tokensUsed, enriched } = await generateDiagnosis({
+    title,
+    clientName: clientName ?? null,
+    instagramContext,
+    marketResearchContext,
+  });
 
   // Save diagnosis to database
   const { data, error } = await supabaseAdmin
@@ -48,7 +65,9 @@ export async function createDiagnosis(
     .insert({
       user_id: userId,
       consultancy_id: consultancyId,
-      content,
+      content: enriched
+        ? { ...content, _enriched: true, _enriched_at: new Date().toISOString() }
+        : content,
       is_edited: false,
       version: 1,
       tokens_used: tokensUsed,

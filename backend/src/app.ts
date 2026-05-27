@@ -36,6 +36,9 @@ import assetsRouter from './routes/assets.js';
 import analyticsRouter from './routes/analytics.js';
 import templatesRouter from './routes/templates.js';
 import marketResearchRouter from './routes/marketResearch.js';
+import metaOAuthRouter from './routes/metaOAuth.js';
+import metaInsightsRouter from './routes/metaInsights.js';
+import adminMetaSnapshotRouter from './routes/admin/metaSnapshot.js';
 import proxyRouter from './routes/proxy.js';
 import { requireAuth, type AuthenticatedRequest } from './middleware/auth.js';
 
@@ -158,6 +161,9 @@ app.use('/api/plans', publicPlansRouter);
 app.use('/api/stripe', stripeCheckoutRouter);
 app.use('/api/account', accountRouter);
 app.use('/api/market-research', marketResearchRouter);
+app.use('/api/meta', metaOAuthRouter);
+app.use('/api/meta/insights', metaInsightsRouter);
+app.use('/api/admin/meta/snapshot', adminLimit, adminMetaSnapshotRouter);
 app.use('/api/proxy', proxyRouter);
 
 app.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res) => {

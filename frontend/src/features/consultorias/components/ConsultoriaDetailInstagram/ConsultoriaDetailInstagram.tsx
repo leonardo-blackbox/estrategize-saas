@@ -1,5 +1,6 @@
 import { useInstagramSnapshot } from '../../hooks/useInstagramSnapshot.ts';
 import type { InstagramProfileData } from '../../../../types/market-intelligence.ts';
+import { ConnectInstagramButton } from '../ConnectInstagramButton';
 
 const API_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3010';
 
@@ -61,25 +62,37 @@ function PostsGrid({ data }: { data: InstagramProfileData }) {
 export function ConsultoriaDetailInstagram({ consultancyId, instagram }: Props) {
   const { snapshot, isLoading } = useInstagramSnapshot(consultancyId);
 
-  if (!instagram) return null;
-
-  const handle = instagram.replace(/^@/, '');
-
-  if (isLoading || snapshot?.status === 'pending' || snapshot?.status === 'running') {
-    return <PostsSkeleton handle={handle} />;
-  }
-
-  if (snapshot?.status === 'failed') {
+  if (!instagram) {
     return (
-      <div className="rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-4">
-        <p className="text-xs text-amber-400">Não foi possível carregar os posts. Verifique se a conta é pública.</p>
+      <div className="space-y-3">
+        <ConnectInstagramButton consultancyId={consultancyId} />
       </div>
     );
   }
 
-  if (snapshot?.status === 'done' && snapshot.data) {
-    return <PostsGrid data={snapshot.data} />;
-  }
+  const handle = instagram.replace(/^@/, '');
 
-  return null;
+  const apifyContent = (() => {
+    if (isLoading || snapshot?.status === 'pending' || snapshot?.status === 'running') {
+      return <PostsSkeleton handle={handle} />;
+    }
+    if (snapshot?.status === 'failed') {
+      return (
+        <div className="rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-surface-1)] p-4">
+          <p className="text-xs text-amber-400">Não foi possível carregar os posts. Verifique se a conta é pública.</p>
+        </div>
+      );
+    }
+    if (snapshot?.status === 'done' && snapshot.data) {
+      return <PostsGrid data={snapshot.data} />;
+    }
+    return null;
+  })();
+
+  return (
+    <div className="space-y-3">
+      <ConnectInstagramButton consultancyId={consultancyId} />
+      {apifyContent}
+    </div>
+  );
 }

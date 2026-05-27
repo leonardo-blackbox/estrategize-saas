@@ -1,0 +1,168 @@
+epic_id: "EPIC-10"
+epic_name: "Meta API Foundation (Onda 1)"
+prd_file: "docs/prd/epic-10-meta-foundation.md"
+version: "1.0"
+created: "2026-05-26"
+status: "ready_for_execution"
+
+# Execução em 4 waves
+# Wave 1 (10.1) bloqueia tudo
+# Wave 2 (10.2 + 10.3) paraleliza após 10.1
+# Wave 3 (10.4 + 10.5) depende de 10.3 (e 10.5 também de 10.2 para ConnectInstagramButton)
+# Wave 4 (10.6) depende de 10.3
+
+waves:
+  - wave: 1
+    name: "Foundation Schema"
+    description: "Migration 035 com 5 tabelas + RLS + pgcrypto"
+    can_parallelize: false
+    notes: "Story 10.1 DEVE estar 100% concluída antes de qualquer outra começar. Inclui pgcrypto setup."
+    stories:
+      - id: "10.1"
+        file: "docs/stories/story-10.1-meta-foundation-migration.md"
+        branch: "feat/10.1-meta-foundation-migration"
+        estimated_complexity: "high"
+        agent: "@data-engineer"
+        notes: "Bloqueia todas as demais. 5 tabelas + RLS owner-only + pgcrypto + indexes."
+
+  - wave: 2
+    name: "OAuth + Insights Service"
+    description: "OAuth flow completo + serviço de leitura da Graph API"
+    can_parallelize: true
+    depends_on_wave: 1
+    notes: "10.2 e 10.3 podem rodar em paralelo APÓS 10.1. 10.2 entrega o frontend de conexão; 10.3 entrega backend de leitura."
+    stories:
+      - id: "10.2"
+        file: "docs/stories/story-10.2-meta-oauth-flow.md"
+        branch: "feat/10.2-meta-oauth-flow"
+        estimated_complexity: "high"
+        depends_on: ["10.1"]
+        parallel_with: ["10.3"]
+        agent: "@dev"
+        notes: "OAuth start + callback + refresh + webhook deauthorize + ConnectInstagramButton."
+
+      - id: "10.3"
+        file: "docs/stories/story-10.3-meta-insights-service.md"
+        branch: "feat/10.3-meta-insights-service"
+        estimated_complexity: "high"
+        depends_on: ["10.1"]
+        parallel_with: ["10.2"]
+        agent: "@dev"
+        notes: "metaInsightsService + cache + 3 endpoints REST. Pode rodar com mock de token enquanto 10.2 não termina."
+
+  - wave: 3
+    name: "Snapshot Cron + UI Panel"
+    description: "Cron diário + cron stories 6h + upgrade do painel"
+    can_parallelize: true
+    depends_on_wave: 2
+    notes: "10.4 e 10.5 paralelizam. 10.5 também depende de 10.2 (ConnectInstagramButton)."
+    stories:
+      - id: "10.4"
+        file: "docs/stories/story-10.4-meta-snapshot-cron.md"
+        branch: "feat/10.4-meta-snapshot-cron"
+        estimated_complexity: "medium"
+        depends_on: ["10.3"]
+        parallel_with: ["10.5"]
+        agent: "@dev"
+        notes: "metaSnapshotService + cron diário 03:00 BRT + cron stories 6h + endpoint admin manual."
+
+      - id: "10.5"
+        file: "docs/stories/story-10.5-instagram-insights-panel-upgrade.md"
+        branch: "feat/10.5-instagram-insights-panel-upgrade"
+        estimated_complexity: "high"
+        depends_on: ["10.2", "10.3"]
+        parallel_with: ["10.4"]
+        agent: "@dev"
+        notes: "7 novos micro-módulos + hook useMetaInsights + fallback Apify. Coordenação com @ux-design-expert para mockups."
+
+  - wave: 4
+    name: "Iris Diagnosis Forense"
+    description: "irisAIService consome dados oficiais"
+    can_parallelize: false
+    depends_on_wave: 3
+    notes: "Story 10.6 fecha a Onda 1 entregando o killer feature: diagnóstico Iris com evidência numérica oficial."
+    stories:
+      - id: "10.6"
+        file: "docs/stories/story-10.6-iris-diagnosis-with-meta.md"
+        branch: "feat/10.6-iris-diagnosis-with-meta"
+        estimated_complexity: "medium"
+        depends_on: ["10.3"]
+        agent: "@dev"
+        notes: "Overload do generateDiagnosis() + endpoint + botão na tab Diagnosis."
+
+dependencies:
+  external:
+    - name: "App Meta — Advanced Access nas permissões"
+      blocking: true
+      owner: "Leonardo Rodrigues"
+      notes: "Validar antes de Story 10.2. Permissões: instagram_basic, instagram_manage_insights, pages_read_engagement, pages_show_list, business_management."
+
+    - name: "pgcrypto habilitado no Supabase"
+      blocking: true
+      owner: "@data-engineer"
+      notes: "Verificar via SELECT * FROM pg_available_extensions WHERE name='pgcrypto'. Habilitar via CREATE EXTENSION IF NOT EXISTS pgcrypto na migration."
+
+    - name: "META_TOKEN_ENCRYPTION_KEY gerada e setada"
+      blocking: true
+      owner: "@devops"
+      notes: "openssl rand -hex 32. Setar em Railway env vars antes do deploy."
+
+    - name: "META_APP_ID, META_APP_SECRET, META_OAUTH_REDIRECT_URI configurados"
+      blocking: true
+      owner: "@devops"
+      notes: "Configurar redirect URI no app Meta também: https://app.estrategize.co/api/meta/oauth/callback."
+
+  internal:
+    - name: "ConsultoriaDetailInstagramInsights existente continua funcionando"
+      blocking: false
+      notes: "Story 10.5 modifica em modo aditivo — mantém fallback Apify."
+
+    - name: "irisAIService existente continua funcionando"
+      blocking: false
+      notes: "Story 10.6 adiciona overload — chamadas antigas seguem funcionando."
+
+quality_gates:
+  - gate: "after_wave_1"
+    checks:
+      - "Migration aplica via supabase db push sem erros"
+      - "5 tabelas criadas com RLS"
+      - "pgcrypto encrypt/decrypt funciona em teste manual"
+
+  - gate: "after_wave_2"
+    checks:
+      - "OAuth flow completo funciona em ambiente staging com 1 conta real"
+      - "Token long-lived salvo encriptado no banco"
+      - "metaInsightsService.fetchAccountInsights() retorna dados reais"
+      - "Rate limit handler testado (mock 429)"
+
+  - gate: "after_wave_3"
+    checks:
+      - "Cron diário roda em staging e popula instagram_insights_daily"
+      - "Painel mostra dados oficiais para consultoria conectada"
+      - "Painel mostra fallback Apify para consultoria sem conexão"
+
+  - gate: "after_wave_4"
+    checks:
+      - "Diagnóstico Iris com flag = true contém evidências numéricas"
+      - "Backwards compatibility: diagnóstico sem flag funciona como antes"
+      - "Smoke test E2E: connect → wait cron → generate diagnosis → verify content"
+
+risks_tracking:
+  high:
+    - "App Meta sem Advanced Access em alguma permissão"
+    - "Token refresh falha silenciosamente"
+    - "LGPD compliance gap"
+  medium:
+    - "Rate limit estoura em produção"
+    - "Snapshot cron falha intermitentemente"
+    - "Apify continua sendo cobrado em consultorias sem conexão"
+  low:
+    - "Conflito visual entre modos oficial e Apify"
+
+constitutional_compliance:
+  article_I_cli_first: "All operations via CLI tools (psql, supabase, openssl)"
+  article_II_agent_authority: "@data-engineer for migration, @dev for code, @devops for env vars and deploy"
+  article_III_story_driven: "All 6 stories defined, tracked, validated"
+  article_IV_no_invention: "Every feature traces to research doc 12 in Obsidian + Meta API official docs"
+  article_V_quality_first: "Quality gates after each wave"
+  article_VI_absolute_imports: "Apply in frontend code (Story 10.5)"

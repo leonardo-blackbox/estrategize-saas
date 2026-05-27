@@ -1,4 +1,17 @@
 import { useInstagramSnapshot } from '../../hooks/useInstagramSnapshot.ts';
+import { useMetaConnection } from '../../hooks/useMetaConnection.ts';
+import { useMetaInsights } from '../../hooks/useMetaInsights.ts';
+import { ConnectInstagramButton } from '../ConnectInstagramButton';
+import {
+  OfficialDataBadge,
+  HeroMetricsOfficial,
+  AudienceDemographicsPanel,
+  EngagedVsFollowersGap,
+  ReelsRetentionPanel,
+  SavesSharesBreakdown,
+  PostingHeatmap,
+  StoriesPanel,
+} from '../MetaInsightsPanels';
 import type { InstagramProfileData, InstagramLatestPost } from '../../../../types/market-intelligence.ts';
 
 const API_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3010';
@@ -193,38 +206,77 @@ function InsightsContent({ data, scrapedAt }: { data: InstagramProfileData; scra
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+function OfficialInsights({ consultancyId }: { consultancyId: string }) {
+  const { account, media, audience, isLoading } = useMetaInsights(consultancyId, true);
+
+  if (isLoading) {
+    return <Card><p className="text-sm text-[var(--text-tertiary)]">Carregando insights oficiais...</p></Card>;
+  }
+  if (!account || !media || !audience) {
+    return <Card><p className="text-sm text-[var(--text-tertiary)]">Aguardando o primeiro snapshot...</p></Card>;
+  }
+
+  return (
+    <div className="space-y-4">
+      <OfficialDataBadge capturedAt={account.capturedAt} />
+      <HeroMetricsOfficial data={account} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <AudienceDemographicsPanel data={audience} />
+        <EngagedVsFollowersGap data={audience} />
+      </div>
+      <SavesSharesBreakdown media={media} />
+      <ReelsRetentionPanel media={media} />
+      <PostingHeatmap media={media} />
+      <StoriesPanel media={media} />
+    </div>
+  );
+}
+
 export function ConsultoriaDetailInstagramInsights({ consultancyId, instagram }: Props) {
   const { snapshot, isLoading } = useInstagramSnapshot(consultancyId);
+  const { connection } = useMetaConnection(consultancyId);
+  const hasOfficial = connection?.status === 'active';
+
+  if (hasOfficial) {
+    return (
+      <div className="space-y-4">
+        <ConnectInstagramButton consultancyId={consultancyId} />
+        <OfficialInsights consultancyId={consultancyId} />
+      </div>
+    );
+  }
 
   if (!instagram) {
     return (
-      <Card>
-        <p className="text-sm text-[var(--text-secondary)]">Nenhum perfil do Instagram cadastrado para esta consultoria.</p>
-      </Card>
+      <div className="space-y-3">
+        <ConnectInstagramButton consultancyId={consultancyId} />
+        <Card>
+          <p className="text-sm text-[var(--text-secondary)]">Nenhum perfil do Instagram cadastrado. Conecte para ver dados oficiais ou cadastre o @ para usar o modo legado.</p>
+        </Card>
+      </div>
     );
   }
 
   const handle = instagram.replace(/^@/, '');
 
-  if (isLoading || snapshot?.status === 'pending' || snapshot?.status === 'running') {
-    return (
-      <Card>
-        <p className="text-sm text-[var(--text-tertiary)]">Analisando o perfil @{handle}...</p>
-      </Card>
-    );
-  }
+  const apifyContent = (() => {
+    if (isLoading || snapshot?.status === 'pending' || snapshot?.status === 'running') {
+      return <Card><p className="text-sm text-[var(--text-tertiary)]">Analisando o perfil @{handle}...</p></Card>;
+    }
+    if (snapshot?.status === 'failed') {
+      return <Card><p className="text-sm text-amber-400">Não foi possível analisar o perfil. Verifique se a conta é pública.</p></Card>;
+    }
+    if (snapshot?.status === 'done' && snapshot.data) {
+      return <InsightsContent data={snapshot.data} scrapedAt={snapshot.scraped_at} />;
+    }
+    return null;
+  })();
 
-  if (snapshot?.status === 'failed') {
-    return (
-      <Card>
-        <p className="text-sm text-amber-400">Não foi possível analisar o perfil. Verifique se a conta é pública.</p>
-      </Card>
-    );
-  }
-
-  if (snapshot?.status === 'done' && snapshot.data) {
-    return <InsightsContent data={snapshot.data} scrapedAt={snapshot.scraped_at} />;
-  }
-
-  return null;
+  return (
+    <div className="space-y-3">
+      <ConnectInstagramButton consultancyId={consultancyId} />
+      <div className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wider px-1">Modo legado (via scraping)</div>
+      {apifyContent}
+    </div>
+  );
 }
