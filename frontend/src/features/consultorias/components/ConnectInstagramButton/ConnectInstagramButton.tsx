@@ -15,7 +15,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 export function ConnectInstagramButton({ consultancyId }: Props) {
-  const { connection, isLoading, connect, isConnecting, disconnect, isDisconnecting } =
+  const { connection, isLoading, connect, isConnecting, connectError, disconnect, isDisconnecting } =
     useMetaConnection(consultancyId);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -85,6 +85,15 @@ export function ConnectInstagramButton({ consultancyId }: Props) {
               >
                 {isConnecting ? 'Abrindo Instagram...' : 'Conectar Instagram'}
               </button>
+              {connectError && (
+                <div className="mt-3 rounded bg-red-500/10 border border-red-500/30 px-3 py-2 text-[12px] text-red-300">
+                  <p className="font-semibold mb-0.5">Falha ao iniciar OAuth</p>
+                  <p className="text-red-300/80">{connectError.message}</p>
+                  <p className="text-red-300/60 mt-1 text-[11px]">
+                    Geralmente significa que as env vars Meta não estão configuradas no servidor. Veja DevTools → Network → Response da última chamada.
+                  </p>
+                </div>
+              )}
               <p className="mt-2 text-[11px] text-[var(--text-muted)]">
                 Requer conta Instagram Business.
               </p>

@@ -25,6 +25,10 @@ export function useMetaConnection(consultancyId: string | undefined) {
     onSuccess: ({ url }) => {
       window.location.href = url;
     },
+    onError: (err) => {
+      // eslint-disable-next-line no-console
+      console.error('[meta-oauth] start failed', err);
+    },
   });
 
   const disconnect = useMutation({
@@ -42,6 +46,7 @@ export function useMetaConnection(consultancyId: string | undefined) {
     refetch: query.refetch,
     connect: connect.mutate,
     isConnecting: connect.isPending,
+    connectError: connect.error as Error | null,
     disconnect: disconnect.mutate,
     isDisconnecting: disconnect.isPending,
   };
